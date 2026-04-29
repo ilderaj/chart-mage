@@ -16,7 +16,7 @@
   - 已将 `origin/main` 合入 `dev`，解决 `package-lock.json` 冲突，运行 `npm run build:check` 与 `npx wrangler deploy --dry-run` 通过后推送 `origin/dev`。
   - 已确认 `origin/dev` build `ad9ca3eb-0585-4dce-a342-73536f8c4802` 成功，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
   - 已执行 `git fetch --prune origin`，清理删除后的 `origin/cloudflare/workers-autoconfig` remote-tracking ref。
-  - 已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`；PR 的 `Workers Builds: chartmage` 检查已触发 build `a8e6a27e-4d11-4035-b818-3500644b93c2`，当前仍在运行。
+  - 已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`；后续 PR head `6aa4d12` 触发 build `7ccd4eda-7ab6-4829-b495-71130f30c4a4`，结果为 `success`，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
   - 已将部署 runbook 更新为 Worker primary / Pages fallback，避免继续把 direct-upload Pages 描述为当前自动发布目标。
 - Files created/modified:
   - docs/deployment/cloudflare-pages.md (updated)
@@ -35,6 +35,7 @@
   - 已运行 `git diff --check`，无空白错误。
   - 已运行 `npm run build:check`，Gulp build 通过；仅出现既有 `fs.Stats constructor` deprecation warning。
   - 已确认本次 build 未产生需要提交的 `dist` 改动，工作区仅剩 runbook 与 planning 文件变更。
+  - 已确认 PR head `6aa4d12` 的 Worker build `7ccd4eda-7ab6-4829-b495-71130f30c4a4` 成功；准备推送最终状态记录并等待最后一轮 PR check 后合并。
 - Files created/modified:
   - docs/deployment/cloudflare-pages.md (updated)
   - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
