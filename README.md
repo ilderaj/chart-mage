@@ -94,9 +94,36 @@ They cover sequence creation plus rename/delete behavior in the charts drawer an
 - `scripts/` - helper scripts for Maestro installation and smoke execution.
 - `planning/` - internal task planning notes for active maintenance work.
 
-## Deployment Notes
+For future UAT coverage, add more YAML flows under `.maestro/flows/` and run them with the same CLI entrypoint.
 
-The current deployment direction is Cloudflare Pages with `main` as the production branch target. The first deployment path serves the static `app/` directory directly to avoid coupling production availability to the legacy Gulp build chain.
+## Deployment
+
+Production is currently running on Cloudflare Pages at `https://chart-mage.pages.dev` via a temporary direct-upload fallback.
+
+- Current mode: direct-upload fallback
+- Production URL: `https://chart-mage.pages.dev`
+- Intended production branch: `main`
+- Git integration / automatic preview deployments: temporarily blocked until the Cloudflare Pages GitHub installation is repaired
+- First-stage publish surface: `app/`
+- Operational runbook: [docs/deployment/cloudflare-pages.md](docs/deployment/cloudflare-pages.md)
+
+### Local preview
+
+```bash
+npm run serve:app
+```
+
+Open `http://127.0.0.1:8000/index.html`.
+
+### Legacy build pipeline
+
+The repository still includes the historical Gulp pipeline for local build verification:
+
+```bash
+npm run build:check
+```
+
+Cloudflare Pages is not required to use that pipeline for the first production rollout.
 
 ## Technology Credit
 

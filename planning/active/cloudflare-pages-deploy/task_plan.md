@@ -5,12 +5,12 @@
 - 达成目标状态：当变更合并并推送到 `origin/main` 后，生产站点自动更新；PR / 非生产分支自动生成 preview 部署；站点可通过 `*.pages.dev` 或自有域名访问。
 
 ## Current State
-Status: blocked
+Status: active
 Archive Eligible: no
 Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but the original target state is only partially complete. Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
 
 ## Current Phase
-Phase 6
+Phase 8
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
@@ -27,6 +27,7 @@ Phase 6
 5. 配置 production / preview 分支行为与 `pages.dev` 域名（待执行）
 6. 绑定自有域名并完成上线验证、回滚说明和运维约定（待执行）
 7. direct-upload fallback 后的仓库与 Cloudflare 收敛计划（已完成计划，待执行）
+8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（执行中）
 
 ## Risk Assessment
 
@@ -59,6 +60,7 @@ Phase 6
 | 生产 Pages 项目名固定为 `chart-mage`，生产 URL 为 `https://chart-mage.pages.dev` | 该项目已成功创建并完成首个 production deployment，后续文档与运维都以此为准 |
 | direct-upload fallback 不再被视作最终形态 | Cloudflare 文档确认 Direct Upload 项目不能切换成 Git integration；最终自动发布需要新建 Git-integrated project |
 | 仓库收敛必须先于 Git 集成重试 | 当前 `main` 缺少部署文件，Cloudflare 后续从 Git 构建必须以 main 上的真实发布契约为准 |
+| 本次合并以 `main` 为用户指定目标分支 | 用户明确要求将 `cloudflare-pages-deploy` worktree 合回 local `main`，并推送到 `origin/main` |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |

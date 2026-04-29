@@ -42,6 +42,11 @@
 - Cloudflare Direct Upload 文档明确说明：选择 Direct Upload 后，不能之后切换到 Git integration；要恢复 main 自动发布和 PR preview，必须新建 Git-integrated Pages 项目，或删除 / 替换当前 fallback 项目。
 - 当前仓库 `main` 尚未包含 deployment branch 上的 `app/_headers`、`docs/deployment/cloudflare-pages.md`、README 部署说明和 `serve:app` / `build:check` 脚本调整；这些变更存在于 `cloudflare-pages-deploy` 分支提交 `1612f07`、`24ef1a3`、`8b4ff4c`。
 - 当前 `main` 已包含 planning 更新提交 `5cea6d6`，因此后续合入 `cloudflare-pages-deploy` 时不能直接覆盖 planning files；应只合入非 planning 的仓库部署文件，或者手工解决冲突。
+- 2026-04-29 合并前复核：本地 `main` 与 `origin/main` 同步在 `6a57f9d`，主工作区无未提交改动。
+- 2026-04-29 合并前复核：`cloudflare-pages-deploy` worktree 位于 `.worktrees/cloudflare-pages-deploy`，分支头为 `8b4ff4c`。
+- 2026-04-29 合并前复核：`main..cloudflare-pages-deploy` 有 3 个待合入提交：`1612f07`、`24ef1a3`、`8b4ff4c`；`cloudflare-pages-deploy..main` 有后续 README、planning、legacy dependency、editor demo 和 dist 刷新提交，合并时需要保留 main 侧新状态。
+- 2026-04-29 合并执行复核：`README.md` 是唯一内容冲突；解决方案保留 main 的项目布局、Technology Credit 和 License，同时加入 Cloudflare Pages direct-upload fallback 部署说明。
+- 2026-04-29 合并验证复核：`npm run build:check`、本地 `index.html?maestro=1` / `intro.html` HTTP probes、`npm run uat:smoke` 均通过。
 
 ## Technical Decisions
 | Decision | Rationale |

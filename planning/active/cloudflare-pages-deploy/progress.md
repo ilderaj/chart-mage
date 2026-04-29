@@ -2,6 +2,24 @@
 
 ## 2026-04-29
 
+### Phase 8: Merge cloudflare-pages-deploy into main
+- **Status:** in_progress
+- Actions taken:
+  - 已读取现有任务计划、发现记录和进度记录，确认这是同一个 Cloudflare Pages deploy 收敛任务的集成阶段。
+  - 已确认主工作区当前在 `main`，本地无未提交改动，且 `origin/main` 与本地 `main` 同步在 `6a57f9d`。
+  - 已确认 `cloudflare-pages-deploy` worktree 仍存在于 `.worktrees/cloudflare-pages-deploy`，分支头为 `8b4ff4c`。
+  - 已确认待合入分支相对 `main` 的提交为 `1612f07`、`24ef1a3`、`8b4ff4c`；`main` 自分叉后也有多项后续提交，因此预期需要普通 merge 而不是 fast-forward。
+  - 已将合并前 planning 更新临时 stash，避免本地记录改动阻塞 merge。
+  - 已执行 `git merge --no-commit --no-ff cloudflare-pages-deploy`，遇到并解决 `README.md` 内容冲突。
+  - 已恢复合并前 stash 的 planning 更新，准备与合并结果一起验证和提交。
+  - 已运行 `npm run build:check`，Gulp default task 完成。
+  - 已启动本地静态服务 task，并验证 `http://127.0.0.1:8000/index.html?maestro=1` 与 `http://127.0.0.1:8000/intro.html` 均返回 `200`。
+  - 已运行 `npm run uat:smoke`，Maestro Web smoke flow 完整通过。
+- Files created/modified:
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ### Phase 1: Discovery
 - **Status:** complete
 - **Started:** 2026-04-29
@@ -101,6 +119,11 @@
 | Cloudflare Pages project API | `GET /accounts/:account_id/pages/projects/chart-mage` | 项目存在且 latest deployment 可读 | project id `32d49de7-925e-408a-b308-92fe8b24058d`，latest deployment `010f65fe...` success | passed |
 | Cloudflare Pages trigger mode | latest deployment trigger metadata | Git integration 时应为 Git trigger，fallback 时应为 ad hoc | `deployment_trigger.type = ad_hoc` | confirms fallback |
 | Repository convergence diff | `git diff --name-status main..cloudflare-pages-deploy` | 查出尚未合入 main 的部署文件 | README、app/_headers、docs/deployment/cloudflare-pages.md、package.json 和 planning 文件存在差异 | action required |
+| Merge whitespace check | `git diff --check --cached` | 待提交内容无空白错误 | 无输出，exit 0 | passed |
+| Post-merge build check | `npm run build:check` | Gulp default task 完成 | `cleanDist`、`buildUseref`、`copyImages`、`default` 完成，exit 0 | passed |
+| Local editor entry probe | `curl -I 'http://127.0.0.1:8000/index.html?maestro=1'` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Local intro entry probe | `curl -I http://127.0.0.1:8000/intro.html` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Post-merge UAT smoke | `npm run uat:smoke` | Web smoke flow 通过 | 所有 Maestro steps 通过 | passed |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -109,6 +132,9 @@
 | 2026-04-29 | Cloudflare Pages Git-integrated project creation failed with API error `8000011` | 1 | 用 direct-upload project 对照实验确认是 Cloudflare GitHub 安装阻塞；经用户确认后改走 direct-upload fallback |
 | 2026-04-29 | System Python blocked `pip install blake3` with PEP 668 | 1 | 改用 session 私有 virtualenv 安装 `blake3` 并继续完成资产上传 |
 | 2026-04-29 | Direct Upload project cannot be converted to Git integration | review | 记录为架构约束；后续需要新建 Git-integrated Pages 项目并切换入口 |
+| 2026-04-29 | `git stash apply stash@{0}` failed with `README.md: needs merge` | 1 | 先执行 `git add README.md` 标记冲突已解决，再重新应用 stash 成功 |
+| 2026-04-29 | `curl -I http://127.0.0.1:8000/index.html?maestro=1` failed with `zsh: no matches found` | 1 | 使用引号包住带 query string 的 URL 后重新执行成功 |
+| 2026-04-29 | `curl -I http://127.0.0.1:8000/intro.html` failed because no server was listening on port 8000 | 1 | 启动 VS Code task `serve-chartmage-app` 后重新执行成功 |
 
 ## 5-Question Reboot Check
 | Question | Answer |
