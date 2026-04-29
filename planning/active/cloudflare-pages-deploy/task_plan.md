@@ -5,12 +5,12 @@
 - 达成目标状态：当变更合并并推送到 `origin/main` 后，生产站点自动更新；PR / 非生产分支自动生成 preview 部署；站点可通过 `*.pages.dev` 或自有域名访问。
 
 ## Current State
-Status: waiting_execution
+Status: blocked
 Archive Eligible: no
-Close Reason:
+Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`).
 
 ## Current Phase
-Phase 2
+Phase 5
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
@@ -34,6 +34,7 @@ Phase 2
 | 本地 `git push` HTTPS 存在 LibreSSL `SSL_ERROR_SYSCALL` | 开发机网络 / TLS 栈异常 | 仓库配置提交无法推到 GitHub，进而无法触发 Pages 自动部署 | 将该问题单独记录为外部阻塞项；必要时切换 SSH remote 或改用其他网络环境完成首次推送 |
 | 自有域名接入方式选择错误 | apex / subdomain 场景未区分 | 域名解析失败或证书签发卡住 | 优先用 `pages.dev` 完成验证，再分流到 apex 或 subdomain 的独立域名接入步骤 |
 | Preview 部署默认公开 | Pages preview 未启用 Access 保护 | PR 预览链接可被外部访问 | 默认先接受公开 preview，若进入私有协作阶段再追加 Access 策略 |
+| 项目内 `.worktrees/` 未被忽略 | 创建 project-local worktree 前缺少 ignore 保护 | worktree 内容可能污染仓库状态 | 先把 `.worktrees/` 写入 `.gitignore`，再创建隔离工作区 |
 
 ## Key Questions
 1. 首次上线是否应直接发布 `app/`，而不是继续依赖旧的 `dist/` 构建链？
@@ -48,8 +49,14 @@ Phase 2
 | 首阶段优先直接托管静态目录，而不是把 Cloudflare 生产绑定到旧 Gulp 构建 | 当前应用是纯静态站点，直接托管可降低构建不兼容风险，先完成稳定上线再决定是否恢复构建优化 |
 | 保留自有域名为第二步，先用 `pages.dev` 验证 | 先缩短上线路径，避免把 DNS / 证书问题和应用托管问题绑在一起 |
 | 继续保留 `dev` 分支，并让其由 Pages 生成 preview / branch alias | 这能提供稳定的非生产对外地址，适合后续联调和验收 |
+| 本次执行采用项目内 `.worktrees/` 作为隔离工作区目录 | 用户已明确选择 project-local hidden directory，符合 worktree 技能推荐路径 |
+| 当 Git integration 创建失败时，先以 direct upload fallback 让站点上线 | 用户明确选择“先用 direct upload 部署到 Pages，让站点先可用”，优先满足“能够开始使用”的目标 |
+| 生产 Pages 项目名固定为 `chart-mage`，生产 URL 为 `https://chart-mage.pages.dev` | 该项目已成功创建并完成首个 production deployment，后续文档与运维都以此为准 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
 |-------|---------|------------|
 | `fatal: unable to access 'https://github.com/ilderaj/chart-mage.git/': LibreSSL SSL_connect: SSL_ERROR_SYSCALL` | 1 | 目前仅记录为外部 Git 网络阻塞；不影响本次规划产出，但会影响后续首次推送与自动部署验证 |
+| `.worktrees/` 当前未被 Git ignore | 1 | 已在执行开始阶段补充 `.gitignore` 保护，后续再创建 worktree |
+| Cloudflare Pages API 创建 Git-integrated project 返回 `8000011` | 1 | 已确认普通 Pages API 与 direct-upload project 创建正常，根因定位为 Cloudflare Pages GitHub 安装状态异常；当前改走 direct-upload fallback，上线后等待外部修复 |
+| 系统 Python 受 PEP 668 限制，无法直接 `pip install blake3` | 1 | 已改用 session 私有 virtualenv 安装 `blake3`，完成 Pages asset hash / upload 流程 |

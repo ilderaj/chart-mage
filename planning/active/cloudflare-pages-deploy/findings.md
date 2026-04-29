@@ -22,6 +22,19 @@
 - Cloudflare Pages 的 API 支持 project / deployment / domain 管理，但首次 Git 仓库集成通常仍更适合走控制台完成授权和项目建立。
 - 当前开发机直接执行 `git push origin main:main` 时出现 LibreSSL `SSL_ERROR_SYSCALL`，这是后续实际接入与验证阶段需要处理的外部风险。
 
+## Execution Findings
+- 当前仓库位于 `main`，工作区干净，适合先创建隔离 worktree 再执行计划中的仓库改动。
+- 仓库内不存在现成的 `.worktrees/` 或 `worktrees/` 目录，也没有可用的 `./scripts/harness worktree-name` 辅助脚本。
+- 用户已选择使用项目内隐藏目录 `.worktrees/` 作为 worktree 根目录。
+- `.worktrees/` 在开始执行前未被 Git ignore，需要先补充 `.gitignore` 保护。
+- 部署目标仓库仍以 `origin = https://github.com/ilderaj/chart-mage.git` 为准；`upstream` 是 `heyjunlin/chart-mage`。
+- Cloudflare Pages Git-integrated project 创建请求在当前账号下返回 API 错误 `8000011`，而不带 `source` 的 direct-upload project 创建成功，说明阻塞点在 Cloudflare Pages GitHub 安装状态，而不是 Pages API 或项目配置本身。
+- 用户已明确选择 direct-upload fallback 以优先达成“站点先可用”。
+- 当前 Cloudflare Pages 项目名为 `chart-mage`，生产 URL 为 `https://chart-mage.pages.dev`。
+- 首个生产部署 ID 为 `010f65fe-098e-41bf-9582-40887adf4630`，部署状态为 `success`。
+- `https://chart-mage.pages.dev` 返回 `200`；`/intro.html` 会规范化到 `/intro` 并返回 `200`，`/index.html?maestro=1` 会规范化到 `/?maestro=1` 并返回 `200`。
+- 当前生产模式是 direct upload，因此 Git-based production / preview automation 和 branch preview 仍不可用，必须等待 Cloudflare GitHub 安装恢复后再继续。
+
 ## Technical Decisions
 | Decision | Rationale |
 |----------|-----------|
