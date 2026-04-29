@@ -24,6 +24,7 @@ Phase 5 — Final verification and integration readiness.
 - **2026-04-29** — 移除 `gulp-cssnano`，改用 `gulp-postcss@10.0.0` + `cssnano@7.1.7`；CSS dist 产物生成正常，audit 降至 `11`，剩余全部来自 `gulp@4`。
 - **2026-04-29** — 升级 `gulp@5.0.1`，发现并修复 `vinyl-fs@4` 默认 UTF-8 转码导致图片复制损坏的问题；为图片 copy task 设置 `{ encoding: false }`。
 - **2026-04-29** — 移除 `del`，改用 Node 内置 `fs.rmSync` 清理 `dist`；最终 `npm audit` 为 `0`，`npm outdated` 为 `0`。
+- **2026-04-29** — 本地合并到 `main` 后发现 `:8000` 仍由验证残留 PID `14083` 监听；风险记录后准备执行 `kill 14083`，再用自启动 server 重跑 smoke。
 
 ## Next action
 

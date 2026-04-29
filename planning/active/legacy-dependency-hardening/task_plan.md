@@ -72,6 +72,7 @@ Phase 5
 | UAT 与构建链相互干扰 | 构建脚本或 HTML 入口变更 | Maestro smoke 回归失败 | 每个阶段后重跑 `npm run uat:smoke` |
 | 大版本升级过多导致问题难以定位 | 同时改多个核心包 | 排障困难 | 按 phase 分层推进，避免一次性大升级 |
 | 终止占用 `:8000` 的遗留验证进程 | 需要恢复标准 `npm run uat:smoke` 验证锚点；目标命令为 `kill 84314`，目标进程为 `/opt/homebrew/.../Python`，cwd 为 `/Users/jared/Vibings/ChartMage/.worktrees/cloudflare-pages-deploy` | 仅终止一个监听 TCP `:8000` 的 Python http server；不删除或改写文件；跨当前 worktree 但仍在同一 repo 的另一个 worktree 内 | 执行前确认 PID 与 cwd；无法用 `./scripts/harness checkpoint . --quiet`，因为本仓库没有 `scripts/harness`；回滚方式为从对应 worktree 重新启动需要的 http server |
+| 终止合并后验证残留的 `:8000` server | 合并后重跑 smoke 时发现目标命令为 `kill 14083`，目标进程为 Python http server，cwd 为 `/Users/jared/Vibings/ChartMage` | 仅终止一个由本地验证使用的 Python http server；不删除或改写文件；限定当前 workspace | 执行前确认 PID 与 cwd；仓库仍无 `./scripts/harness` checkpoint helper；回滚方式为按需重新运行 `python3 -m http.server 8000 --directory app` |
 
 ## Key Questions
 1. 哪些漏洞可以通过非破坏性升级直接消除，哪些需要更换工具链组件？
@@ -98,3 +99,4 @@ Phase 5
 | 使用变量形式 `kill "$pid"` 被 shell 安全策略拒绝 | 1 | 改为显式 numeric PID 命令 `kill 84314` 并完成端口释放 |
 | `gulp-autoprefixer@10` 构建时报 `autoPrefixer is not a function` | 1 | 确认 CJS `require` 返回 `{ default }`，改为 `require("gulp-autoprefixer").default`，并更新 options 为 `overrideBrowserslist` |
 | `gulp@5` 初次构建后图片被 UTF-8 转码破坏 | 1 | 定位到 `vinyl-fs@4` 默认 `encoding: "utf8"`；为 `copyImages` 的 `gulp.src` 和 `gulp.dest` 设置 `{ encoding: false }` |
+| 合并后验证发现 `:8000` 仍由 PID `14083` 监听，临时 server 未能绑定端口 | 1 | 已定位 PID `14083` cwd 为项目根目录；执行 `kill 14083` 后用自启动 server 重新验证 |

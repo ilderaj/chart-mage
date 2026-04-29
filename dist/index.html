@@ -132,44 +132,61 @@
     </nav>
     
     <main role="main" class="hidden">
-      <section class="editor workspacePanel">
-        <div class="workspaceHeader">
-          <div class="workspaceCopy">
-            <p class="workspaceEyebrow">Input</p>
-            <h2 class="workspaceTitle">Diagram Input</h2>
-            <p class="workspaceDescription">Write Mermaid-style syntax with inline hints. Every change renders directly into the paired preview surface.</p>
+      <div class="workspaceFileFrame" aria-label="Editable diagram workspace">
+        <div class="workspaceFileBar">
+          <div class="workspaceWindowControls" aria-hidden="true">
+            <span class="windowDot windowDotDanger"></span>
+            <span class="windowDot windowDotWarning"></span>
+            <span class="windowDot windowDotSuccess"></span>
           </div>
-          <div class="workspaceStatus">Autosave . local</div>
-        </div>
-        <div class="workspaceBody editorBody">
-          <div class="quickInsertBar" aria-label="Syntax shortcuts">
-            <button type="button" class="quick-chip" data-sequence="participant Alice" data-flow="((Terminal)) ->> Process">participant</button>
-            <button type="button" class="quick-chip" data-sequence="Alice ->> John: Message" data-flow="Process ->> Decision?">arrow</button>
-            <button type="button" class="quick-chip" data-sequence="Note right of John: Text in note" data-flow="subgraph Title&#10;  Process ->> Process 2&#10;end">note</button>
-            <button type="button" class="quick-chip" data-sequence="loop Retry&#10;  Alice ->> John: Try again&#10;end" data-flow="Decision? - Yes ->> Process 2">loop</button>
+          <div class="workspaceFileMeta">
+            <span class="workspaceFileName" id="workspace-file-name">Sample sequence diagram.cm</span>
+            <span class="workspaceFileType" id="workspace-file-type">SEQ</span>
           </div>
-          <textarea id="code" name="code">
-          </textarea>
+          <div class="workspaceFileStatus" id="workspace-file-status">Saved locally</div>
         </div>
-      </section>
 
-      <section class="diagram workspacePanel">
-        <div class="workspaceHeader">
-          <div class="workspaceCopy">
-            <p class="workspaceEyebrow">Output</p>
-            <h2 class="workspaceTitle">Live Preview</h2>
-            <p class="workspaceDescription">Inspect the rendered diagram in real time and export the current canvas to PNG when it is ready to share.</p>
-          </div>
-          <div class="previewToolbar" aria-label="Preview tools">
-            <button type="button" class="preview-chip active" data-preview-mode="fit">Fit</button>
-            <button type="button" class="preview-chip" data-preview-mode="actual">100%</button>
-            <button type="button" class="preview-chip preview-chip-disabled" disabled>Dark</button>
-          </div>
+        <div class="workspaceSplit">
+          <section class="editor workspacePanel">
+            <div class="workspaceHeader">
+              <div class="workspaceCopy">
+                <p class="workspaceEyebrow">Input</p>
+                <h2 class="workspaceTitle">Diagram Input</h2>
+                <p class="workspaceDescription">Write Mermaid-style syntax with inline hints. Every change renders directly into the paired preview surface.</p>
+              </div>
+              <div class="workspaceStatus">Autosave . local</div>
+            </div>
+            <div class="workspaceBody editorBody">
+              <div class="quickInsertBar" aria-label="Syntax shortcuts">
+                <button type="button" class="quick-chip" data-sequence="participant Alice" data-flow="((Terminal)) ->> Process">participant</button>
+                <button type="button" class="quick-chip" data-sequence="Alice ->> John: Message" data-flow="Process ->> Decision?">arrow</button>
+                <button type="button" class="quick-chip" data-sequence="Note right of John: Text in note" data-flow="subgraph Title&#10;  Process ->> Process 2&#10;end">note</button>
+                <button type="button" class="quick-chip" data-sequence="loop Retry&#10;  Alice ->> John: Try again&#10;end" data-flow="Decision? - Yes ->> Process 2">loop</button>
+              </div>
+              <textarea id="code" name="code">
+              </textarea>
+            </div>
+          </section>
+
+          <section class="diagram workspacePanel">
+            <div class="workspaceHeader">
+              <div class="workspaceCopy">
+                <p class="workspaceEyebrow">Output</p>
+                <h2 class="workspaceTitle">Live Preview</h2>
+                <p class="workspaceDescription">Inspect the rendered diagram in real time and export the current canvas to PNG when it is ready to share.</p>
+              </div>
+              <div class="previewToolbar" aria-label="Preview tools">
+                <button type="button" class="preview-chip active" data-preview-mode="fit">Fit</button>
+                <button type="button" class="preview-chip" data-preview-mode="actual">100%</button>
+                <button type="button" class="preview-chip preview-chip-disabled" disabled>Dark</button>
+              </div>
+            </div>
+            <div class="workspaceBody previewBody">
+              <div class="chart" id="chart"></div>
+            </div>
+          </section>
         </div>
-        <div class="workspaceBody previewBody">
-          <div class="chart" id="chart"></div>
-        </div>
-      </section>
+      </div>
     </main>
 
     <div class="workspaceBackdrop hidden" id="drawer-backdrop"></div>
