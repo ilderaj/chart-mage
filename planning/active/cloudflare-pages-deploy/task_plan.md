@@ -5,7 +5,7 @@
 - 达成目标状态：当变更合并并推送到 `origin/main` 后，生产站点自动更新；PR / 非生产分支自动生成 preview 部署；站点可通过 `*.pages.dev` 或自有域名访问。
 
 ## Current State
-Status: active
+Status: blocked
 Archive Eligible: no
 Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but the original target state is only partially complete. Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
 
@@ -27,7 +27,7 @@ Phase 8
 5. 配置 production / preview 分支行为与 `pages.dev` 域名（待执行）
 6. 绑定自有域名并完成上线验证、回滚说明和运维约定（待执行）
 7. direct-upload fallback 后的仓库与 Cloudflare 收敛计划（已完成计划，待执行）
-8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（执行中）
+8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（已完成，worktree / branch 已清理）
 
 ## Risk Assessment
 
@@ -41,6 +41,7 @@ Phase 8
 | 项目内 `.worktrees/` 未被忽略 | 创建 project-local worktree 前缺少 ignore 保护 | worktree 内容可能污染仓库状态 | 先把 `.worktrees/` 写入 `.gitignore`，再创建隔离工作区 |
 | direct-upload 项目无法原地切换到 Git integration | 当前 `chart-mage` 项目是 direct upload fallback | main 自动发布和 PR preview 不能在该项目上补齐 | GitHub 安装修复后新建 Git-integrated Pages 项目，验证后再切换域名 / 生产入口 |
 | 部署仓库文件还停留在 `cloudflare-pages-deploy` 分支 | `app/_headers`、部署 README、runbook、脚本变更未合入当前 `main` | 当前 `main` 不能完整代表线上部署约定 | 先 cherry-pick / restore 非 planning 文件到 `main`，保留当前 planning 文件更新 |
+| 清理已合并 worktree 和本地分支 | 执行 `git worktree remove /Users/jared/Vibings/ChartMage/.worktrees/cloudflare-pages-deploy` 与 `git branch -d cloudflare-pages-deploy` | 删除本地隔离工作区目录和已合并本地分支；不触碰远端分支或主工作区文件 | 已确认 worktree 干净、`cloudflare-pages-deploy` 是 `main` 祖先、远端无同名分支；`scripts/harness` checkpoint 不存在，回滚用 `git branch cloudflare-pages-deploy 8b4ff4c0af24a6fd693973cff351c85fea7e27a0` 和 `git worktree add .worktrees/cloudflare-pages-deploy cloudflare-pages-deploy` |
 
 ## Key Questions
 1. 首次上线是否应直接发布 `app/`，而不是继续依赖旧的 `dist/` 构建链？

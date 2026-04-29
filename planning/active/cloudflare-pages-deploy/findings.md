@@ -47,6 +47,10 @@
 - 2026-04-29 合并前复核：`main..cloudflare-pages-deploy` 有 3 个待合入提交：`1612f07`、`24ef1a3`、`8b4ff4c`；`cloudflare-pages-deploy..main` 有后续 README、planning、legacy dependency、editor demo 和 dist 刷新提交，合并时需要保留 main 侧新状态。
 - 2026-04-29 合并执行复核：`README.md` 是唯一内容冲突；解决方案保留 main 的项目布局、Technology Credit 和 License，同时加入 Cloudflare Pages direct-upload fallback 部署说明。
 - 2026-04-29 合并验证复核：`npm run build:check`、本地 `index.html?maestro=1` / `intro.html` HTTP probes、`npm run uat:smoke` 均通过。
+- 2026-04-30 清理前复核：主工作区 `main` 与 `origin/main` 同步在 `1e8c3523af5a9ce35dae23ac5f7e9dca209fd941`。
+- 2026-04-30 清理前复核：`.worktrees/cloudflare-pages-deploy` 工作区干净，分支头为 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0`；`cloudflare-pages-deploy` 已是 `main` 祖先。
+- 2026-04-30 清理前复核：远端不存在 `origin/cloudflare-pages-deploy`，本次只需要删除本地 worktree 和本地分支。
+- 2026-04-30 清理执行复核：`.worktrees/cloudflare-pages-deploy` worktree 已移除，本地 `cloudflare-pages-deploy` 分支已删除；如需恢复，可从提交 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0` 重建分支和 worktree。
 
 ## Technical Decisions
 | Decision | Rationale |

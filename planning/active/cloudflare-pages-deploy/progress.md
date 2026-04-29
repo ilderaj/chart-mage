@@ -3,7 +3,7 @@
 ## 2026-04-29
 
 ### Phase 8: Merge cloudflare-pages-deploy into main
-- **Status:** in_progress
+- **Status:** complete
 - Actions taken:
   - 已读取现有任务计划、发现记录和进度记录，确认这是同一个 Cloudflare Pages deploy 收敛任务的集成阶段。
   - 已确认主工作区当前在 `main`，本地无未提交改动，且 `origin/main` 与本地 `main` 同步在 `6a57f9d`。
@@ -15,6 +15,14 @@
   - 已运行 `npm run build:check`，Gulp default task 完成。
   - 已启动本地静态服务 task，并验证 `http://127.0.0.1:8000/index.html?maestro=1` 与 `http://127.0.0.1:8000/intro.html` 均返回 `200`。
   - 已运行 `npm run uat:smoke`，Maestro Web smoke flow 完整通过。
+  - 2026-04-30 已按用户要求准备清理已合并的 `cloudflare-pages-deploy` worktree 和本地分支。
+  - 已确认主工作区 `main` 与 `origin/main` 同步，当前 HEAD 为 `1e8c3523af5a9ce35dae23ac5f7e9dca209fd941`。
+  - 已确认 `.worktrees/cloudflare-pages-deploy` 内无未提交改动，分支头为 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0`。
+  - 已确认 `cloudflare-pages-deploy` 是 `main` 的祖先，且不存在 `origin/cloudflare-pages-deploy`。
+  - 已检查 `scripts/harness` checkpoint 工具不存在；本次清理回滚点改用 Git 提交哈希记录。
+  - 已执行 `git worktree remove /Users/jared/Vibings/ChartMage/.worktrees/cloudflare-pages-deploy`，worktree 列表现在只剩主工作区。
+  - 已执行 `git branch -d cloudflare-pages-deploy`，本地分支已删除。
+  - 已确认 `.worktrees/cloudflare-pages-deploy` 目录不存在，且主工作区除本任务记录更新外无其它改动。
 - Files created/modified:
   - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
   - planning/active/cloudflare-pages-deploy/findings.md (updated)
@@ -124,6 +132,9 @@
 | Local editor entry probe | `curl -I 'http://127.0.0.1:8000/index.html?maestro=1'` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
 | Local intro entry probe | `curl -I http://127.0.0.1:8000/intro.html` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
 | Post-merge UAT smoke | `npm run uat:smoke` | Web smoke flow 通过 | 所有 Maestro steps 通过 | passed |
+| Worktree cleanup verification | `git worktree list --porcelain` | 只剩主工作区 | 仅列出 `/Users/jared/Vibings/ChartMage` | passed |
+| Branch cleanup verification | `git branch --list cloudflare-pages-deploy` | 无输出 | 无输出 | passed |
+| Worktree directory verification | `test -d .worktrees/cloudflare-pages-deploy && echo exists || echo missing` | `missing` | `missing` | passed |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -135,6 +146,7 @@
 | 2026-04-29 | `git stash apply stash@{0}` failed with `README.md: needs merge` | 1 | 先执行 `git add README.md` 标记冲突已解决，再重新应用 stash 成功 |
 | 2026-04-29 | `curl -I http://127.0.0.1:8000/index.html?maestro=1` failed with `zsh: no matches found` | 1 | 使用引号包住带 query string 的 URL 后重新执行成功 |
 | 2026-04-29 | `curl -I http://127.0.0.1:8000/intro.html` failed because no server was listening on port 8000 | 1 | 启动 VS Code task `serve-chartmage-app` 后重新执行成功 |
+| 2026-04-30 | `scripts/harness` checkpoint tool missing before cleanup | 1 | 记录 `main` 与 `cloudflare-pages-deploy` 的提交哈希，并记录可重建分支 / worktree 的回滚命令 |
 
 ## 5-Question Reboot Check
 | Question | Answer |
