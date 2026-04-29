@@ -8,7 +8,8 @@
 
     <title>Chart Mage - Draw sequence diagrams and flowcharts at lightning speed.</title>
 
-    <link rel="icon" href="images/favicon.png">
+    <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="images/favicon.png">
     <link rel="stylesheet" href="css/style.min.css">
 
     <script>
@@ -21,9 +22,16 @@
       ga('send', 'pageview');
     </script>
   </head>
-  <body>
+  <body class="app-shell">
     <script type="text/javascript">
-      if (!localStorage.getItem("visited") || window.innerWidth < 768)
+      var searchParams = new URLSearchParams(window.location.search);
+      var isMaestroAutomation = searchParams.get("maestro") === "1";
+
+      if (isMaestroAutomation) {
+        localStorage.setItem("visited", "true");
+      }
+
+      if (!isMaestroAutomation && (!localStorage.getItem("visited") || window.innerWidth < 768))
         window.location.replace("intro.html");
       if (/*@cc_on!@*/false || !!document.documentMode)
         window.location.replace("browser.html");
@@ -31,13 +39,15 @@
 
     <div class="splashscreen">
       <div class="sc-container">
-        <svg viewBox="363 255 560 105" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-            <!-- Generator: Sketch 40.2 (33826) - http://www.bohemiancoding.com/sketch -->
-            <desc>Created with Sketch.</desc>
-            <defs></defs>
-            <path d="M410.968,336.104 C410.968,339.272016 410.368006,342.295986 409.168,345.176 C407.967994,348.056014 406.312011,350.575989 404.2,352.736 C402.087989,354.896011 399.616014,356.623994 396.784,357.92 C393.951986,359.216006 390.904016,359.864 387.64,359.864 C384.855986,359.864 382.024014,359.480004 379.144,358.712 C376.263986,357.943996 373.672012,356.624009 371.368,354.752 C369.063988,352.879991 367.168007,350.408015 365.68,347.336 C364.191993,344.263985 363.448,340.376024 363.448,335.672 L363.448,279.224 C363.448,275.863983 364.023994,272.744014 365.176,269.864 C366.328006,266.983986 367.959989,264.488011 370.072,262.376 C372.184011,260.263989 374.703985,258.608006 377.632,257.408 C380.560015,256.207994 383.799982,255.608 387.352,255.608 C390.712017,255.608 393.831986,256.207994 396.712,257.408 C399.592014,258.608006 402.087989,260.287989 404.2,262.448 C406.312011,264.608011 407.967994,267.199985 409.168,270.224 C410.368006,273.248015 410.968,276.535982 410.968,280.088 L410.968,285.848 L396.28,285.848 L396.28,280.952 C396.28,278.071986 395.464008,275.576011 393.832,273.464 C392.199992,271.351989 389.992014,270.296 387.208,270.296 C383.559982,270.296 381.136006,271.423989 379.936,273.68 C378.735994,275.936011 378.136,278.791983 378.136,282.248 L378.136,334.664 C378.136,337.640015 378.783994,340.13599 380.08,342.152 C381.376006,344.16801 383.703983,345.176 387.064,345.176 C388.024005,345.176 389.055994,345.008002 390.16,344.672 C391.264006,344.335998 392.271995,343.784004 393.184,343.016 C394.096005,342.247996 394.839997,341.192007 395.416,339.848 C395.992003,338.503993 396.28,336.82401 396.28,334.808 L396.28,329.768 L410.968,329.768 L410.968,336.104 Z M422.92,256.472 L437.608,256.472 L437.608,300.392 L455.752,300.392 L455.752,256.472 L470.44,256.472 L470.44,359 L455.752,359 L455.752,313.352 L437.608,313.352 L437.608,359 L422.92,359 L422.92,256.472 Z M506.728,285.992 L506.44,285.992 L499.24,323.144 L513.928,323.144 L506.728,285.992 Z M500.536,256.472 L512.776,256.472 L535.672,359 L520.984,359 L516.664,336.968 L496.648,336.968 L492.328,359 L477.64,359 L500.536,256.472 Z M557.56,302.264 L565.912,302.264 C568.504013,302.264 570.567992,301.904004 572.104,301.184 C573.640008,300.463996 574.815996,299.432007 575.632,298.088 C576.448004,296.743993 576.999999,295.08801 577.288,293.12 C577.576001,291.15199 577.72,288.872013 577.72,286.28 C577.72,283.687987 577.576001,281.40801 577.288,279.44 C576.999999,277.47199 576.400005,275.792007 575.488,274.4 C574.575995,273.007993 573.304008,271.976003 571.672,271.304 C570.039992,270.631997 567.880013,270.296 565.192,270.296 L557.56,270.296 L557.56,302.264 Z M542.872,256.472 L566.488,256.472 C583.768086,256.472 592.408,266.5039 592.408,286.568 C592.408,292.52003 591.472009,297.631979 589.6,301.904 C587.727991,306.176021 584.440024,309.607987 579.736,312.2 L595.576,359 L580.024,359 L566.344,315.224 L557.56,315.224 L557.56,359 L542.872,359 L542.872,256.472 Z M611.272,270.296 L594.28,270.296 L594.28,256.472 L642.952,256.472 L642.952,270.296 L625.96,270.296 L625.96,359 L611.272,359 L611.272,270.296 Z M676.216,256.472 L690.328,256.472 L709.192,310.76 L709.48,310.76 L728.2,256.472 L742.456,256.472 L742.456,359 L727.768,359 L727.768,296.648 L727.48,296.648 L712.936,340.712 L705.592,340.712 L691.192,296.648 L690.904,296.648 L690.904,359 L676.216,359 L676.216,256.472 Z M778.744,285.992 L778.456,285.992 L771.256,323.144 L785.944,323.144 L778.744,285.992 Z M772.552,256.472 L784.792,256.472 L807.688,359 L793,359 L788.68,336.968 L768.664,336.968 L764.344,359 L749.656,359 L772.552,256.472 Z M814.024,280.664 C814.024,276.535979 814.743993,272.888016 816.184,269.72 C817.624007,266.551984 819.519988,263.93601 821.872,261.872 C824.224012,259.80799 826.863985,258.248005 829.792,257.192 C832.720015,256.135995 835.671985,255.608 838.648,255.608 C841.624015,255.608 844.575985,256.135995 847.504,257.192 C850.432015,258.248005 853.071988,259.80799 855.424,261.872 C857.776012,263.93601 859.671993,266.551984 861.112,269.72 C862.552007,272.888016 863.272,276.535979 863.272,280.664 L863.272,285.848 L848.584,285.848 L848.584,280.664 C848.584,277.111982 847.60001,274.496008 845.632,272.816 C843.66399,271.135992 841.336013,270.296 838.648,270.296 C835.959987,270.296 833.63201,271.135992 831.664,272.816 C829.69599,274.496008 828.712,277.111982 828.712,280.664 L828.712,334.808 C828.712,338.360018 829.69599,340.975992 831.664,342.656 C833.63201,344.336008 835.959987,345.176 838.648,345.176 C841.336013,345.176 843.66399,344.336008 845.632,342.656 C847.60001,340.975992 848.584,338.360018 848.584,334.808 L848.584,315.512 L836.92,315.512 L836.92,302.552 L863.272,302.552 L863.272,334.808 C863.272,339.032021 862.552007,342.703984 861.112,345.824 C859.671993,348.944016 857.776012,351.53599 855.424,353.6 C853.071988,355.66401 850.432015,357.223995 847.504,358.28 C844.575985,359.336005 841.624015,359.864 838.648,359.864 C835.671985,359.864 832.720015,359.336005 829.792,358.28 C826.863985,357.223995 824.224012,355.66401 821.872,353.6 C819.519988,351.53599 817.624007,348.944016 816.184,345.824 C814.743993,342.703984 814.024,339.032021 814.024,334.808 L814.024,280.664 Z M876.232,256.472 L920.008,256.472 L920.008,270.296 L890.92,270.296 L890.92,300.392 L916.264,300.392 L916.264,314.216 L890.92,314.216 L890.92,344.312 L920.008,344.312 L920.008,359 L876.232,359 L876.232,256.472 Z" id="CHART-MAGE" stroke="none" fill="#FFFFFF" fill-rule="evenodd"></path>
-        </svg>
-        <p>Preparing all the things...</p>
+        <a href="intro.html" class="brand-logo splash-brand" aria-label="Chart Mage home">
+          <span class="brand-mark brand-mark-lg" aria-hidden="true">
+            <span class="brand-line"></span>
+            <span class="brand-node brand-node-left"></span>
+            <span class="brand-node brand-node-right"></span>
+          </span>
+          <span class="brand-word"><strong>chart</strong>mage</span>
+        </a>
+        <p>Preparing your local workspace...</p>
       </div>
     </div>
 
@@ -76,46 +86,107 @@
       </defs>
     </svg>
     
-    <nav class="hidden">
-        <img src="images/logo.png" class="logo">
+    <nav class="app-nav hidden">
+      <div class="app-nav-brand">
+        <a href="intro.html" class="brand-logo nav-brand-logo" aria-label="Chart Mage home">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-line"></span>
+            <span class="brand-node brand-node-left"></span>
+            <span class="brand-node brand-node-right"></span>
+          </span>
+          <span class="brand-word"><strong>chart</strong>mage</span>
+        </a>
+        <div class="nav-chart-meta">
+          <p class="nav-chart-caption">Current chart</p>
+          <div class="nav-chart-pill">
+            <span class="nav-type-pill" id="current-chart-type">Seq</span>
+            <span id="current-chart-name">Sample sequence diagram</span>
+          </div>
+        </div>
+      </div>
 
-        <ul class="nav">
-          <li>
-            <a href="#showChartsList" rel="modal:open" id="show-charts-button">
-              <svg class="icon icon-file"><use xlink:href="#icon-file"></use></svg>My Charts
-            </a>
-          </li>
-          <li><a href="#newSequenceDiagram" rel="modal:open">
-            <svg class="icon icon-seq"><use xlink:href="#icon-seq"></use></svg>New Sequence Diagram</a>
-          </li>
-          <li>
-            <a href="#newFlowchart" rel="modal:open">
-              <svg class="icon icon-flowchart"><use xlink:href="#icon-flowchart"></use></svg>New Flowchart
-            </a>
-          </li>
-          <li><a href="#about-chart-mage" rel="modal:open" title="About"><svg class="icon icon-about"><use xlink:href="#icon-about"></use></svg></a></li>
-          <li><a href="mailto:chartmage@gmail.com" title="Feedback"><svg class="icon icon-mail"><use xlink:href="#icon-mail"></use></svg></a></li>
-        </ul>
+      <div class="app-nav-actions">
+        <span class="save-pill" id="save-state-pill">Saved locally</span>
+        <button type="button" id="show-charts-button" class="nav-button">
+          <svg class="icon icon-file"><use xlink:href="#icon-file"></use></svg>My Charts
+        </button>
+        <a href="#newSequenceDiagram" rel="modal:open" class="nav-button" id="new-sequence-diagram-button">
+          <svg class="icon icon-seq"><use xlink:href="#icon-seq"></use></svg>New Sequence Diagram
+        </a>
+        <a href="#newFlowchart" rel="modal:open" class="nav-button nav-button-primary" id="new-flowchart-button">
+          <svg class="icon icon-flowchart"><use xlink:href="#icon-flowchart"></use></svg>New Flowchart
+        </a>
+        <button type="button" id="show-syntax" class="nav-icon-button" title="Syntax Guide">
+          <svg class="icon icon-help_outline"><use xlink:href="#icon-help_outline"></use></svg>
+        </button>
+        <button type="button" id="export-diagram" class="nav-icon-button" title="Export PNG">
+          <svg class="icon icon-vertical_align_bottom"><use xlink:href="#icon-vertical_align_bottom"></use></svg>
+        </button>
+        <a href="#about-chart-mage" rel="modal:open" class="nav-icon-button" title="About Chart Mage">
+          <svg class="icon icon-about"><use xlink:href="#icon-about"></use></svg>
+        </a>
+        <a href="mailto:chartmage@gmail.com" class="nav-icon-button" title="Send feedback">
+          <svg class="icon icon-mail"><use xlink:href="#icon-mail"></use></svg>
+        </a>
+      </div>
     </nav>
     
     <main role="main" class="hidden">
-      <section class="editor">
-        <div class="sectionLabel" id="show-syntax">
-          <p href="#">Magic Spell</p>
-          <svg class="icon icon-help_outline"><use xlink:href="#icon-help_outline"></use></svg>
+      <section class="editor workspacePanel">
+        <div class="workspaceHeader">
+          <div class="workspaceCopy">
+            <p class="workspaceEyebrow">Input</p>
+            <h2 class="workspaceTitle">Diagram Input</h2>
+            <p class="workspaceDescription">Write Mermaid-style syntax with inline hints. Every change renders directly into the paired preview surface.</p>
+          </div>
+          <div class="workspaceStatus">Autosave . local</div>
         </div>
-        <textarea id="code" name="code">
-        </textarea>
+        <div class="workspaceBody editorBody">
+          <div class="quickInsertBar" aria-label="Syntax shortcuts">
+            <button type="button" class="quick-chip" data-sequence="participant Alice" data-flow="((Terminal)) ->> Process">participant</button>
+            <button type="button" class="quick-chip" data-sequence="Alice ->> John: Message" data-flow="Process ->> Decision?">arrow</button>
+            <button type="button" class="quick-chip" data-sequence="Note right of John: Text in note" data-flow="subgraph Title&#10;  Process ->> Process 2&#10;end">note</button>
+            <button type="button" class="quick-chip" data-sequence="loop Retry&#10;  Alice ->> John: Try again&#10;end" data-flow="Decision? - Yes ->> Process 2">loop</button>
+          </div>
+          <textarea id="code" name="code">
+          </textarea>
+        </div>
       </section>
 
-      <section class="diagram">
-        <div class="sectionLabel" id="export-diagram">
-          <p href="">Generated Diagram</p>
-          <svg class="icon icon-vertical_align_bottom"><use xlink:href="#icon-vertical_align_bottom"></use></svg>
+      <section class="diagram workspacePanel">
+        <div class="workspaceHeader">
+          <div class="workspaceCopy">
+            <p class="workspaceEyebrow">Output</p>
+            <h2 class="workspaceTitle">Live Preview</h2>
+            <p class="workspaceDescription">Inspect the rendered diagram in real time and export the current canvas to PNG when it is ready to share.</p>
+          </div>
+          <div class="previewToolbar" aria-label="Preview tools">
+            <button type="button" class="preview-chip active" data-preview-mode="fit">Fit</button>
+            <button type="button" class="preview-chip" data-preview-mode="actual">100%</button>
+            <button type="button" class="preview-chip preview-chip-disabled" disabled>Dark</button>
+          </div>
         </div>
-        <div class="chart" id="chart"></div>
+        <div class="workspaceBody previewBody">
+          <div class="chart" id="chart"></div>
+        </div>
       </section>
     </main>
+
+    <div class="workspaceBackdrop hidden" id="drawer-backdrop"></div>
+    <aside class="chartsDrawer hidden" id="charts-drawer" aria-label="My Charts">
+      <div class="drawerHeader">
+        <div>
+          <p class="drawerEyebrow">Library</p>
+          <h2>My Charts</h2>
+        </div>
+        <button type="button" class="drawerClose" id="drawer-close" aria-label="Close charts drawer">&times;</button>
+      </div>
+      <div class="drawerSearch">
+        <input type="search" id="drawer-search" placeholder="Search charts">
+      </div>
+      <div class="drawerMeta" id="drawer-count">0 saved</div>
+      <div class="drawerList" id="drawer-list"></div>
+    </aside>
 
     <!-- Modal Dialogs-->
     <div id="newFlowchart" style="display:none;">
@@ -125,7 +196,7 @@
         <fieldset>
           <div class="pure-control-group">
             <label for="flowchart-name-input">Chart Name</label>
-            <input type="text" name="name" placeholder="Chart Name" id="flowchart-name-input" required><br>
+            <input type="text" placeholder="Chart Name" id="flowchart-name-input" required><br>
           </div>
           <div class="pure-controls">
             <button type="submit" class="pure-button pure-button-primary">Create</button>
@@ -141,7 +212,7 @@
         <fieldset>
           <div class="pure-control-group">
             <label for="sequence-diagram-name-input">Chart Name</label>
-            <input type="text" name="name" placeholder="Chart Name" id="sequence-diagram-name-input" required><br>
+            <input type="text" placeholder="Chart Name" id="sequence-diagram-name-input" required><br>
           </div>
           <div class="pure-controls">
             <button type="submit" class="pure-button pure-button-primary">Create</button>
@@ -175,7 +246,7 @@
         <fieldset>
           <div class="pure-control-group">
             <label for="rename-input">New Name</label>
-            <input type="text" name="name" placeholder="New Name" id="rename-input" required><br>
+            <input type="text" placeholder="New Name" id="rename-input" required><br>
           </div>
           <div class="pure-controls">
             <button type="submit" class="pure-button pure-button-primary">Save</button>

@@ -185,6 +185,6 @@ Mermaid-based rendering pipeline or the Maestro smoke flow.
 - [x] Phase 2 — Landing rewrite
 - [x] Phase 3 — Editor shell
 - [x] Phase 4 — Charts drawer
-- [ ] Phase 5 — Cleanup & QA
+- [x] Phase 5 — Cleanup & QA
 
 See `progress.md` for execution log and `findings.md` for in-flight notes.

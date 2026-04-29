@@ -2,8 +2,7 @@
 
 ## Current phase
 
-Phase 4 — Editor shell and charts drawer integrated. Final cleanup and repo-level
-verification are in progress.
+Phase 5 — Complete. Repo-level verification and build-tooling cleanup finished.
 
 ## Log
 
@@ -45,12 +44,18 @@ verification are in progress.
   `gulp@5.0.1`, which would not validate the repo against its declared
   `gulp@^3.9.1` toolchain, so the build verification remains pending until the
   repo dependencies are installed normally.
+- **2026-04-29** — Phase 5 completed: repo dependencies were installed, the
+  build pipeline was upgraded from `gulp@3 + run-sequence` to a gulp 4-compatible
+  task composition, and `gulpfile.js` was adjusted for current plugin semantics
+  (`done()` for clean task completion and `browsers` autoprefixer option).
+- **2026-04-29** — Final verification passed: `npm run uat:smoke` passes against
+  the redesigned app and `./node_modules/.bin/gulp` now completes successfully
+  on the current Node runtime.
 
 ## Next action
 
-Run repo-level build verification (`npx gulp`) once the repo dependencies are
-installed, then do a final cleanup pass for dead CSS / copy / planning notes
-before marking Phase 5 complete.
+Task complete. Any follow-up work should be optional polish or a separate
+cleanup pass outside the redesign scope.
 
 ## Verification status
 
@@ -60,4 +65,4 @@ before marking Phase 5 complete.
 | 2     | pass   | pass          | pending    | pass             |
 | 3     | pass   | pass          | pending    | pass             |
 | 4     | pass   | pass          | pending    | pass             |
-| 5     | in progress | pass     | blocked    | in progress      |
+| 5     | pass   | pass          | pass       | pass             |

@@ -66,10 +66,9 @@ Smoke Flow` assertions hold.
   tracked under `maestro-uat-setup`, not a redesign-only regression. The
   local DOM trigger (`form.name` returning object values) has now been
   removed and the smoke flow passes again.
-- [ ] Gulp build verification currently depends on installing the repo's pinned
-  devDependencies first. With no `node_modules/`, `npx gulp` prompts for a
-  transient `gulp@5.0.1` install, which is not a trustworthy substitute for
-  the repo's declared `gulp@^3.9.1` toolchain.
+- [x] Gulp build verification no longer depends on an incompatible `gulp@3`
+  stack. The repo now builds with gulp 4 task composition on the current
+  Node runtime after installing the repo devDependencies locally.
 
 ## Decisions log
 
@@ -86,6 +85,8 @@ Smoke Flow` assertions hold.
   `New Flowchart`, `My Charts`) verbatim while modernizing shell structure.
 - 2026-04-29: Keep the preview Dark chip visible but disabled until Mermaid
   theme switching is proven safe.
+- 2026-04-29: Build verification on modern Node required upgrading the repo
+  build runner from `gulp@3` to `gulp@4` and removing `run-sequence`.
 - 2026-04-29: Promote stable UAT ids `new-flowchart-button` and
   `show-charts-button` into the live DOM so Maestro Web does not rely on
   fragile text matching for the main nav actions.
