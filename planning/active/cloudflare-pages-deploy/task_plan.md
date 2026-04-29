@@ -7,10 +7,10 @@
 ## Current State
 Status: blocked
 Archive Eligible: no
-Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but the original target state is only partially complete. Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
+Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, and repository-side deployment files plus Wrangler manual redeploy commands are now present locally. The original target state remains blocked because Git integration / automatic previews still depend on repairing the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
 
 ## Current Phase
-Phase 8
+Phase 9
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
@@ -28,6 +28,7 @@ Phase 8
 6. 绑定自有域名并完成上线验证、回滚说明和运维约定（待执行）
 7. direct-upload fallback 后的仓库与 Cloudflare 收敛计划（已完成计划，待执行）
 8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（已完成，worktree / branch 已清理）
+9. 补齐 Wrangler direct-upload 手动 redeploy fallback：依赖、npm scripts、runbook 和本地验证（已完成；待提交 / 推送）
 
 ## Risk Assessment
 

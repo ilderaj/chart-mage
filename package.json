@@ -7,6 +7,9 @@
     "serve:app": "python3 -m http.server 8000 --directory app",
     "build": "gulp",
     "build:check": "gulp",
+    "pages:deploy": "wrangler pages deploy app --project-name chart-mage --branch main",
+    "pages:deploy:preview": "wrangler pages deploy app --project-name chart-mage --branch dev",
+    "pages:list": "wrangler pages deployment list --project-name chart-mage",
     "test": "echo \"Error: no test specified\" && exit 1",
     "maestro:install": "./scripts/install-maestro.sh",
     "uat:serve": "npm run serve:app",
@@ -23,6 +26,7 @@
     "gulp-if": "^3.0.0",
     "gulp-postcss": "^10.0.0",
     "gulp-uglify": "^3.0.2",
-    "gulp-useref": "^5.0.0"
+    "gulp-useref": "^5.0.0",
+    "wrangler": "^4.86.0"
   }
 }

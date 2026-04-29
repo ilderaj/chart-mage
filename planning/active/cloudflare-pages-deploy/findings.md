@@ -51,6 +51,10 @@
 - 2026-04-30 清理前复核：`.worktrees/cloudflare-pages-deploy` 工作区干净，分支头为 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0`；`cloudflare-pages-deploy` 已是 `main` 祖先。
 - 2026-04-30 清理前复核：远端不存在 `origin/cloudflare-pages-deploy`，本次只需要删除本地 worktree 和本地分支。
 - 2026-04-30 清理执行复核：`.worktrees/cloudflare-pages-deploy` worktree 已移除，本地 `cloudflare-pages-deploy` 分支已删除；如需恢复，可从提交 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0` 重建分支和 worktree。
+- 2026-04-30 convergence 复核：当前分支已包含 Task 1 仓库部署文件收敛结果，包括 `app/_headers`、README 部署说明、`docs/deployment/cloudflare-pages.md`、`serve:app`、`build`、`build:check` 与 `uat:serve` 复用。
+- 2026-04-30 convergence 复核：Task 2 尚未完成；`package.json` 缺少 `wrangler` devDependency 与 `pages:deploy` / `pages:deploy:preview` / `pages:list` scripts，runbook 也缺少 Wrangler 手动 redeploy 命令说明。
+- 2026-04-30 convergence 执行：已安装 `wrangler@4.86.0`，新增 `pages:deploy`、`pages:deploy:preview`、`pages:list` scripts，并在 runbook 中记录认证和 manual redeploy 用法。
+- 2026-04-30 convergence 验证：`npm run pages:list` 已能读取 `chart-mage` 项目部署列表，并显示 production deployment `010f65fe-098e-41bf-9582-40887adf4630`。
 
 ## Technical Decisions
 | Decision | Rationale |

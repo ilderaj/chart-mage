@@ -1,5 +1,27 @@
 # Progress
 
+## 2026-04-30
+
+### Phase 9: Manual redeploy fallback completion
+- **Status:** complete
+- Actions taken:
+  - 已按 convergence plan 复核当前任务完成度：整体仍因 Cloudflare Pages GitHub installation `8000011` 处于 blocked，不是完全完成。
+  - 已确认 Task 1 仓库部署文件收敛已经存在于当前分支。
+  - 已确认 Task 2 仍缺 Wrangler 手动 redeploy fallback 所需依赖、npm scripts 和 runbook 文档，准备继续补齐本地可执行部分。
+  - 已通过 Cloudflare 文档复核 Direct Upload + Wrangler 当前命令模型，确认 direct-upload 项目可以使用 Wrangler 部署目录，并且 preview branch alias 通过 `--branch` 指定。
+  - 已执行 `npm install --save-dev wrangler@latest`，安装结果为 `wrangler@4.86.0`，`npm audit` 为 0 vulnerabilities。
+  - 已更新 `package.json`，新增 `pages:deploy`、`pages:deploy:preview`、`pages:list` scripts。
+  - 已更新 `docs/deployment/cloudflare-pages.md`，记录手动 production redeploy、preview-style redeploy、deployment list 和 `npx wrangler login` 认证要求。
+  - 已运行验证：`git diff --check`、`npm run build:check`、`npx wrangler --version`、两个本地 HTTP probes、`npm run pages:list`、VS Code Problems 检查。
+  - `npm run pages:list` 已在当前环境完成 OAuth 登录并列出 deployment `010f65fe-098e-41bf-9582-40887adf4630`。
+- Files created/modified:
+  - package.json (updated)
+  - package-lock.json (updated)
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ## 2026-04-29
 
 ### Phase 8: Merge cloudflare-pages-deploy into main
@@ -135,6 +157,12 @@
 | Worktree cleanup verification | `git worktree list --porcelain` | 只剩主工作区 | 仅列出 `/Users/jared/Vibings/ChartMage` | passed |
 | Branch cleanup verification | `git branch --list cloudflare-pages-deploy` | 无输出 | 无输出 | passed |
 | Worktree directory verification | `test -d .worktrees/cloudflare-pages-deploy && echo exists || echo missing` | `missing` | `missing` | passed |
+| Wrangler install check | `npx wrangler --version` | Wrangler prints a version | `wrangler 4.86.0` | passed |
+| Manual Pages list script | `npm run pages:list` | Deployment list includes existing production deployment | listed `010f65fe-098e-41bf-9582-40887adf4630` for `chart-mage` | passed |
+| Post-Wrangler build check | `npm run build:check` | Gulp default task completes | `cleanDist`、`buildUseref`、`copyImages`、`default` 完成 | passed |
+| Post-Wrangler editor entry probe | `curl -I 'http://127.0.0.1:8000/index.html?maestro=1'` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Post-Wrangler intro entry probe | `curl -I http://127.0.0.1:8000/intro.html` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Problems check | VS Code Problems for package/runbook/planning files | no errors | no errors found | passed |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
