@@ -51,3 +51,24 @@
 - `gulp@5` 是否会引入新的 `gulpfile.js` 兼容调整需求。
 - `gulp-autoprefixer@10` 对当前 `gulpfile.js` API 需要哪些最小改动。
 - 替换 `gulp-cssnano` 的最小稳定方案是什么。
+
+## 执行期发现
+- 隔离 worktree 已创建在 `.worktrees/legacy-dependency-hardening`，当前分支为 `legacy-dependency-hardening`。
+- 基线构建命令 `./node_modules/.bin/gulp` 可以通过，但 Node 输出 `fs.Stats constructor is deprecated` 警告，来源仍是旧构建链。
+- 标准 smoke 验证依赖 `http://127.0.0.1:8000/index.html?maestro=1`。
+- `:8000` 当前被 PID `84314` 占用；该进程 cwd 为 `/Users/jared/Vibings/ChartMage/.worktrees/cloudflare-pages-deploy`，父进程为 `launchd`，`curl` 返回 empty reply，无法复用为当前 smoke 服务。
+- 用户确认后已终止 PID `84314`，随后标准 smoke 通过。
+- `npm audit` direct dependency 分类：
+  - `browser-sync`：direct high，非 major fix 可用，先处理。
+  - `gulp`：direct high，fix 指向 `gulp@5.0.1` major，应独立决策。
+  - `gulp-autoprefixer`：direct high，fix 指向 `gulp-autoprefixer@10.0.0` major，可能需要处理 ESM/API 兼容。
+  - `gulp-cssnano`：direct moderate，`fixAvailable: false`，应在 CSS minify phase 替换或重做。
+
+## 最终实现发现
+- `browser-sync@3` 消除了 `localtunnel` / old `send` / `serve-static` 风险链。
+- `gulp-autoprefixer@10` 在 CommonJS gulpfile 中需要通过 `.default` 使用；旧 `browsers` option 已替换为 `overrideBrowserslist`。
+- `gulp-cssnano` 被移除后，`gulp-postcss@10` + `cssnano@7` 可以继续在 `useref` 产出的 CSS stream 上完成压缩。
+- CSS minify 链替换后，剩余 `11` 个漏洞全部来自 `gulp@4` 的 watcher/CLI 旧链，因此升级 `gulp@5.0.1` 是有证据支持的。
+- `gulp@5` 带来的关键兼容差异是 `vinyl-fs@4` 的默认编码行为；复制图片等二进制文件必须使用 `{ encoding: false }`，否则会出现 `ef bf bd` replacement bytes 并破坏图片。
+- `del` 只用于 `del.sync("dist")`，已由 `fs.rmSync("dist", { recursive: true, force: true })` 替代，减少 legacy tooling 面。
+- 最终 `npm audit` 和 `npm outdated` 都为 0；没有 remaining vulnerabilities 需要 defer。

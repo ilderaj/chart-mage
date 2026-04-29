@@ -1,14 +1,15 @@
 var gulp = require("gulp");
+var fs = require("fs");
 var browserSync = require("browser-sync").create();
 var useref = require("gulp-useref");
 var uglify = require("gulp-uglify");
 var gulpIf = require("gulp-if");
-var cssnano = require("gulp-cssnano");
-var del = require("del");
-var autoPrefixer = require("gulp-autoprefixer");
+var postcss = require("gulp-postcss");
+var cssnano = require("cssnano");
+var autoPrefixer = require("gulp-autoprefixer").default;
 
 function cleanDist(done) {
-	del.sync("dist");
+	fs.rmSync("dist", { recursive: true, force: true });
 	done();
 }
 
@@ -31,14 +32,14 @@ function buildUseref() {
 	return gulp.src("app/*.html")
 		.pipe(useref())
 		.pipe(gulpIf("*.js", uglify()))
-		.pipe(gulpIf("*.css", autoPrefixer({ browsers: [">5%"] })))
-		.pipe(gulpIf("*.css", cssnano()))
+		.pipe(gulpIf("*.css", autoPrefixer({ overrideBrowserslist: [">5%"] })))
+		.pipe(gulpIf("*.css", postcss([cssnano()])))
 		.pipe(gulp.dest("dist"))
 }
 
 function copyImages() {
-	return gulp.src("app/images/**/*")
-		.pipe(gulp.dest("dist/images"));
+	return gulp.src("app/images/**/*", { encoding: false })
+		.pipe(gulp.dest("dist/images", { encoding: false }));
 }
 
 gulp.task("clean:dist", cleanDist);

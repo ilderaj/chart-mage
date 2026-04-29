@@ -5,8 +5,17 @@
 ## Active Task Link
 
 - Active task path: `planning/active/legacy-dependency-hardening/`
-- Lifecycle state: `waiting_review`
-- Sync-back status: plan written, summary synced to active task files
+- Lifecycle state: `waiting_integration`
+- Sync-back status: execution complete, results synced to active task files
+
+## Execution Result
+
+- Upgraded legacy direct build dependencies in slices.
+- Replaced `gulp-cssnano` with `gulp-postcss` + `cssnano`.
+- Upgraded `gulp` to `5.0.1` after evidence showed all remaining audit risk was in the Gulp 4 watcher/CLI chain.
+- Removed `del` and replaced its single usage with Node `fs.rmSync`.
+- Final result: `npm audit` reports `0` vulnerabilities and `npm outdated` reports `0` outdated dependencies.
+- Final validation passed: `./node_modules/.bin/gulp`, `npm run uat:smoke`, and binary asset copy sanity checks.
 
 ## Goal
 
