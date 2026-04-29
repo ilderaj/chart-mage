@@ -53,12 +53,14 @@ For future UAT coverage, add more YAML flows under `.maestro/flows/` and run the
 
 ## Deployment
 
-ChartMage is deployed on Cloudflare Pages through GitHub integration.
+Production is currently running on Cloudflare Pages at `https://chart-mage.pages.dev` via a temporary direct-upload fallback.
 
-- Production branch: `main`
-- Production URL: `https://<project>.pages.dev`
-- Preview deployments: every non-production branch and supported pull request
+- Current mode: direct-upload fallback
+- Production URL: `https://chart-mage.pages.dev`
+- Intended production branch: `main`
+- Git integration / automatic preview deployments: temporarily blocked until the Cloudflare Pages GitHub installation is repaired
 - First-stage publish surface: `app/`
+- Operational runbook: [`docs/deployment/cloudflare-pages.md`](docs/deployment/cloudflare-pages.md)
 
 ### Local preview
 
