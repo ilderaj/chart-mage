@@ -11,7 +11,9 @@
     "maestro:install": "./scripts/install-maestro.sh",
     "uat:serve": "npm run serve:app",
     "uat:smoke": "./scripts/run-maestro-web-smoke.sh",
-    "uat:smoke:headed": "./scripts/run-maestro-web-smoke.sh --headed"
+    "uat:smoke:headed": "./scripts/run-maestro-web-smoke.sh --headed",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
   },
   "author": "Junlin Shang",
   "license": "ISC",
@@ -23,6 +25,7 @@
     "gulp-if": "^3.0.0",
     "gulp-postcss": "^10.0.0",
     "gulp-uglify": "^3.0.2",
-    "gulp-useref": "^5.0.0"
+    "gulp-useref": "^5.0.0",
+    "wrangler": "^4.86.0"
   }
 }
