@@ -258,6 +258,12 @@ What truly distinguishes Stripe is its shadow system. Rather than the flat or si
 - Don't apply positive letter-spacing at display sizes -- Stripe tracks tight
 - Don't use the magenta/ruby accents for buttons or links -- they're decorative/gradient only
 
+## 8. ChartMage Adoption Notes
+
+- `sohne-var` is not bundled in this repository, so implementation uses a controlled fallback stack that preserves light headline weight and tight tracking intent.
+- The editor and Mermaid canvas remain compatibility surfaces. Their colors are aligned to the Stripe palette, but readability and syntax/diagram clarity take precedence over strict aesthetic fidelity.
+- Shared visual primitives live in `app/css/design-tokens.css`, and page-level files should consume those tokens instead of introducing new hard-coded brand colors.
+
 ## 8. Responsive Behavior
 
 ### Breakpoints

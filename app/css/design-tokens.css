@@ -1,0 +1,159 @@
+:root {
+	--font-sans: "Sohne", "Sohne Buch", "Neue Haas Grotesk Text", "SF Pro Display", "Segoe UI", sans-serif;
+	--font-mono: "Source Code Pro", "SFMono-Regular", "Consolas", monospace;
+	--font-feature-settings: "ss01" 1;
+	--font-weight-light: 300;
+	--font-weight-regular: 400;
+	--font-weight-medium: 500;
+
+	--color-bg: #f6f9fc;
+	--color-surface: #ffffff;
+	--color-surface-muted: #eef4fb;
+	--color-surface-strong: #e9eef8;
+	--color-heading: #061b31;
+	--color-text: #425466;
+	--color-text-muted: #64748d;
+	--color-text-inverse: #f6f9fc;
+	--color-brand: #533afd;
+	--color-brand-hover: #4434d4;
+	--color-brand-soft: #d6d9fc;
+	--color-brand-subtle: rgba(83, 58, 253, 0.08);
+	--color-brand-strong: #1c1e54;
+	--color-border: #e5edf5;
+	--color-border-strong: #cdd8e5;
+	--color-danger: #ea2261;
+	--color-danger-hover: #d11b57;
+	--color-success: #15be53;
+	--color-overlay: rgba(13, 37, 61, 0.58);
+
+	--shadow-soft: 0 3px 6px rgba(23, 23, 23, 0.06);
+	--shadow-card: 0 15px 35px rgba(23, 23, 23, 0.08);
+	--shadow-elevated: 0 30px 45px -30px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
+	--shadow-deep: 0 14px 21px -14px rgba(3, 3, 39, 0.25), 0 8px 17px -8px rgba(0, 0, 0, 0.1);
+
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 8px;
+
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-7: 32px;
+	--space-8: 40px;
+	--space-9: 56px;
+
+	--transition-base: 180ms ease;
+	--focus-ring: 0 0 0 2px rgba(83, 58, 253, 0.24);
+}
+
+html {
+	background: var(--color-bg);
+	color: var(--color-text);
+}
+
+body {
+	font-family: var(--font-sans);
+	font-feature-settings: var(--font-feature-settings);
+	color: var(--color-text);
+	background: var(--color-bg);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--color-heading);
+	font-family: var(--font-sans);
+	font-feature-settings: var(--font-feature-settings);
+	font-weight: var(--font-weight-light);
+	letter-spacing: -0.02em;
+}
+
+a {
+	color: var(--color-brand);
+	transition: color var(--transition-base), background-color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+a:hover {
+	color: var(--color-brand-hover);
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+	font-feature-settings: var(--font-feature-settings);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+	outline: none;
+	box-shadow: var(--focus-ring);
+	border-color: var(--color-brand);
+}
+
+::selection {
+	background: rgba(83, 58, 253, 0.16);
+	color: var(--color-heading);
+}
+
+.button-primary,
+.button-secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	padding: 10px 18px;
+	border-radius: var(--radius-sm);
+	border: 1px solid transparent;
+	font-weight: var(--font-weight-regular);
+	line-height: 1;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.button-primary {
+	background: var(--color-brand);
+	border-color: var(--color-brand);
+	color: var(--color-text-inverse);
+	box-shadow: var(--shadow-elevated);
+}
+
+.button-primary:hover {
+	background: var(--color-brand-hover);
+	border-color: var(--color-brand-hover);
+	color: var(--color-text-inverse);
+	transform: translateY(-1px);
+}
+
+.button-secondary {
+	background: rgba(255, 255, 255, 0.72);
+	border-color: var(--color-brand-soft);
+	color: var(--color-brand);
+	box-shadow: var(--shadow-soft);
+}
+
+.button-secondary:hover {
+	background: var(--color-brand-subtle);
+	border-color: var(--color-brand);
+	color: var(--color-brand-hover);
+}
+
+.surface-card {
+	background: rgba(255, 255, 255, 0.88);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-card);
+	backdrop-filter: blur(18px);
+	-webkit-backdrop-filter: blur(18px);
+}

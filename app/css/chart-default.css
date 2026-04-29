@@ -2,90 +2,90 @@
 /* Sequence Diagram variables */
 /* Gantt chart variables */
 .mermaid .label {
-  color: #333;
+  color: #061b31;
 }
 .node rect,
 .node circle,
 .node ellipse,
 .node polygon {
   fill: white;
-  stroke: #474C72;
+  stroke: #425466;
   stroke-width: 1px;
 }
 .edgePath .path {
-  stroke: #474C72;
+  stroke: #425466;
 }
 .edgeLabel {
-  background-color: #F4F7F9;
+  background-color: rgba(246, 249, 252, 0.92);
 }
 .cluster rect {
-  fill: #F4F7F9 !important;
+  fill: #eef4fb !important;
   rx: 4 !important;
-  stroke: #474C72 !important;
+  stroke: #425466 !important;
   stroke-width: 1px !important;
 }
 .cluster text {
-  fill: #474C72;
+  fill: #061b31;
 }
 .actor {
-  stroke: #474C72;
+  stroke: #425466;
   fill: white;
 }
 text.actor {
-  fill: #474C72;
+  fill: #061b31;
   stroke: none;
 }
 .actor-line {
   stroke-width: 1;
   stroke-dasharray: 3, 3;
-  stroke: #474C72;
+  stroke: #64748d;
 }
 .messageLine0 {
   stroke-width: 1.5;
   stroke-dasharray: "2 2";
   marker-end: "url(#arrowhead)";
-  stroke: #474C72;
+  stroke: #425466;
 }
 .messageLine1 {
   stroke-width: 1.5;
   stroke-dasharray: 2, 2;
-  stroke: #474C72;
+  stroke: #425466;
 }
 #arrowhead {
-  fill: #474C72;
+  fill: #425466;
 }
 #crosshead path {
-  fill: #474C72 !important;
-  stroke: #474C72 !important;
+  fill: #425466 !important;
+  stroke: #425466 !important;
 }
 .messageText {
-  fill: #474C72;
+  fill: #061b31;
   stroke: none;
 }
 .labelBox {
-  stroke: #474C72;
-  fill: #F4F7F9;
+  stroke: #425466;
+  fill: #eef4fb;
 }
 .labelText {
-  fill: #474C72;
+  fill: #061b31;
   stroke: none;
 }
 .loopText {
-  fill: #474C72;
+  fill: #061b31;
   stroke: none;
 }
 .loopLine {
   stroke-width: 1;
   stroke-dasharray: "2 2";
   marker-end: "url(#arrowhead)";
-  stroke: #474C72;
+  stroke: #425466;
 }
 .note {
-  stroke: #E0C75D;
-  fill: #FADE68;
+  stroke: #d9b75e;
+  fill: #fff1ba;
 }
 .noteText {
-  fill: #474C72;
+  fill: #061b31;
   stroke: none;
 }
 /** Section styling */
@@ -105,16 +105,16 @@ text.actor {
   opacity: 0.2;
 }
 .sectionTitle0 {
-  fill: #333;
+  fill: #061b31;
 }
 .sectionTitle1 {
-  fill: #333;
+  fill: #061b31;
 }
 .sectionTitle2 {
-  fill: #333;
+  fill: #061b31;
 }
 .sectionTitle3 {
-  fill: #333;
+  fill: #061b31;
 }
 .sectionTitle {
   text-anchor: start;
@@ -166,8 +166,8 @@ text.actor {
 .task1,
 .task2,
 .task3 {
-  fill: #8a90dd;
-  stroke: #534fbc;
+  fill: #b9b9f9;
+  stroke: #533afd;
 }
 .taskTextOutside0,
 .taskTextOutside2 {
@@ -182,8 +182,8 @@ text.actor {
 .active1,
 .active2,
 .active3 {
-  fill: #bfc7ff;
-  stroke: #534fbc;
+  fill: #d6d9fc;
+  stroke: #533afd;
 }
 .activeText0,
 .activeText1,
@@ -248,14 +248,14 @@ text.actor {
 .titleText {
   text-anchor: middle;
   font-size: 18px;
-  fill: black;
+  fill: #061b31;
 }
 /*
 
 
 */
 .node text {
-  font-family: 'trebuchet ms', verdana, arial;
+  font-family: "Sohne", "Sohne Buch", "Neue Haas Grotesk Text", "SF Pro Display", "Segoe UI", sans-serif;
   font-size: 12px;
 }
 div.mermaidTooltip {
@@ -263,10 +263,10 @@ div.mermaidTooltip {
   text-align: center;
   max-width: 200px;
   padding: 2px;
-  font-family: 'trebuchet ms', verdana, arial;
+  font-family: "Sohne", "Sohne Buch", "Neue Haas Grotesk Text", "SF Pro Display", "Segoe UI", sans-serif;
   font-size: 12px;
-  background: #ffffde;
-  border: 1px solid #aaaa33;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5edf5;
   border-radius: 2px;
   pointer-events: none;
   z-index: 100;

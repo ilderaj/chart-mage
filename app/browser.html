@@ -9,34 +9,65 @@
     <title>Chart Mage - Draw sequence diagrams and flowcharts at lightning speed.</title>
 
     <link rel="icon" href="images/favicon.png">
+    <link rel="stylesheet" href="css/design-tokens.css">
 
     <style type="text/css">
+      html,
       body {
-        font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
-        font-weight: 300;
-        background-color: #F4F7F9;
+        min-height: 100%;
+        margin: 0;
+      }
+      body {
+        font-family: var(--font-sans);
+        font-feature-settings: var(--font-feature-settings);
+        font-weight: var(--font-weight-light);
+        background:
+          radial-gradient(circle at top left, rgba(249, 107, 238, 0.18), transparent 26%),
+          radial-gradient(circle at top right, rgba(83, 58, 253, 0.16), transparent 24%),
+          linear-gradient(180deg, #ffffff 0%, var(--color-bg) 100%);
+        color: var(--color-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+      }
+      .browser-card {
+        width: min(780px, 100%);
+        padding: 32px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: var(--shadow-elevated);
         text-align: center;
       }
       h1 {
-        font-weight: 500;
-        font-size: 48px;
+        font-weight: var(--font-weight-light);
+        font-size: clamp(34px, 5vw, 52px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+        color: var(--color-heading);
+        margin: 0 0 18px;
       }
       p {
-        font-size: 16px;
+        font-size: 18px;
+        line-height: 1.55;
+        margin: 0;
       }
       a {
-        /*text-decoration: none;*/
-        color: #02C385;
+        color: var(--color-brand);
       }
       div {
         margin-top: 24px;
       }
       .thin {
-        color: #959697;
-        margin-top: 8px;
+        color: var(--color-text-muted);
+        margin-top: 14px;
+        font-size: 14px;
       }
       img {
-        width: 560px;
+        width: min(560px, 100%);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-card);
       }
     </style>
 
@@ -52,12 +83,13 @@
   </head>
 
   <body>
-    <h1>Not working fine with IE :(</h1>
-    <p>Chart Mage needs some features that IE doesn't provide. Please use the latest version of <a href="http://www.google.com/chrome/">Chrome</a> or <a href="http://www.firefox.com">Firefox</a>.</p>
-    <div class="kitten">
-      <img src="images/cat.jpg">
-      <p class="thin">You'll be back, right?</p>
+    <div class="browser-card">
+      <h1>Chart Mage leaves IE behind.</h1>
+      <p>Chart Mage depends on modern browser features that Internet Explorer never shipped. Please open it in the latest version of <a href="http://www.google.com/chrome/">Chrome</a> or <a href="http://www.firefox.com">Firefox</a>.</p>
+      <div class="kitten">
+        <img src="images/cat.jpg">
+        <p class="thin">The diagrams will still be here when you come back with a modern browser.</p>
+      </div>
     </div>
-    
   </body>
 </html>
