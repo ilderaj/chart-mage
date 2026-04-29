@@ -26,9 +26,16 @@ $(function() {
 
   function updateShellMeta() {
     if (!controller.currentChart) return;
-    $("#current-chart-name").text(controller.currentChart.name);
-    $("#current-chart-type").text(chartTypeLabel(controller.currentChart.type));
+
+    var chartName = controller.currentChart.name;
+    var chartType = chartTypeLabel(controller.currentChart.type);
+
+    $("#current-chart-name").text(chartName);
+    $("#current-chart-type").text(chartType);
     $("#save-state-pill").text("Saved locally");
+    $("#workspace-file-name").text(chartName + ".cm");
+    $("#workspace-file-type").text(chartType);
+    $("#workspace-file-status").text("Saved locally");
   }
 
   function renderChartsCollections(filterText) {
