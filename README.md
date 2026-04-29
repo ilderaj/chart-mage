@@ -50,3 +50,30 @@ They cover sequence creation plus rename/delete behavior in the charts drawer an
 - Helper scripts: `scripts/install-maestro.sh` and `scripts/run-maestro-web-smoke.sh`
 
 For future UAT coverage, add more YAML flows under `.maestro/flows/` and run them with the same CLI entrypoint.
+
+## Deployment
+
+ChartMage is deployed on Cloudflare Pages through GitHub integration.
+
+- Production branch: `main`
+- Production URL: `https://<project>.pages.dev`
+- Preview deployments: every non-production branch and supported pull request
+- First-stage publish surface: `app/`
+
+### Local preview
+
+```bash
+npm run serve:app
+```
+
+Open `http://127.0.0.1:8000/index.html`.
+
+### Legacy build pipeline
+
+The repository still includes the historical Gulp pipeline for local build verification:
+
+```bash
+npm run build:check
+```
+
+Cloudflare Pages is not required to use that pipeline for the first production rollout.
