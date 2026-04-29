@@ -7,7 +7,7 @@
 ## Current State
 Status: active
 Archive Eligible: no
-Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, and the latest `app/` snapshot was redeployed on 2026-04-30 as deployment `f83819ca`. Local and origin `master` have been removed. User has now created a GitHub-connected Worker `chartmage`; current session is validating and converging that Worker deployment path as the likely automatic deployment replacement.
+Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, and the latest `app/` snapshot was redeployed on 2026-04-30 as deployment `f83819ca`. Local and origin `master` have been removed. GitHub-connected Worker `chartmage` is now verified as the primary automatic deployment path; PR #2 is open to converge the remaining `dev` deployment runbook / fallback changes into `main`.
 
 ## Current Phase
 Phase 11
@@ -30,7 +30,8 @@ Phase 11
 8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（已完成，worktree / branch 已清理）
 9. 补齐 Wrangler direct-upload 手动 redeploy fallback：依赖、npm scripts、runbook 和本地验证（已完成；待提交 / 推送）
 10. 清理本地 / 远端 `master`，核验 `dev -> origin/dev -> PR -> origin/main -> Pages` 目标链路，并用 fallback 发布最新 `app/` 快照（已完成；Git 自动部署仍被 `8000011` 阻塞）
-11. 验证并收敛 GitHub-connected Worker `chartmage`：合入 `wrangler.jsonc`，确认 `main` 自动 production build 和非生产 preview build，整理域名策略（进行中）
+11. 验证并收敛 GitHub-connected Worker `chartmage`：合入 `wrangler.jsonc`，确认 `main` 自动 production build 和非生产 preview build，整理域名策略（已完成；PR #2 进行中）
+12. 将 `dev` 中剩余 Pages fallback / runbook 收敛通过 PR 合入 `main`，触发 Worker production 自动发布并最终验证（进行中）
 
 ## Risk Assessment
 
@@ -67,6 +68,8 @@ Phase 11
 | 仓库收敛必须先于 Git 集成重试 | 当前 `main` 缺少部署文件，Cloudflare 后续从 Git 构建必须以 main 上的真实发布契约为准 |
 | 本次合并以 `main` 为用户指定目标分支 | 用户明确要求将 `cloudflare-pages-deploy` worktree 合回 local `main`，并推送到 `origin/main` |
 | `chartmage` Worker 可作为自动发布主路径候选 | Workers Builds 已成功连接 GitHub repo `ilderaj/chart-mage`，且 Cloudflare 自动生成配置 PR 可合入 main；但它的默认域名是 `workers.dev`，不是 `pages.dev` |
+| `chartmage` Worker 作为当前 primary automatic deploy path | PR #1 已合入 `main`，production build `96787207` 成功；`dev` push 也成功生成 non-production preview `https://dev-chartmage.ilderaj.workers.dev` |
+| `chart-mage.pages.dev` 保留为 Pages direct-upload fallback | 当前 Pages Git integration 仍被 `8000011` 阻塞；Pages fallback 可继续手动发布，但不再是自动发布主路径 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |

@@ -67,9 +67,12 @@
 - 2026-04-30 Git integration 探测：使用临时项目名 `chart-mage-git-probe-20260430`、GitHub repo `ilderaj/chart-mage`、production branch `main` 创建 Git-integrated Pages project，仍返回 `8000011`；当前不能安全替换 `chart-mage` direct-upload 项目。
 - 2026-04-30 Worker 复核：用户创建的 Worker `chartmage` 存在，`has_assets = true`，`compatibility_date = 2026-04-29`，`compatibility_flags = ["nodejs_compat"]`，observability enabled，当前 `https://chartmage.ilderaj.workers.dev` 返回 `200`。
 - 2026-04-30 Worker Builds 复核：Cloudflare 为 repo `ilderaj/chart-mage` 创建了 PR #1 `Add Cloudflare Workers configuration`，状态检查 `Workers Builds: chartmage` 为 success，PR mergeable/clean。
-- 2026-04-30 Worker Builds 复核：default branch trigger `8b77d198-4c3b-42b3-9585-0052216eab5b` 监听 `main`，build command 为 `npm run build`，deploy command 为 `npx wrangler deploy`；non-production trigger `8ec87900-413c-48bd-9d19-e2be8c8db4b3` 监听非 `main` 分支，deploy command 为 `npx wrangler versions upload`，预览 URL 形态为 `https://<branch>-chartmage.typemint.workers.dev`。
+- 2026-04-30 Worker Builds 复核：default branch trigger `8b77d198-4c3b-42b3-9585-0052216eab5b` 监听 `main`，build command 为 `npm run build`，deploy command 为 `npx wrangler deploy`；non-production trigger `8ec87900-413c-48bd-9d19-e2be8c8db4b3` 监听非 `main` 分支，deploy command 为 `npx wrangler versions upload`，`dev` 预览 URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
 - 2026-04-30 Worker 配置复核：Cloudflare 自动生成的 `wrangler.jsonc` 指向 Worker name `chartmage`，assets directory 为 `dist`，这与当前 `npm run build` 生成的 Gulp output 一致。
 - 2026-04-30 域名复核：`*.pages.dev` 是 Cloudflare Pages 项目的免费二级域名，Worker 的免费二级域名形态是 `<worker>.<account-subdomain>.workers.dev`；`chartmage.pages.dev` 不能作为 Worker 的 `workers.dev` 域名直接配置，只能通过 Pages 项目名或自有 custom domain 达成类似短域名。
+- 2026-04-30 Worker 自动发布验证：PR #1 已合入 `origin/main`，main production build `96787207` 成功，`https://chartmage.ilderaj.workers.dev/` 已包含最新 `workspaceFileFrame` / `workspaceSplit` 结构，`/intro.html` 与 `/index.html?maestro=1` 均返回 `200`。
+- 2026-04-30 Worker preview 验证：`origin/dev` push 触发 build `ad9ca3eb-0585-4dce-a342-73536f8c4802`，最终 `status = stopped`、`build_outcome = success`，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+- 2026-04-30 GitHub PR 收敛：已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`，用于把 Pages fallback scripts / runbook / task records 收敛进 `main` 并通过 Worker build check 验证。
 
 ## Technical Decisions
 | Decision | Rationale |
@@ -90,6 +93,7 @@
 | `origin/master` / 本地 `master` 残留 | 已按用户要求清理；保留 `upstream/master`，因为它属于上游仓库历史引用，不是 origin 发布链路的一部分 |
 | `dev -> origin/dev -> PR -> origin/main -> Pages` 不能自动触发 production | 当前 Cloudflare 项目仍是 direct upload；要么修复 Cloudflare GitHub installation 后新建 Git-integrated Pages project，要么后续改走 GitHub Actions + Wrangler direct-upload CI 并配置 Cloudflare API token secret |
 | Worker `chartmage` 与 Pages `chart-mage` 并存 | Worker 现在是可自动化候选主入口；Pages 仍可保留为 fallback，但文档和 package scripts 需要明确哪一个是 primary deploy target |
+| `chartmage.pages.dev` 域名诉求不能由 Worker 免费域名满足 | `*.pages.dev` 属于 Pages 产品；Worker 只能使用 `*.workers.dev` 免费域名或绑定 custom domain |
 
 ## Resources
 - https://developers.cloudflare.com/pages/get-started/git-integration/

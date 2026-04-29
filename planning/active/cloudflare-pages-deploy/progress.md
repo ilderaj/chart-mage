@@ -2,7 +2,7 @@
 
 ## 2026-04-30 Worker Git deployment convergence
 
-- **Status:** in_progress
+- **Status:** complete
 - Actions taken:
   - 已读取 Workers / Wrangler 技能与当前 Cloudflare deploy 任务文件，确认这是同一发布链路收敛任务的延续。
   - 已通过 Cloudflare API 确认 Worker `chartmage` 存在，具备 static assets，`https://chartmage.ilderaj.workers.dev` 返回 `200`。
@@ -11,7 +11,32 @@
   - 已反查 Worker build IDs：default branch trigger 监听 `main` 并执行 `npm run build` + `npx wrangler deploy`；non-production trigger 监听非 `main` 并执行 `npm run build` + `npx wrangler versions upload`。
   - 已确认 PR #1 主要添加 `.gitignore` Wrangler 忽略项、`wrangler.jsonc`、`deploy` / `preview` scripts 和 Wrangler devDependency；`wrangler.jsonc` 的 assets directory 为 `dist`，符合当前 Gulp build output。
   - 已确认 `*.pages.dev` 不能直接作为 Worker 的免费二级域名；Worker 免费域名是 `chartmage.ilderaj.workers.dev`，若要短域名应使用 custom domain，或继续使用 Pages 项目 `chart-mage.pages.dev`。
+  - 已合并 Cloudflare 自动创建的 PR #1 到 `origin/main`，确认 production build `96787207` 成功。
+  - 已验证 `https://chartmage.ilderaj.workers.dev/` 包含 `workspaceFileFrame` / `workspaceSplit`，`/intro.html` 与 `/index.html?maestro=1` 均返回 `200`。
+  - 已将 `origin/main` 合入 `dev`，解决 `package-lock.json` 冲突，运行 `npm run build:check` 与 `npx wrangler deploy --dry-run` 通过后推送 `origin/dev`。
+  - 已确认 `origin/dev` build `ad9ca3eb-0585-4dce-a342-73536f8c4802` 成功，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+  - 已执行 `git fetch --prune origin`，清理删除后的 `origin/cloudflare/workers-autoconfig` remote-tracking ref。
+  - 已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`；PR 的 `Workers Builds: chartmage` 检查已触发 build `a8e6a27e-4d11-4035-b818-3500644b93c2`，当前仍在运行。
+  - 已将部署 runbook 更新为 Worker primary / Pages fallback，避免继续把 direct-upload Pages 描述为当前自动发布目标。
 - Files created/modified:
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
+## 2026-04-30 Dev-to-main convergence PR
+
+- **Status:** in_progress
+- Actions taken:
+  - 已确认 `dev -> main` 原本没有打开 PR。
+  - 已创建 PR #2：`https://github.com/ilderaj/chart-mage/pull/2`。
+  - 已确认 PR #2 不需要强制 approval，Cloudflare Worker check 已触发。
+  - 已继续更新 runbook 和 planning 文件，准备提交并推送到 `dev`，让 PR #2 包含最终收敛说明。
+  - 已运行 `git diff --check`，无空白错误。
+  - 已运行 `npm run build:check`，Gulp build 通过；仅出现既有 `fs.Stats constructor` deprecation warning。
+  - 已确认本次 build 未产生需要提交的 `dist` 改动，工作区仅剩 runbook 与 planning 文件变更。
+- Files created/modified:
+  - docs/deployment/cloudflare-pages.md (updated)
   - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
   - planning/active/cloudflare-pages-deploy/findings.md (updated)
   - planning/active/cloudflare-pages-deploy/progress.md (updated)
