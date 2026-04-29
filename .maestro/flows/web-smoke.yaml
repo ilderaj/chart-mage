@@ -1,0 +1,22 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - smoke
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- assertVisible: "Diagram Input"
+- assertVisible: "Live Preview"
+- tapOn:
+    id: "new-flowchart-button"
+- assertVisible: "Chart Name"
+- tapOn:
+    id: "flowchart-name-input"
+- inputText: "Maestro Smoke Flow"
+- tapOn: "Create"
+- assertVisible: "Maestro Smoke Flow"
+- tapOn:
+    id: "show-charts-button"
+- assertVisible: "Sample flowchart"
+- assertVisible: "Maestro Smoke Flow"

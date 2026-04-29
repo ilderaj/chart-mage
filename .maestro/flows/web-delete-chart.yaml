@@ -1,0 +1,34 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - charts
+  - delete
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- tapOn:
+    id: "new-flowchart-button"
+- assertVisible: "Chart Name"
+- tapOn:
+    id: "flowchart-name-input"
+- inputText: "Delete Target Flow"
+- tapOn: "Create"
+- assertVisible: "Delete Target Flow"
+- tapOn:
+    id: "show-charts-button"
+- tapOn: "Sample flowchart"
+- tapOn:
+    id: "show-charts-button"
+- tapOn:
+    id: "drawer-search"
+- inputText: "Delete Target Flow"
+- tapOn: "Delete"
+- assertVisible: "Delete Confirmation"
+- tapOn:
+    id: "confirm-del-button"
+- tapOn:
+    id: "show-charts-button"
+- tapOn:
+    id: "drawer-search"
+- inputText: "Delete Target Flow"
+- assertVisible: "No charts match your search."

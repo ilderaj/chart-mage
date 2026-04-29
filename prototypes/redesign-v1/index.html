@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChartMage · Redesign Prototype v1</title>
+<link rel="stylesheet" href="../../app/css/design-tokens.css">
+<style>
+/* ============ Prototype shell ============ */
+:root {
+  --canvas-bg: #eef2f8;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--canvas-bg);
+  font-family: var(--font-sans);
+  font-feature-settings: var(--font-feature-settings);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}
+.proto-bar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 28px;
+  display: flex; align-items: center; gap: 24px;
+}
+.proto-bar h1 {
+  font-size: 14px; font-weight: 400; margin: 0;
+  color: var(--color-heading); letter-spacing: -0.01em;
+}
+.proto-bar nav { display: flex; gap: 6px; }
+.proto-bar nav a {
+  font-size: 13px; font-weight: 400;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 6px 10px; border-radius: 4px;
+  transition: all 180ms ease;
+}
+.proto-bar nav a:hover { color: var(--color-heading); background: var(--color-brand-subtle); }
+.proto-bar .badge {
+  margin-left: auto;
+  font-size: 11px; padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(21,190,83,0.18);
+  color: #108c3d;
+  border: 1px solid rgba(21,190,83,0.4);
+  font-weight: 400;
+}
+
+.proto-section {
+  padding: 64px 28px;
+  border-bottom: 1px dashed var(--color-border-strong);
+}
+.proto-section > header {
+  max-width: 1200px; margin: 0 auto 28px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+}
+.proto-section .label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-brand);
+}
+.proto-section .desc {
+  font-size: 14px; color: var(--color-text-muted); max-width: 520px;
+}
+
+/* ============ Logo ============ */
+.cm-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.cm-logo .mark {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #533afd 0%, #2e2b8c 100%);
+  position: relative;
+  box-shadow: 0 6px 14px -6px rgba(83,58,253,0.55), inset 0 0 0 1px rgba(255,255,255,0.12);
+}
+.cm-logo .mark::before,
+.cm-logo .mark::after {
+  content: ""; position: absolute;
+  background: #ffffff;
+  border-radius: 1px;
+}
+/* horizontal connector */
+.cm-logo .mark::before {
+  left: 6px; right: 6px; top: 50%;
+  height: 2px; transform: translateY(-50%);
+  opacity: 0.92;
+}
+/* node bullets */
+.cm-logo .mark::after {
+  left: 5px; top: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: 12px 0 0 0 #ffffff;
+}
+.cm-logo .word {
+  font-size: 17px; font-weight: 400;
+  color: var(--color-heading);
+  letter-spacing: -0.02em;
+}
+.cm-logo .word b { font-weight: 500; }
+
+/* ============ Frame container ============ */
+.frame {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--color-surface);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+}
+.frame.frame-mobile {
+  max-width: 380px;
+  border-radius: 28px;
+  padding: 8px;
+  background: #0d253d;
+}
+.frame.frame-mobile .inner {
+  background: var(--color-surface);
+  border-radius: 22px;
+  overflow: hidden;
+  height: 720px;
+  position: relative;
+}
+
+/* ============ Landing ============ */
+.landing-nav {
+  display: flex; align-items: center;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+}
+.landing-nav .links {
+  display: flex; gap: 4px; margin-left: 36px;
+}
+.landing-nav .links a {
+  font-size: 14px; font-weight: 400;
+  color: var(--color-heading);
+  text-decoration: none;
+  padding: 6px 12px; border-radius: 4px;
+}
+.landing-nav .links a:hover { background: var(--color-brand-subtle); color: var(--color-brand); }
+.landing-nav .right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.landing-nav .right a { font-size: 14px; color: var(--color-heading); text-decoration: none; padding: 6px 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px; border-radius: 4px;
+  font-size: 14px; font-weight: 400;
+  font-family: var(--font-sans); font-feature-settings: var(--font-feature-settings);
+  text-decoration: none; line-height: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+.btn-primary { background: var(--color-brand); color: #fff; }
+.btn-primary:hover { background: var(--color-brand-hover); }
+.btn-ghost { background: transparent; color: var(--color-brand); border-color: var(--color-brand-soft); }
+.btn-ghost:hover { background: var(--color-brand-subtle); }
+.btn-neutral { background: transparent; color: var(--color-heading); border-color: var(--color-border-strong); }
+.btn-neutral:hover { background: var(--color-surface-muted); }
+.btn-icon {
+  width: 32px; height: 32px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  background: transparent; border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.btn-icon:hover { color: var(--color-brand); border-color: var(--color-brand-soft); background: var(--color-brand-subtle); }
+
+.hero {
+  padding: 96px 32px 80px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 56px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -40%; right: -20%;
+  width: 720px; height: 720px;
+  background: radial-gradient(circle at 30% 30%, rgba(249,107,238,0.12) 0%, rgba(83,58,253,0.04) 40%, transparent 70%);
+  pointer-events: none;
+}
+.hero .eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 400;
+  color: var(--color-brand);
+  background: var(--color-brand-subtle);
+  border: 1px solid var(--color-brand-soft);
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-size: 56px; line-height: 1.03;
+  letter-spacing: -1.4px;
+  font-weight: 300;
+  color: var(--color-heading);
+  margin: 0 0 20px;
+}
+.hero h1 em { font-style: normal; color: var(--color-brand); }
+.hero .lede {
+  font-size: 18px; line-height: 1.5;
+  font-weight: 300;
+  color: var(--color-text-muted);
+  margin: 0 0 28px;
+  max-width: 480px;
+}
+.hero .actions { display: flex; gap: 10px; }
+.hero .meta {
+  margin-top: 32px;
+  display: flex; gap: 24px;
+  font-size: 13px; color: var(--color-text-muted);
+}
+.hero .meta strong { color: var(--color-heading); font-weight: 400; }
+
+/* Hero demo: side-by-side editor → diagram, static & polished */
+.hero-demo {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 30px 45px -30px rgba(50,50,93,0.25), 0 18px 36px -18px rgba(0,0,0,0.1);
+  position: relative;
+}
+.hero-demo .tabs {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 12px;
+}
+.hero-demo .tabs .dot { width: 9px; height: 9px; border-radius: 50%; background: #cdd8e5; }
+.hero-demo .tabs .dot:nth-child(1) { background: #ea2261; opacity: 0.8; }
+.hero-demo .tabs .dot:nth-child(2) { background: #f9a826; opacity: 0.8; }
+.hero-demo .tabs .dot:nth-child(3) { background: #15be53; opacity: 0.8; }
+.hero-demo .tabs .title {
+  font-family: var(--font-mono); font-size: 12px; color: var(--color-text-muted);
+  margin-left: 8px;
+}
+.hero-demo .body { display: grid; grid-template-columns: 1fr 1fr; }
+.hero-demo .code-pane {
+  background: #fafbfd;
+  padding: 18px 20px;
+  font-family: var(--font-mono);
+  font-size: 12px; line-height: 2;
+  color: var(--color-heading);
+  border-right: 1px solid var(--color-border);
+}
+.hero-demo .code-pane .k { color: var(--color-brand); }
+.hero-demo .code-pane .a { color: #ea2261; }
+.hero-demo .code-pane .arrow { color: var(--color-brand-strong); font-weight: 700; }
+.hero-demo .code-pane .m { color: var(--color-text); }
+.hero-demo .code-pane .c { color: var(--color-text-muted); }
+.hero-demo .preview-pane {
+  padding: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+  display: flex; align-items: center; justify-content: center;
+  min-height: 280px;
+}
+/* simple SVG sequence diagram */
+.diag-svg { width: 100%; max-width: 320px; height: auto; }
+
+/* Logo proposals */
+.logo-grid {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.logo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 32px;
+  display: flex; flex-direction: column; gap: 16px;
+  align-items: flex-start;
+  box-shadow: var(--shadow-soft);
+}
+.logo-card .name {
+  font-size: 12px; color: var(--color-text-muted);
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em;
+}
+.logo-card .desc {
+  font-size: 13px; color: var(--color-text-muted); line-height: 1.5;
+}
+.logo-card.dark { background: var(--color-brand-strong); border-color: var(--color-brand-strong); }
+.logo-card.dark .name { color: rgba(255,255,255,0.6); }
+.logo-card.dark .desc { color: rgba(255,255,255,0.7); }
+.logo-card.dark .cm-logo .word { color: #fff; }
+
+/* Logo variant: connector */
+.lv-mark {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #533afd 0%, #2e2b8c 100%);
+  position: relative;
+  box-shadow: 0 8px 18px -8px rgba(83,58,253,0.6), inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+.lv-mark::before {
+  content: ""; position: absolute;
+  left: 8px; right: 8px; top: 50%;
+  height: 2px; background: #fff; border-radius: 1px;
+  transform: translateY(-50%);
+}
+.lv-mark::after {
+  content: ""; position: absolute;
+  left: 7px; top: 50%;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #fff;
+  transform: translateY(-50%);
+  box-shadow: 14px 0 0 0 #fff;
+}
+.lv-arrow {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  position: relative;
+}
+.lv-arrow svg { position: absolute; inset: 0; margin: auto; }
+
+/* Features */
+.features {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.feature-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 28px;
+  box-shadow: var(--shadow-soft);
+  transition: all 200ms ease;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.feature-card:hover {
+  box-shadow: 0 30px 45px -30px rgba(50,50,93,0.25), 0 18px 36px -18px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+.feature-card .icon {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  background: var(--color-brand-subtle);
+  color: var(--color-brand);
+  display: flex; align-items: center; justify-content: center;
+}
+.feature-card h3 {
+  font-size: 22px; line-height: 1.1;
+  letter-spacing: -0.22px; font-weight: 300;
+  color: var(--color-heading); margin: 0;
+}
+.feature-card p {
+  font-size: 14px; line-height: 1.5;
+  color: var(--color-text-muted); margin: 0;
+}
+
+/* Dark band */
+.dark-band {
+  background: var(--color-brand-strong);
+  color: #fff;
+  padding: 80px 32px;
+}
+.dark-band .inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 56px;
+  align-items: center;
+}
+.dark-band h2 {
+  font-size: 32px; line-height: 1.1;
+  letter-spacing: -0.64px; font-weight: 300;
+  color: #fff; margin: 0 0 16px;
+}
+.dark-band p {
+  font-size: 16px; line-height: 1.5; font-weight: 300;
+  color: rgba(255,255,255,0.72);
+  margin: 0 0 24px;
+}
+.dark-band .stat-grid {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 24px;
+}
+.dark-band .stat {
+  border-left: 1px solid rgba(255,255,255,0.18);
+  padding-left: 16px;
+}
+.dark-band .stat .num {
+  font-size: 32px; font-weight: 300; letter-spacing: -0.64px;
+  color: #fff; font-feature-settings: "tnum" 1;
+}
+.dark-band .stat .lbl {
+  font-size: 12px; color: rgba(255,255,255,0.6);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+/* ============ Editor screen ============ */
+.app-nav {
+  display: flex; align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  gap: 16px;
+}
+.app-nav .chart-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  font-size: 13px; color: var(--color-heading);
+}
+.app-nav .chart-pill .type {
+  font-family: var(--font-mono); font-size: 10px;
+  background: var(--color-brand);
+  color: #fff;
+  padding: 1px 6px; border-radius: 3px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.app-nav .save-state {
+  font-size: 12px; color: var(--color-text-muted);
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.app-nav .save-state::before {
+  content: ""; width: 6px; height: 6px;
+  border-radius: 50%; background: var(--color-success);
+}
+.app-nav .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+.workspace {
+  display: grid; grid-template-columns: 1fr 1fr;
+  height: 640px;
+  background: var(--color-surface-muted);
+}
+.pane {
+  background: var(--color-surface);
+  display: flex; flex-direction: column;
+}
+.pane + .pane { border-left: 1px solid var(--color-border); }
+
+.pane-header {
+  display: flex; align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  gap: 12px;
+}
+.pane-header .label {
+  font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+}
+.pane-header .title {
+  font-size: 13px; color: var(--color-heading);
+}
+.pane-header .tools { margin-left: auto; display: flex; gap: 4px; }
+.tool-chip {
+  padding: 4px 8px; font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 180ms ease;
+}
+.tool-chip:hover { color: var(--color-brand); border-color: var(--color-brand-soft); background: var(--color-brand-subtle); }
+.tool-chip.active { color: var(--color-brand); background: var(--color-brand-subtle); border-color: var(--color-brand-soft); }
+
+/* Syntax quick-insert bar */
+.quick-bar {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: #fafbfd;
+}
+.quick-bar .chip {
+  font-family: var(--font-mono); font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-heading);
+  cursor: pointer;
+}
+.quick-bar .chip:hover { color: var(--color-brand); border-color: var(--color-brand-soft); }
+.quick-bar .chip kbd {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--color-text-muted);
+  margin-left: 6px;
+  padding: 1px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  background: var(--color-surface-muted);
+}
+
+.code-area {
+  flex: 1;
+  padding: 18px 20px;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.9;
+  color: var(--color-heading);
+  background: #ffffff;
+  overflow: auto;
+}
+.code-area .k { color: var(--color-brand); font-weight: 500; }
+.code-area .a { color: #ea2261; }
+.code-area .arrow { color: var(--color-brand-strong); font-weight: 700; }
+.code-area .m { color: var(--color-text); }
+.code-area .c { color: var(--color-text-muted); }
+.code-area .ln {
+  display: inline-block; width: 24px;
+  color: var(--color-border-strong);
+  user-select: none; text-align: right;
+  margin-right: 14px; font-size: 11px;
+}
+
+.canvas-area {
+  flex: 1;
+  padding: 32px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  background-image:
+    linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%),
+    radial-gradient(circle, #e5edf5 1px, transparent 1px);
+  background-size: 100% 100%, 16px 16px;
+  background-blend-mode: normal, normal;
+}
+.canvas-area::before {
+  content: "";
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(13,37,61,0.06) 1px, transparent 1px);
+  background-size: 18px 18px;
+  pointer-events: none;
+}
+
+.canvas-status {
+  position: absolute; bottom: 12px; left: 16px;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--color-text-muted);
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(8px);
+  padding: 4px 8px; border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+/* Charts drawer */
+.with-drawer { position: relative; }
+.drawer {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 360px;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -30px 0 45px -30px rgba(50,50,93,0.25), -18px 0 36px -18px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column;
+  z-index: 5;
+}
+.drawer-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center; gap: 12px;
+}
+.drawer-header h3 {
+  font-size: 18px; font-weight: 300; letter-spacing: -0.18px;
+  color: var(--color-heading); margin: 0;
+}
+.drawer-header .close {
+  margin-left: auto;
+  background: none; border: none; cursor: pointer;
+  color: var(--color-text-muted); font-size: 16px;
+  width: 24px; height: 24px; border-radius: 4px;
+}
+.drawer-search {
+  padding: 12px 16px; border-bottom: 1px solid var(--color-border);
+}
+.drawer-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--color-surface-muted);
+}
+.drawer-search input:focus { outline: none; border-color: var(--color-brand); background: #fff; box-shadow: var(--focus-ring); }
+.drawer-list { flex: 1; overflow-y: auto; padding: 8px; }
+.drawer-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px;
+  transition: background 180ms ease;
+}
+.drawer-item:hover { background: var(--color-brand-subtle); }
+.drawer-item.active { background: var(--color-brand-subtle); }
+.drawer-item .row1 { display: flex; align-items: center; gap: 8px; }
+.drawer-item .name { font-size: 14px; color: var(--color-heading); flex: 1; }
+.drawer-item .type {
+  font-family: var(--font-mono); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 1px 5px; border-radius: 3px;
+}
+.drawer-item .type.seq { background: rgba(83,58,253,0.12); color: var(--color-brand); }
+.drawer-item .type.flow { background: rgba(234,34,97,0.12); color: var(--color-danger); }
+.drawer-item .meta {
+  font-size: 11px; color: var(--color-text-muted);
+  font-feature-settings: "tnum" 1;
+}
+.drawer-footer {
+  padding: 12px 16px; border-top: 1px solid var(--color-border);
+  display: flex; gap: 8px;
+}
+.drawer-footer .btn { flex: 1; }
+
+/* Mobile fallback */
+.m-screen {
+  height: 100%; padding: 32px 24px;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f9fc 100%);
+}
+.m-logo { margin-bottom: 32px; }
+.m-eyebrow {
+  font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: var(--color-brand); margin-bottom: 12px;
+}
+.m-screen h1 {
+  font-size: 32px; line-height: 1.1; letter-spacing: -0.64px;
+  font-weight: 300; color: var(--color-heading);
+  margin: 0 0 16px;
+}
+.m-screen p {
+  font-size: 15px; color: var(--color-text-muted);
+  line-height: 1.5; margin: 0 0 24px;
+}
+.m-card {
+  margin-top: auto;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  background: #fff;
+}
+.m-card .label {
+  font-family: var(--font-mono); font-size: 10px;
+  text-transform: uppercase; color: var(--color-text-muted);
+  letter-spacing: 0.12em; margin-bottom: 8px;
+}
+.m-card code {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--color-heading);
+  background: var(--color-surface-muted);
+  padding: 2px 6px; border-radius: 3px;
+}
+
+/* Footnote */
+.footnote {
+  max-width: 1200px; margin: 0 auto;
+  padding-top: 32px;
+  font-size: 12px; color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  display: flex; flex-wrap: wrap; gap: 16px;
+}
+.footnote .pill {
+  padding: 2px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: #fff;
+}
+</style>
+</head>
+<body>
+
+<!-- ============ Prototype top bar ============ -->
+<div class="proto-bar">
+  <h1>ChartMage · Redesign Prototype <span style="color: var(--color-text-muted)">v1</span></h1>
+  <nav>
+    <a href="#logo">Logo</a>
+    <a href="#landing">Landing</a>
+    <a href="#editor">Editor</a>
+    <a href="#drawer">Charts Drawer</a>
+    <a href="#mobile">Mobile</a>
+  </nav>
+  <span class="badge">Static · review only</span>
+</div>
+
+<!-- ============ Logo ============ -->
+<section class="proto-section" id="logo">
+  <header>
+    <div>
+      <div class="label">01 — Brand mark</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">A quieter logo</h2>
+      <p class="desc">The mark is a connector — two nodes joined by a line. It reads as flowchart, sequence, and the act of linking thoughts. Tight 6–8px radius, brand-tinted gradient, one supportive shadow.</p>
+    </div>
+  </header>
+  <div class="logo-grid">
+    <div class="logo-card">
+      <span class="name">Primary · light</span>
+      <a class="cm-logo" href="#">
+        <span class="lv-mark"></span>
+        <span class="word"><b>chart</b>mage</span>
+      </a>
+      <p class="desc">Default lockup for headers and landing.</p>
+    </div>
+    <div class="logo-card dark">
+      <span class="name">Primary · dark</span>
+      <a class="cm-logo" href="#">
+        <span class="lv-mark"></span>
+        <span class="word"><b>chart</b>mage</span>
+      </a>
+      <p class="desc">Dark brand sections (#1c1e54). Mark stays gradient.</p>
+    </div>
+    <div class="logo-card">
+      <span class="name">App icon · 32×32</span>
+      <span class="lv-mark" style="width:32px;height:32px;border-radius:7px;"></span>
+      <p class="desc">Standalone mark for favicon, dock icon, og-image badge.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Landing ============ -->
+<section class="proto-section" id="landing">
+  <header>
+    <div>
+      <div class="label">02 — Landing / intro</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">Marketing page, retuned</h2>
+      <p class="desc">One hero, one static side-by-side demo (no GIF flicker), three feature cards, one dark band. Less motion, more confidence.</p>
+    </div>
+  </header>
+
+  <div class="frame">
+    <!-- nav -->
+    <nav class="landing-nav">
+      <a class="cm-logo" href="#">
+        <span class="lv-mark"></span>
+        <span class="word"><b>chart</b>mage</span>
+      </a>
+      <div class="links">
+        <a href="#">Features</a>
+        <a href="#">Syntax</a>
+        <a href="#">Examples</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="right">
+        <a href="#">Sign in</a>
+        <a class="btn btn-primary" href="#">Start drawing →</a>
+      </div>
+    </nav>
+
+    <!-- hero -->
+    <div class="hero">
+      <div>
+        <span class="eyebrow">v3 · text-first diagrams</span>
+        <h1>Diagrams at the speed of <em>thought</em>, not&nbsp;dragging.</h1>
+        <p class="lede">ChartMage turns a few lines of plain text into a polished sequence diagram or flowchart. Keep your hands on the keyboard — layout, spacing, and arrows resolve themselves.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#">Start drawing →</a>
+          <a class="btn btn-ghost" href="#">View syntax</a>
+        </div>
+        <div class="meta">
+          <span><strong>10s</strong> to learn the syntax</span>
+          <span><strong>0</strong> dependencies, runs offline</span>
+          <span><strong>PNG</strong> export ready</span>
+        </div>
+      </div>
+
+      <!-- static demo card -->
+      <div class="hero-demo">
+        <div class="tabs">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          <span class="title">checkout-flow.cm</span>
+        </div>
+        <div class="body">
+          <div class="code-pane">
+            <div><span class="k">participant</span> <span class="a">User</span></div>
+            <div><span class="k">participant</span> <span class="a">API</span></div>
+            <div><span class="k">participant</span> <span class="a">Stripe</span></div>
+            <div style="height:8px"></div>
+            <div><span class="a">User</span><span class="arrow">-&gt;&gt;</span><span class="a">API</span><span class="m">: checkout</span></div>
+            <div><span class="a">API</span><span class="arrow">-&gt;&gt;</span><span class="a">Stripe</span><span class="m">: charge</span></div>
+            <div><span class="a">Stripe</span><span class="arrow">--&gt;&gt;</span><span class="a">API</span><span class="m">: ok</span></div>
+            <div><span class="a">API</span><span class="arrow">--&gt;&gt;</span><span class="a">User</span><span class="m">: 200</span></div>
+          </div>
+          <div class="preview-pane">
+            <svg class="diag-svg" viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif">
+              <defs>
+                <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#1c1e54"/>
+                </marker>
+              </defs>
+              <!-- lifelines -->
+              <g stroke="#cdd8e5" stroke-dasharray="3 3" stroke-width="1" fill="none">
+                <line x1="50" y1="40" x2="50" y2="200"/>
+                <line x1="160" y1="40" x2="160" y2="200"/>
+                <line x1="270" y1="40" x2="270" y2="200"/>
+              </g>
+              <!-- actor boxes -->
+              <g>
+                <rect x="20" y="20" width="60" height="24" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+                <rect x="130" y="20" width="60" height="24" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+                <rect x="240" y="20" width="60" height="24" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+              </g>
+              <g font-size="11" font-weight="400" fill="#061b31" stroke="none">
+                <text x="50" y="36" text-anchor="middle">User</text>
+                <text x="160" y="36" text-anchor="middle">API</text>
+                <text x="270" y="36" text-anchor="middle">Stripe</text>
+              </g>
+              <!-- solid arrows -->
+              <g stroke="#1c1e54" stroke-width="1.4" fill="none" marker-end="url(#ah)">
+                <line x1="50" y1="70" x2="158" y2="70"/>
+                <line x1="160" y1="100" x2="268" y2="100"/>
+              </g>
+              <!-- dashed arrows -->
+              <g stroke="#1c1e54" stroke-width="1.2" stroke-dasharray="4 3" fill="none" marker-end="url(#ah)">
+                <line x1="270" y1="135" x2="162" y2="135"/>
+                <line x1="160" y1="170" x2="52" y2="170"/>
+              </g>
+              <!-- arrow labels (no stroke) -->
+              <g font-size="10" font-weight="400" fill="#425466" stroke="none">
+                <text x="104" y="64" text-anchor="middle">checkout</text>
+                <text x="214" y="94" text-anchor="middle">charge</text>
+                <text x="216" y="129" text-anchor="middle">ok</text>
+                <text x="106" y="164" text-anchor="middle">200</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Features ============ -->
+<section class="proto-section">
+  <header>
+    <div>
+      <div class="label">03 — Features</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">Three cards, one promise</h2>
+      <p class="desc">Replaces the current GIF triplet with restrained iconography and a fixed grid.</p>
+    </div>
+  </header>
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v16"/></svg>
+      </div>
+      <h3>Layout solves itself</h3>
+      <p>Type your actors and messages — ChartMage handles spacing, alignment, and arrow routing without a single click.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h6"/><path d="M5 6h14"/><path d="M5 18h10"/><circle cx="18" cy="12" r="2.5"/></svg>
+      </div>
+      <h3>Predictive autocomplete</h3>
+      <p>Inline hints know your participants, your loops, and your last arrow. Tab completes, Enter commits, Esc dismisses.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 6L4 12l4 6"/><path d="M16 6l4 6-4 6"/><path d="M14 4l-4 16"/></svg>
+      </div>
+      <h3>Syntax you read out loud</h3>
+      <p><code style="font-family:var(--font-mono);font-size:12px;color:var(--color-brand)">User -&gt;&gt; API: checkout</code> says exactly what it does. Learnable in ten seconds, memorable forever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Dark band ============ -->
+<section class="proto-section" style="padding:0;">
+  <div class="dark-band">
+    <div class="inner">
+      <div>
+        <h2>A clean canvas, not a clean slate.</h2>
+        <p>Charts are saved locally, exported as crisp PNGs, and stay version-friendly because they're just text. Paste into a Notion doc, a PR, or a Slack thread.</p>
+        <a class="btn btn-primary" href="#">Open the editor →</a>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="num">12k</div><div class="lbl">Charts drafted this month</div></div>
+        <div class="stat"><div class="num">96<span style="font-size:18px;">%</span></div><div class="lbl">Stay in keyboard flow</div></div>
+        <div class="stat"><div class="num">10s</div><div class="lbl">Average syntax learn time</div></div>
+        <div class="stat"><div class="num">0</div><div class="lbl">Drag handles in the canvas</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Editor ============ -->
+<section class="proto-section" id="editor">
+  <header>
+    <div>
+      <div class="label">04 — Editor / workspace</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">The split that actually splits</h2>
+      <p class="desc">50/50 input + preview, with a slim sticky nav, an inline syntax bar replacing the modal, and a tiny canvas tool-strip for zoom / fit / theme.</p>
+    </div>
+  </header>
+
+  <div class="frame">
+    <!-- nav -->
+    <div class="app-nav">
+      <a class="cm-logo" href="#"><span class="lv-mark"></span><span class="word"><b>chart</b>mage</span></a>
+      <span class="chart-pill">
+        <span class="type">Seq</span>
+        Checkout Flow
+      </span>
+      <span class="save-state">Saved · just now</span>
+      <div class="right">
+        <button class="btn btn-neutral">My Charts</button>
+        <button class="btn btn-neutral">Help</button>
+        <button class="btn btn-icon" title="Export PNG">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2v8"/><path d="M5 7l3 3 3-3"/><path d="M3 13h10"/></svg>
+        </button>
+        <button class="btn btn-primary">+ New chart</button>
+      </div>
+    </div>
+
+    <!-- workspace -->
+    <div class="workspace">
+      <!-- input pane -->
+      <div class="pane">
+        <div class="pane-header">
+          <span class="label">Input</span>
+          <span class="title">checkout-flow.cm</span>
+          <div class="tools">
+            <button class="tool-chip">⌘ ↵ run</button>
+          </div>
+        </div>
+        <div class="quick-bar">
+          <button class="chip">participant <kbd>p</kbd></button>
+          <button class="chip">-&gt;&gt; <kbd>a</kbd></button>
+          <button class="chip">--&gt;&gt; <kbd>d</kbd></button>
+          <button class="chip">loop <kbd>l</kbd></button>
+          <button class="chip">alt <kbd>⌥</kbd></button>
+          <button class="chip">note <kbd>n</kbd></button>
+        </div>
+        <div class="code-area">
+          <div><span class="ln">1</span><span class="k">participant</span> <span class="a">User</span></div>
+          <div><span class="ln">2</span><span class="k">participant</span> <span class="a">API</span></div>
+          <div><span class="ln">3</span><span class="k">participant</span> <span class="a">Stripe</span></div>
+          <div><span class="ln">4</span><span class="c">// happy path</span></div>
+          <div><span class="ln">5</span><span class="a">User</span><span class="arrow">-&gt;&gt;</span><span class="a">API</span><span class="m">: checkout</span></div>
+          <div><span class="ln">6</span><span class="a">API</span><span class="arrow">-&gt;&gt;</span><span class="a">Stripe</span><span class="m">: charge $19.00</span></div>
+          <div><span class="ln">7</span><span class="a">Stripe</span><span class="arrow">--&gt;&gt;</span><span class="a">API</span><span class="m">: ok</span></div>
+          <div><span class="ln">8</span><span class="a">API</span><span class="arrow">--&gt;&gt;</span><span class="a">User</span><span class="m">: 200</span></div>
+          <div><span class="ln">9</span></div>
+          <div><span class="ln">10</span><span class="k">note</span> over <span class="a">User</span>,<span class="a">API</span>: receipt mailed</div>
+        </div>
+      </div>
+
+      <!-- preview pane -->
+      <div class="pane">
+        <div class="pane-header">
+          <span class="label">Preview</span>
+          <span class="title">Live · auto-rendered</span>
+          <div class="tools">
+            <button class="tool-chip active">Fit</button>
+            <button class="tool-chip">100%</button>
+            <button class="tool-chip">Dark</button>
+          </div>
+        </div>
+        <div class="canvas-area">
+          <svg class="diag-svg" style="max-width:420px;" viewBox="0 0 380 280" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif">
+            <defs>
+              <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" fill="#1c1e54"/>
+              </marker>
+            </defs>
+            <!-- lifelines -->
+            <g stroke="#cdd8e5" stroke-dasharray="3 3" stroke-width="1" fill="none">
+              <line x1="60" y1="44" x2="60" y2="260"/>
+              <line x1="190" y1="44" x2="190" y2="260"/>
+              <line x1="320" y1="44" x2="320" y2="260"/>
+            </g>
+            <!-- actor boxes -->
+            <g>
+              <rect x="22" y="22" width="76" height="26" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+              <rect x="152" y="22" width="76" height="26" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+              <rect x="282" y="22" width="76" height="26" rx="4" fill="#fff" stroke="#533afd" stroke-width="1"/>
+            </g>
+            <g font-size="12" font-weight="400" fill="#061b31" stroke="none">
+              <text x="60" y="39" text-anchor="middle">User</text>
+              <text x="190" y="39" text-anchor="middle">API</text>
+              <text x="320" y="39" text-anchor="middle">Stripe</text>
+            </g>
+            <!-- solid arrows -->
+            <g stroke="#1c1e54" stroke-width="1.4" fill="none" marker-end="url(#ah2)">
+              <line x1="60" y1="80" x2="188" y2="80"/>
+              <line x1="190" y1="120" x2="318" y2="120"/>
+            </g>
+            <!-- dashed arrows -->
+            <g stroke="#1c1e54" stroke-width="1.2" stroke-dasharray="4 3" fill="none" marker-end="url(#ah2)">
+              <line x1="320" y1="160" x2="192" y2="160"/>
+              <line x1="190" y1="200" x2="62" y2="200"/>
+            </g>
+            <!-- arrow labels -->
+            <g font-size="11" font-weight="400" fill="#425466" stroke="none">
+              <text x="124" y="74" text-anchor="middle">checkout</text>
+              <text x="254" y="114" text-anchor="middle">charge $19.00</text>
+              <text x="256" y="154" text-anchor="middle">ok</text>
+              <text x="126" y="194" text-anchor="middle">200</text>
+            </g>
+            <!-- note -->
+            <g>
+              <rect x="40" y="225" width="170" height="28" rx="4" fill="#fffbe6" stroke="#9b6829" stroke-width="1"/>
+              <text x="125" y="244" text-anchor="middle" font-size="11" font-weight="400" fill="#9b6829" stroke="none">receipt mailed</text>
+            </g>
+          </svg>
+          <div class="canvas-status">rendered · 38ms · 380×280</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Drawer ============ -->
+<section class="proto-section" id="drawer">
+  <header>
+    <div>
+      <div class="label">05 — Charts drawer (replaces modal)</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">Side-in, not blocking</h2>
+      <p class="desc">My Charts becomes a 360px drawer with search and inline rename / delete on hover, instead of a centered modal that interrupts flow.</p>
+    </div>
+  </header>
+
+  <div class="frame">
+    <div class="app-nav">
+      <a class="cm-logo" href="#"><span class="lv-mark"></span><span class="word"><b>chart</b>mage</span></a>
+      <span class="chart-pill"><span class="type">Seq</span>Checkout Flow</span>
+      <span class="save-state">Saved · just now</span>
+      <div class="right">
+        <button class="btn btn-neutral" style="background: var(--color-brand-subtle); color: var(--color-brand); border-color: var(--color-brand-soft);">My Charts</button>
+        <button class="btn btn-neutral">Help</button>
+        <button class="btn btn-primary">+ New chart</button>
+      </div>
+    </div>
+
+    <div class="workspace with-drawer" style="grid-template-columns: 1fr;">
+      <div class="pane" style="opacity:0.55;">
+        <div class="pane-header">
+          <span class="label">Workspace</span>
+          <span class="title" style="color: var(--color-text-muted)">dimmed while drawer is open</span>
+        </div>
+        <div class="canvas-area">
+          <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#cdd8e5" stroke-width="1">
+            <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/>
+          </svg>
+        </div>
+      </div>
+
+      <aside class="drawer">
+        <div class="drawer-header">
+          <h3>My Charts</h3>
+          <button class="close" title="Close">✕</button>
+        </div>
+        <div class="drawer-search">
+          <input type="text" placeholder="Search by name or content…">
+        </div>
+        <div class="drawer-list">
+          <div class="drawer-item active">
+            <div class="row1"><span class="type seq">Seq</span><span class="name">Checkout Flow</span></div>
+            <span class="meta">Edited 2 min ago · 38 lines</span>
+          </div>
+          <div class="drawer-item">
+            <div class="row1"><span class="type flow">Flow</span><span class="name">Onboarding decision tree</span></div>
+            <span class="meta">Yesterday · 24 nodes</span>
+          </div>
+          <div class="drawer-item">
+            <div class="row1"><span class="type seq">Seq</span><span class="name">OAuth handshake</span></div>
+            <span class="meta">Apr 26 · 21 lines</span>
+          </div>
+          <div class="drawer-item">
+            <div class="row1"><span class="type flow">Flow</span><span class="name">Refund pipeline v2</span></div>
+            <span class="meta">Apr 22 · 17 nodes</span>
+          </div>
+          <div class="drawer-item">
+            <div class="row1"><span class="type seq">Seq</span><span class="name">Webhook retry</span></div>
+            <span class="meta">Apr 18 · 14 lines</span>
+          </div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn btn-ghost">+ Sequence</button>
+          <button class="btn btn-ghost">+ Flowchart</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Mobile ============ -->
+<section class="proto-section" id="mobile">
+  <header>
+    <div>
+      <div class="label">06 — Mobile</div>
+      <h2 style="font-size:32px; letter-spacing:-0.64px; font-weight:300; color:var(--color-heading); margin:8px 0 4px;">Read on phone, write on desktop</h2>
+      <p class="desc">Mobile keeps the marketing story but redirects the editor to a respectful "come back on a wider screen" card. No fake editor on phones.</p>
+    </div>
+  </header>
+
+  <div style="display:flex; justify-content:center; gap:32px; flex-wrap:wrap;">
+    <div class="frame frame-mobile">
+      <div class="inner">
+        <div class="m-screen">
+          <a class="cm-logo m-logo" href="#"><span class="lv-mark"></span><span class="word"><b>chart</b>mage</span></a>
+          <span class="m-eyebrow">v3 · text-first diagrams</span>
+          <h1>Diagrams at the speed of thought.</h1>
+          <p>Plain-text input, polished sequence and flowchart output. Ten seconds to learn, forever to keep.</p>
+          <a class="btn btn-primary" href="#" style="width:100%; justify-content:center; padding:14px;">See examples</a>
+          <div class="m-card">
+            <div class="label">Editor</div>
+            <p style="font-size:13px; color:var(--color-text-muted); margin:0 0 8px;">The canvas needs more room than a phone can give. Open <code>chartmage.app</code> on a laptop to start drawing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Footnote ============ -->
+<section class="proto-section" style="border-bottom:none;">
+  <div class="footnote">
+    <span class="pill">tokens</span>
+    <span>Reuses <code>app/css/design-tokens.css</code> — no new colors introduced.</span>
+    <span class="pill">font</span>
+    <span>sohne-var falls back to SF Pro Display / system-ui per <code>DESIGN.md §8</code>.</span>
+    <span class="pill">scope</span>
+    <span>Static markup only — no JS, no real renderer. Built for review, not deploy.</span>
+  </div>
+</section>
+
+</body>
+</html>

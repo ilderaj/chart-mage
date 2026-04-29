@@ -22,3 +22,31 @@ Many thanks to the cool projects [mermaid](https://mermaidjs.github.io/), [Codem
 
 ### Note
 I built Chart Mage three years ago when I taught myself to code. The code is messy and the comments are in Chinese. So the next thing I will do is to tidy up the code and translate the comments into English. 
+
+### UAT with Maestro
+Chart Mage now uses [Maestro](https://github.com/mobile-dev-inc/maestro) as the default UAT framework for browser-based end-to-end checks.
+
+#### Install prerequisites
+- On macOS, `npm run maestro:install` will install `openjdk@17` through Homebrew if Java is missing, then install Maestro CLI.
+- On other environments, make sure Java 17 or newer is already available before running the installer.
+
+#### Run the smoke UAT flow
+1. Start the local app server with `npm run uat:serve`.
+2. In another terminal, run `npm run uat:smoke`.
+
+The default smoke flow opens the local web app, creates a flowchart, and checks that the editor, preview, and saved chart list are visible.
+It opens `index.html?maestro=1`, which seeds the `visited` flag in-place, clears browser state up front, and relies on stable id-based selectors for the main UAT entry points.
+
+Additional validated flows live alongside the smoke flow:
+- `.maestro/flows/web-create-sequence.yaml`
+- `.maestro/flows/web-rename-chart.yaml`
+- `.maestro/flows/web-delete-chart.yaml`
+
+They cover sequence creation plus rename/delete behavior in the charts drawer and its follow-up modals.
+
+#### Where tests live
+- Maestro workspace: `.maestro/`
+- Initial smoke flow: `.maestro/flows/web-smoke.yaml`
+- Helper scripts: `scripts/install-maestro.sh` and `scripts/run-maestro-web-smoke.sh`
+
+For future UAT coverage, add more YAML flows under `.maestro/flows/` and run them with the same CLI entrypoint.

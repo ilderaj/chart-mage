@@ -1,0 +1,28 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - charts
+  - rename
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- tapOn:
+    id: "new-flowchart-button"
+- assertVisible: "Chart Name"
+- tapOn:
+    id: "flowchart-name-input"
+- inputText: "Rename Target Flow"
+- tapOn: "Create"
+- assertVisible: "Rename Target Flow"
+- tapOn:
+    id: "show-charts-button"
+- tapOn:
+    id: "drawer-search"
+- inputText: "Rename Target Flow"
+- tapOn: "Rename"
+- assertVisible: "Rename"
+- tapOn:
+    css: "input#rename-input"
+- inputText: "Renamed Target Flow"
+- tapOn: "Save"
+- assertVisible: "Renamed Target Flow"

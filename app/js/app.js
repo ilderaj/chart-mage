@@ -1,8 +1,79 @@
 $(function() {
   "use strict";
 
+  function chartTypeLabel(type) {
+    return type == "flowchart" ? "Flow" : "Seq";
+  }
+
+  function chartTypeClass(type) {
+    return type == "flowchart" ? "flowchart" : "sequence";
+  }
+
+  function chartTimestamp(chart) {
+    var date = new Date(chart.lastModified || chart.createTime || Date.now());
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " · " + date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  }
+
+  function getChartIdFromElement(element) {
+    var $element = $(element);
+    return $element.attr("data-chart-id") || $element.closest("[data-chart-id]").attr("data-chart-id");
+  }
+
+  function getChartNameFromElement(element) {
+    var $element = $(element);
+    return $element.attr("data-chart-name") || $element.closest("[data-chart-name]").attr("data-chart-name");
+  }
+
+  function updateShellMeta() {
+    if (!controller.currentChart) return;
+    $("#current-chart-name").text(controller.currentChart.name);
+    $("#current-chart-type").text(chartTypeLabel(controller.currentChart.type));
+    $("#save-state-pill").text("Saved locally");
+  }
+
+  function renderChartsCollections(filterText) {
+    var allCharts = controller.getAllCharts();
+    var normalizedFilter = (filterText || "").toLowerCase();
+    var visibleCharts = allCharts.filter(function(chart) {
+      return normalizedFilter === "" || chart.name.toLowerCase().indexOf(normalizedFilter) != -1 || chart.content.toLowerCase().indexOf(normalizedFilter) != -1;
+    });
+
+    var htmlText = visibleCharts.map(function(chart) {
+      var trClass = chart.id == controller.currentChart.id ? "select-chart current-chart" : "select-chart";
+      var chartLabelClass = chart.type == "flowchart" ? "flowchart-label" : "sequence-diagram-label";
+      return "<tr class='" + trClass + "' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>" +
+             "<td><p class='" + chartLabelClass + "'>" + chart.type[0].toUpperCase() + "</p></td>" +
+             "<td style='width:100%;'>" + _.escape(chart.name) + "</td>" +
+             "<td><a class='rename-chart' href='javascript:void(0);' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Rename</a></td>" +
+             "<td><a class='delete-chart' href='javascript:void(0);' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Delete</a></td></tr>";
+    }).join("");
+
+    var drawerHtml = visibleCharts.map(function(chart) {
+      var currentClass = chart.id == controller.currentChart.id ? "drawerChart current-chart" : "drawerChart";
+      return "<div class='" + currentClass + "' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>" +
+             "<div class='drawerChartHeader'><span class='drawerTypePill " + chartTypeClass(chart.type) + "'>" + chartTypeLabel(chart.type) + "</span><span class='drawerChartName'>" + _.escape(chart.name) + "</span></div>" +
+             "<div class='drawerChartActions'><span class='drawerChartMeta'>" + chartTimestamp(chart) + "</span><span class='drawerAction drawerRename rename-chart' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Rename</span><span class='drawerAction drawerDelete delete-chart' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Delete</span></div></div>";
+    }).join("");
+
+    $("#chartsList tbody").html(htmlText);
+    $("#drawer-list").html(drawerHtml || "<p class='drawerEmpty'>No charts match your search.</p>");
+    $("#drawer-count").text(allCharts.length + " saved");
+    updateShellMeta();
+  }
+
+  function openChartsDrawer() {
+    renderChartsCollections($("#drawer-search").val());
+    $("#charts-drawer").removeClass("hidden");
+    $("#drawer-backdrop").removeClass("hidden");
+  }
+
+  function closeChartsDrawer() {
+    $("#charts-drawer").addClass("hidden");
+    $("#drawer-backdrop").addClass("hidden");
+  }
+
   $(".splashscreen").remove();
-  $(".hidden").removeClass("hidden");
+  $("nav.app-nav, main").removeClass("hidden");
 
   // *** 弹出框 *** //
   $("#newFlowchart").on($.modal.CLOSE, function(event, modal) {
@@ -15,69 +86,81 @@ $(function() {
 
   $(".new-chart").submit(function(event) {
     event.preventDefault();
-    controller.newChart(this.getAttribute("data-chart-type"), _.escape(this.name.value));
+    var chartNameInput = this.querySelector("input[id$='name-input']");
+    controller.newChart(this.getAttribute("data-chart-type"), _.escape(chartNameInput.value));
   });
 
-  $("#show-charts-button").click(function() {
-    var allCharts = controller.getAllCharts();
+  $("#show-charts-button").click(function(event) {
+    event.preventDefault();
+    openChartsDrawer();
+  });
 
-    var htmlText = allCharts.map(function(chart) {
-      var trClass = chart.id == controller.currentChart.id ? "select-chart current-chart" : "select-chart";
-      var chartLabelClass = chart.type == "flowchart" ? "flowchart-label" : "sequence-diagram-label";
-      return "<tr class='" + trClass + "'" + " data-chart-id='" + chart.id + "'>" +
-             "<td><p class='" + chartLabelClass + "'>" + chart.type[0].toUpperCase() + "</p></td>" + 
-             "<td style='width:100%;'>" + chart.name + "</td>" +
-             "<td><a class='rename-chart' href='javascript:void(0);' data-chart-name='" + chart.name + "'>Rename</a></td>" +
-             "<td><a class='delete-chart' href='javascript:void(0);' data-chart-name='" + chart.name + "'>Delete</a></td></tr>";
-    }).join("");
+  $("#drawer-close, #drawer-backdrop").click(function() {
+    closeChartsDrawer();
+  });
 
-    $("#chartsList tbody")[0].innerHTML = htmlText;
+  $("#drawer-search").on("input", function() {
+    renderChartsCollections(this.value);
+  });
 
-    $(".select-chart").hover(function() {
-      // 显示本行的rename和delete按钮。
-      $(this).addClass("active-row");
-    }, function() {
-      // 隐藏本行的rename和delete按钮。
-      $(this).removeClass("active-row");
+  $(document).on("mouseenter", ".select-chart, .drawerChart", function() {
+    $(this).addClass("active-row");
+  });
+
+  $(document).on("mouseleave", ".select-chart, .drawerChart", function() {
+    $(this).removeClass("active-row");
+  });
+
+  $(document).on("click", ".select-chart", function(event) {
+    if ($(event.target).closest(".delete-chart, .rename-chart").length)
+      return;
+    controller.openChartByID(this.getAttribute("data-chart-id"));
+  });
+
+  $(document).on("click", ".drawerChart", function(event) {
+    if ($(event.target).closest(".delete-chart, .rename-chart").length)
+      return;
+    controller.openChartByID(this.getAttribute("data-chart-id"));
+  });
+
+  $(document).on("click", ".delete-chart", function(event) {
+    var chartId = getChartIdFromElement(this);
+
+    event.preventDefault();
+    event.stopPropagation();
+    closeChartsDrawer();
+    $("#confirm-delete-chart strong").text(getChartNameFromElement(this));
+    $("#cancel-del-button").off("click").on("click", function() { $.modal.close(); });
+    $("#confirm-del-button").attr("data-chart-id", chartId).off("click").on("click", function() {
+      var id = this.getAttribute("data-chart-id");
+      controller.deleteChartByID(id);
+      if (id != controller.currentChart.id) {
+        $.modal.close();
+        renderChartsCollections($("#drawer-search").val());
+      } else {
+        window.location.reload();
+      }
     });
+    $("#confirm-delete-chart").modal({ closeExisting: false });
+    return false;
+  });
 
-    $(".select-chart").click(function() {
-      controller.openChartByID(this.getAttribute("data-chart-id"));
-    });
+  $(document).on("click", ".rename-chart", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeChartsDrawer();
+    $("#rename-chart-modal strong").text(getChartNameFromElement(this));
+    $("#rename-chart-modal form")[0].reset();
+    $("#rename-chart-modal form").attr("data-chart-id", getChartIdFromElement(this));
+    $("#rename-chart-modal").modal({ closeExisting: false });
+    return false;
+  });
 
-    $(".delete-chart").click(function(event) {
-      event.preventDefault();
-      $("#confirm-delete-chart strong").text(this.getAttribute("data-chart-name"));
-      $("#cancel-del-button").click(function() { $.modal.close(); });
-      $("#confirm-del-button").attr("data-chart-id", this.parentNode.parentNode.getAttribute("data-chart-id"));
-      $("#confirm-del-button").click(function() {
-        var id = this.getAttribute("data-chart-id")
-        controller.deleteChartByID(id);
-        if (id != controller.currentChart.id)
-          $("#show-charts-button").click();
-        else
-          window.location.reload();
-
-      });
-      $("#confirm-delete-chart").modal({ closeExisting: false });
-      return false;
-    });
-
-    $(".rename-chart").click(function(event) {
-      event.preventDefault();
-      $("#rename-chart-modal strong").text(this.getAttribute("data-chart-name"));
-      $("#rename-chart-modal form")[0].reset();
-      $("#rename-chart-modal form").attr("data-chart-id", this.parentNode.parentNode.getAttribute("data-chart-id"));
-      $("#rename-chart-modal").modal({ closeExisting: false });
-      return false;
-    });
-
-    $("#rename-form").submit(function(event) {
-      event.preventDefault();
-      controller.renameChartByID(this.getAttribute("data-chart-id"), _.escape(this.name.value));
-      $("#show-charts-button").click();
-    });
-
+  $("#rename-form").submit(function(event) {
+    event.preventDefault();
+    controller.renameChartByID(this.getAttribute("data-chart-id"), _.escape(this.querySelector("#rename-input").value));
+    renderChartsCollections($("#drawer-search").val());
+    $.modal.close();
   });
 
   /*** 两个功能按钮 ***/
@@ -123,7 +206,19 @@ $(function() {
       $("#flowchart-syntax").modal();
     else if (controller.currentChart.type == "sequenceDiagram")
       $("#sequence-diagram-syntax").modal();
-  })
+  });
+
+  $(document).on("click", ".quick-chip", function() {
+    editorView.insertSnippet(this.getAttribute("data-sequence"), this.getAttribute("data-flow"));
+  });
+
+  $(document).on("click", ".preview-chip", function() {
+    if (this.disabled)
+      return;
+    $(".preview-chip").removeClass("active");
+    $(this).addClass("active");
+    $(".diagram").attr("data-preview-mode", this.getAttribute("data-preview-mode"));
+  });
 
   // *** mermaidAPI ***//
   // 这是固定不变的部分，不用纳入MVC的架构里。
@@ -541,6 +636,18 @@ $(function() {
           this._mermaidDraw("graph TB\n" + compiled);
         }
       }
+    },
+
+    insertSnippet: function(sequenceText, flowText) {
+      if (!this._editor)
+        return;
+
+      var snippet = this._type == "flowchart" ? (flowText || sequenceText || "") : (sequenceText || flowText || "");
+      if (!snippet)
+        return;
+
+      this._editor.replaceSelection(snippet);
+      this._editor.focus();
     }
   }
 
@@ -551,11 +658,14 @@ $(function() {
       modal.init();
       this.currentChart = modal.getChartByID(modal.getLastOpenID());
       editorView.init(this.currentChart.type, this.currentChart.content);
+      updateShellMeta();
+      renderChartsCollections("");
     },
 
     setChartContent: function(content) {
       try {
         modal.setChartByID(this.currentChart.id, content);
+        $("#save-state-pill").text("Saved locally");
       } catch (e) {
         if (e instanceof ChartNotFoundError)
           $("#chart-not-found").modal();
@@ -584,6 +694,10 @@ $(function() {
     renameChartByID: function(id, name) {
       try {
         modal.renameChartByID(id, name);
+        if (this.currentChart.id == id) {
+          this.currentChart.name = name;
+          updateShellMeta();
+        }
       } catch (e) {
         if (e instanceof ChartNotFoundError)
           $("#chart-not-found").modal();
