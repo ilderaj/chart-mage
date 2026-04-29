@@ -7,15 +7,17 @@
 ## Current State
 Status: blocked
 Archive Eligible: no
-Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`).
+Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but the original target state is only partially complete. Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
 
 ## Current Phase
-Phase 5
+Phase 6
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
 - Summary: 采用 Cloudflare Pages Git integration 直接连接 `ilderaj/chart-mage`，生产分支使用 `main`，预览部署覆盖 PR / 非生产分支；仓库侧优先收敛到“可直接托管的静态产物约定”，不再依赖 `github_page` 发布分支。
-- Sync-back status: synced on 2026-04-29
+- Follow-up path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-convergence.md`
+- Follow-up summary: 核验 direct-upload fallback 后的真实完成度，并规划仓库收敛、manual redeploy 自动化、Git-integrated project 重建、preview 验证、自有域名切换和旧资源清理。
+- Sync-back status: synced on 2026-04-29 after deployment review
 
 ## Phases
 1. 盘点当前仓库发布结构、上游历史发布方式和 Cloudflare Pages 能力边界（已完成）
@@ -24,6 +26,7 @@ Phase 5
 4. 在 Cloudflare 中创建 Pages 项目并连接 GitHub 仓库（待执行）
 5. 配置 production / preview 分支行为与 `pages.dev` 域名（待执行）
 6. 绑定自有域名并完成上线验证、回滚说明和运维约定（待执行）
+7. direct-upload fallback 后的仓库与 Cloudflare 收敛计划（已完成计划，待执行）
 
 ## Risk Assessment
 
@@ -35,6 +38,8 @@ Phase 5
 | 自有域名接入方式选择错误 | apex / subdomain 场景未区分 | 域名解析失败或证书签发卡住 | 优先用 `pages.dev` 完成验证，再分流到 apex 或 subdomain 的独立域名接入步骤 |
 | Preview 部署默认公开 | Pages preview 未启用 Access 保护 | PR 预览链接可被外部访问 | 默认先接受公开 preview，若进入私有协作阶段再追加 Access 策略 |
 | 项目内 `.worktrees/` 未被忽略 | 创建 project-local worktree 前缺少 ignore 保护 | worktree 内容可能污染仓库状态 | 先把 `.worktrees/` 写入 `.gitignore`，再创建隔离工作区 |
+| direct-upload 项目无法原地切换到 Git integration | 当前 `chart-mage` 项目是 direct upload fallback | main 自动发布和 PR preview 不能在该项目上补齐 | GitHub 安装修复后新建 Git-integrated Pages 项目，验证后再切换域名 / 生产入口 |
+| 部署仓库文件还停留在 `cloudflare-pages-deploy` 分支 | `app/_headers`、部署 README、runbook、脚本变更未合入当前 `main` | 当前 `main` 不能完整代表线上部署约定 | 先 cherry-pick / restore 非 planning 文件到 `main`，保留当前 planning 文件更新 |
 
 ## Key Questions
 1. 首次上线是否应直接发布 `app/`，而不是继续依赖旧的 `dist/` 构建链？
@@ -52,6 +57,8 @@ Phase 5
 | 本次执行采用项目内 `.worktrees/` 作为隔离工作区目录 | 用户已明确选择 project-local hidden directory，符合 worktree 技能推荐路径 |
 | 当 Git integration 创建失败时，先以 direct upload fallback 让站点上线 | 用户明确选择“先用 direct upload 部署到 Pages，让站点先可用”，优先满足“能够开始使用”的目标 |
 | 生产 Pages 项目名固定为 `chart-mage`，生产 URL 为 `https://chart-mage.pages.dev` | 该项目已成功创建并完成首个 production deployment，后续文档与运维都以此为准 |
+| direct-upload fallback 不再被视作最终形态 | Cloudflare 文档确认 Direct Upload 项目不能切换成 Git integration；最终自动发布需要新建 Git-integrated project |
+| 仓库收敛必须先于 Git 集成重试 | 当前 `main` 缺少部署文件，Cloudflare 后续从 Git 构建必须以 main 上的真实发布契约为准 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
@@ -60,3 +67,13 @@ Phase 5
 | `.worktrees/` 当前未被 Git ignore | 1 | 已在执行开始阶段补充 `.gitignore` 保护，后续再创建 worktree |
 | Cloudflare Pages API 创建 Git-integrated project 返回 `8000011` | 1 | 已确认普通 Pages API 与 direct-upload project 创建正常，根因定位为 Cloudflare Pages GitHub 安装状态异常；当前改走 direct-upload fallback，上线后等待外部修复 |
 | 系统 Python 受 PEP 668 限制，无法直接 `pip install blake3` | 1 | 已改用 session 私有 virtualenv 安装 `blake3`，完成 Pages asset hash / upload 流程 |
+
+## Completion Review 2026-04-29
+| Area | Plan Target | Actual State | Verdict |
+|------|-------------|--------------|---------|
+| Production availability | Cloudflare Pages production URL accessible | `https://chart-mage.pages.dev/` returns `200`; deployment `010f65fe` is `success` | complete via fallback |
+| Main auto-deploy | Push / merge to `origin/main` updates production | Current deployment trigger is `ad_hoc`; Git integration failed with `8000011` | incomplete / blocked |
+| PR and branch preview | PR / non-production branches get preview deployments | Direct-upload project has no Git source previews | incomplete / blocked |
+| Repository deploy contract | `main` contains scripts, `_headers`, README and runbook | These files exist on `cloudflare-pages-deploy`, but not current `main` | incomplete |
+| Custom domain | `pages.dev` or custom domain usable externally | `pages.dev` is live; custom domain not yet selected or attached | partial |
+| Runbook | Operators know current deploy mode and next recovery path | Runbook exists on `cloudflare-pages-deploy`, not current `main` | partial |

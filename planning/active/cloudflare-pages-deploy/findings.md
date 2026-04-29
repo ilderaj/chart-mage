@@ -34,6 +34,14 @@
 - 首个生产部署 ID 为 `010f65fe-098e-41bf-9582-40887adf4630`，部署状态为 `success`。
 - `https://chart-mage.pages.dev` 返回 `200`；`/intro.html` 会规范化到 `/intro` 并返回 `200`，`/index.html?maestro=1` 会规范化到 `/?maestro=1` 并返回 `200`。
 - 当前生产模式是 direct upload，因此 Git-based production / preview automation 和 branch preview 仍不可用，必须等待 Cloudflare GitHub 安装恢复后再继续。
+- 2026-04-29 复核确认：Cloudflare Pages 项目 `chart-mage` 存在，project id 为 `32d49de7-925e-408a-b308-92fe8b24058d`，latest deployment `010f65fe-098e-41bf-9582-40887adf4630` 为 production / success。
+- 2026-04-29 复核确认：deployment trigger type 为 `ad_hoc`，metadata branch 为 `main`，commit hash 为 `24ef1a370233a051f3d903f6635bcebeed369955`，说明当前生产部署来自 direct-upload fallback，而不是 Git integration。
+- 2026-04-29 复核确认：Cloudflare 项目 build config 为 `destination_dir = app`、`build_command = ""`、`root_dir = /`，符合首阶段静态目录直发策略。
+- 2026-04-29 复核确认：线上 `https://chart-mage.pages.dev/` 返回 `200`，并带有 `Permissions-Policy`、`Referrer-Policy`、`X-Content-Type-Options`、`X-Frame-Options` 等来自 `_headers` 的响应头。
+- 2026-04-29 复核确认：`https://chart-mage.pages.dev/intro.html` 规范化到 `/intro` 并返回 `200`；`https://chart-mage.pages.dev/index.html?maestro=1` 规范化到 `/?maestro=1` 并返回 `200`。
+- Cloudflare Direct Upload 文档明确说明：选择 Direct Upload 后，不能之后切换到 Git integration；要恢复 main 自动发布和 PR preview，必须新建 Git-integrated Pages 项目，或删除 / 替换当前 fallback 项目。
+- 当前仓库 `main` 尚未包含 deployment branch 上的 `app/_headers`、`docs/deployment/cloudflare-pages.md`、README 部署说明和 `serve:app` / `build:check` 脚本调整；这些变更存在于 `cloudflare-pages-deploy` 分支提交 `1612f07`、`24ef1a3`、`8b4ff4c`。
+- 当前 `main` 已包含 planning 更新提交 `5cea6d6`，因此后续合入 `cloudflare-pages-deploy` 时不能直接覆盖 planning files；应只合入非 planning 的仓库部署文件，或者手工解决冲突。
 
 ## Technical Decisions
 | Decision | Rationale |
@@ -48,9 +56,12 @@
 |-------|------------|
 | 本地 Git HTTPS 推送失败（LibreSSL / `SSL_ERROR_SYSCALL`） | 暂记为外部阻塞项；实施阶段优先改走 SSH remote 或在网络正常环境重试 |
 | 仓库存在老旧 Gulp 工具链，与 Cloudflare 现代构建镜像的长期兼容性未完全验证 | 实施计划中避免把首次上线绑定在该构建链上 |
+| direct-upload fallback 已上线但不是最终自动发布形态 | 需要建立新的 Git-integrated Pages 项目或重新创建 `chart-mage` 项目后迁移域名 |
+| 部署文件尚未进入当前 `main` | 需要先把 `cloudflare-pages-deploy` 分支中的非 planning 文件合入 `main` |
 
 ## Resources
 - https://developers.cloudflare.com/pages/get-started/git-integration/
 - https://developers.cloudflare.com/pages/configuration/preview-deployments/
 - https://developers.cloudflare.com/pages/configuration/custom-domains/
 - https://developers.cloudflare.com/pages/configuration/build-image/
+- https://developers.cloudflare.com/pages/get-started/direct-upload/

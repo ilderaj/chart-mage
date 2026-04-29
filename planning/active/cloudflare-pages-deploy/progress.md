@@ -69,6 +69,23 @@
   - README.md (worktree committed again)
   - docs/deployment/cloudflare-pages.md (worktree committed)
 
+### Phase 6: Deployment review and convergence planning
+- **Status:** complete
+- Actions taken:
+  - 已按用户提供的其它 agent 结论复核当前 Cloudflare Pages 项目状态。
+  - 已通过 Cloudflare API 确认项目 `chart-mage` 存在，latest deployment `010f65fe-098e-41bf-9582-40887adf4630` 为 production / success。
+  - 已确认当前 deployment trigger type 为 `ad_hoc`，不是 Git integration。
+  - 已通过 `curl -I https://chart-mage.pages.dev/` 验证生产站点返回 `200`，且安全响应头来自部署的 `_headers`。
+  - 已通过 HTTP probe 验证 `/intro.html` 和 `/index.html?maestro=1` 的线上入口均可访问。
+  - 已对比 `main..cloudflare-pages-deploy`，确认部署说明、`app/_headers`、`docs/deployment/cloudflare-pages.md` 和脚本改动尚未合入当前 `main`。
+  - 已确认 Cloudflare Direct Upload 项目不能原地切换到 Git integration，因此最终自动化需要新建 Git-integrated Pages 项目并迁移入口。
+  - 已新增后续收敛计划：`docs/superpowers/plans/2026-04-29-cloudflare-pages-convergence.md`。
+- Files created/modified:
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+  - docs/superpowers/plans/2026-04-29-cloudflare-pages-convergence.md (created)
+
 ## Test Results
 | Test | Input | Expected | Actual | Status |
 |------|-------|----------|--------|--------|
@@ -81,6 +98,9 @@
 | Cloudflare Pages production root | `curl -I https://chart-mage.pages.dev` | 生产 URL 可访问且 header 生效 | 返回 `200`，响应头含 `Permissions-Policy` / `Referrer-Policy` / `X-Content-Type-Options` | passed |
 | Cloudflare Pages intro entry | `curl -L -o /dev/null -w ... https://chart-mage.pages.dev/intro.html` | 最终页面可访问 | 规范化到 `/intro` 后返回 `200` | passed |
 | Cloudflare Pages maestro entry | `curl -L -o /dev/null -w ... 'https://chart-mage.pages.dev/index.html?maestro=1'` | 最终页面可访问 | 规范化到 `/?maestro=1` 后返回 `200` | passed |
+| Cloudflare Pages project API | `GET /accounts/:account_id/pages/projects/chart-mage` | 项目存在且 latest deployment 可读 | project id `32d49de7-925e-408a-b308-92fe8b24058d`，latest deployment `010f65fe...` success | passed |
+| Cloudflare Pages trigger mode | latest deployment trigger metadata | Git integration 时应为 Git trigger，fallback 时应为 ad hoc | `deployment_trigger.type = ad_hoc` | confirms fallback |
+| Repository convergence diff | `git diff --name-status main..cloudflare-pages-deploy` | 查出尚未合入 main 的部署文件 | README、app/_headers、docs/deployment/cloudflare-pages.md、package.json 和 planning 文件存在差异 | action required |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -88,12 +108,13 @@
 | 2026-04-29 | `git push` over HTTPS failed with `LibreSSL SSL_ERROR_SYSCALL` | 1 | 记录为实施阶段外部阻塞项，待切换 SSH 或更换网络环境 |
 | 2026-04-29 | Cloudflare Pages Git-integrated project creation failed with API error `8000011` | 1 | 用 direct-upload project 对照实验确认是 Cloudflare GitHub 安装阻塞；经用户确认后改走 direct-upload fallback |
 | 2026-04-29 | System Python blocked `pip install blake3` with PEP 668 | 1 | 改用 session 私有 virtualenv 安装 `blake3` 并继续完成资产上传 |
+| 2026-04-29 | Direct Upload project cannot be converted to Git integration | review | 记录为架构约束；后续需要新建 Git-integrated Pages 项目并切换入口 |
 
 ## 5-Question Reboot Check
 | Question | Answer |
 |----------|--------|
-| Where am I? | 生产已通过 direct-upload fallback 上线，任务状态为 blocked（等待修复 Cloudflare GitHub 安装后继续 Git integration / preview） |
-| Where am I going? | 生产已上线；若要恢复原目标中的 Git-based 自动部署 / preview / 自有域名，需要先修复 Cloudflare GitHub 安装并补充域名输入 |
+| Where am I? | 生产已通过 direct-upload fallback 上线，任务状态为 blocked（等待修复 Cloudflare GitHub 安装后重建 Git-integrated project / preview） |
+| Where am I going? | 先把部署文件收敛进当前 `main`，再自动化 fallback redeploy，最后在 GitHub 安装修复后新建 Git-integrated Pages 项目并切换域名 / 入口 |
 | What's the goal? | 先让 ChartMage 在 Cloudflare Pages 上可用，再在外部阻塞解除后补回 Git integration / preview / custom domain |
-| What have I learned? | Pages API 本身与 direct upload 正常，真正的阻塞点是当前账号的 Cloudflare Pages GitHub 安装状态 |
-| What have I done? | 已完成仓库侧准备、direct-upload 项目创建、首个生产部署、线上验证和文档修正 |
+| What have I learned? | Pages API 本身与 direct upload 正常；direct-upload project 不能原地切换到 Git integration；当前账号的 Cloudflare Pages GitHub 安装状态仍是自动化阻塞点 |
+| What have I done? | 已复核生产状态、确认 fallback 性质、识别 main 收敛缺口，并写出后续实施计划 |
