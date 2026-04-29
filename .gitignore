@@ -62,3 +62,6 @@ typings/
 
 # Maestro debug artifacts
 .maestro/debug-output/
+
+# Local git worktrees
+.worktrees/
