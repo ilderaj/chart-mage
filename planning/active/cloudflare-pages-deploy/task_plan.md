@@ -5,12 +5,12 @@
 - 达成目标状态：当变更合并并推送到 `origin/main` 后，生产站点自动更新；PR / 非生产分支自动生成 preview 部署；站点可通过 `*.pages.dev` 或自有域名访问。
 
 ## Current State
-Status: blocked
+Status: active
 Archive Eligible: no
-Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, but the original target state is only partially complete. Git integration / automatic previews remain blocked by the Cloudflare Pages GitHub installation issue (`8000011`), and Cloudflare direct-upload projects cannot be converted in place to Git integration later.
+Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, and the latest `app/` snapshot was redeployed on 2026-04-30 as deployment `f83819ca`. Local and origin `master` have been removed. GitHub-connected Worker `chartmage` is now verified as the primary automatic deployment path; PR #2 is open to converge the remaining `dev` deployment runbook / fallback changes into `main`.
 
 ## Current Phase
-Phase 8
+Phase 11
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
@@ -28,6 +28,10 @@ Phase 8
 6. 绑定自有域名并完成上线验证、回滚说明和运维约定（待执行）
 7. direct-upload fallback 后的仓库与 Cloudflare 收敛计划（已完成计划，待执行）
 8. 将 `cloudflare-pages-deploy` worktree 分支合并回本地 `main`，验证后提交并推送 `origin/main`（已完成，worktree / branch 已清理）
+9. 补齐 Wrangler direct-upload 手动 redeploy fallback：依赖、npm scripts、runbook 和本地验证（已完成；待提交 / 推送）
+10. 清理本地 / 远端 `master`，核验 `dev -> origin/dev -> PR -> origin/main -> Pages` 目标链路，并用 fallback 发布最新 `app/` 快照（已完成；Git 自动部署仍被 `8000011` 阻塞）
+11. 验证并收敛 GitHub-connected Worker `chartmage`：合入 `wrangler.jsonc`，确认 `main` 自动 production build 和非生产 preview build，整理域名策略（已完成；PR #2 进行中）
+12. 将 `dev` 中剩余 Pages fallback / runbook 收敛通过 PR 合入 `main`，触发 Worker production 自动发布并最终验证（进行中）
 
 ## Risk Assessment
 
@@ -42,6 +46,7 @@ Phase 8
 | direct-upload 项目无法原地切换到 Git integration | 当前 `chart-mage` 项目是 direct upload fallback | main 自动发布和 PR preview 不能在该项目上补齐 | GitHub 安装修复后新建 Git-integrated Pages 项目，验证后再切换域名 / 生产入口 |
 | 部署仓库文件还停留在 `cloudflare-pages-deploy` 分支 | `app/_headers`、部署 README、runbook、脚本变更未合入当前 `main` | 当前 `main` 不能完整代表线上部署约定 | 先 cherry-pick / restore 非 planning 文件到 `main`，保留当前 planning 文件更新 |
 | 清理已合并 worktree 和本地分支 | 执行 `git worktree remove /Users/jared/Vibings/ChartMage/.worktrees/cloudflare-pages-deploy` 与 `git branch -d cloudflare-pages-deploy` | 删除本地隔离工作区目录和已合并本地分支；不触碰远端分支或主工作区文件 | 已确认 worktree 干净、`cloudflare-pages-deploy` 是 `main` 祖先、远端无同名分支；`scripts/harness` checkpoint 不存在，回滚用 `git branch cloudflare-pages-deploy 8b4ff4c0af24a6fd693973cff351c85fea7e27a0` 和 `git worktree add .worktrees/cloudflare-pages-deploy cloudflare-pages-deploy` |
+| 清理残留 `master` 分支 | 执行 `git push origin --delete master` 与 `git branch -d master`；目标分别为 `origin/master` 和本地 `refs/heads/master` | 删除 origin 仓库 `ilderaj/chart-mage` 的远端 `master` 引用与当前仓库本地 `master` 引用；不触碰 `upstream/master`、`main`、`dev` 或工作区文件 | 已确认 origin 默认分支是 `main`，`origin/master` 与本地 `master` 均为祖先提交 `46e7d209dbb2e912a3d4934c925af2cbc2947365`，无 worktree 使用 `master`；`./scripts/harness checkpoint . --quiet` 不可用，回滚用 `git push origin 46e7d209dbb2e912a3d4934c925af2cbc2947365:refs/heads/master` 和 `git branch master 46e7d209dbb2e912a3d4934c925af2cbc2947365` |
 
 ## Key Questions
 1. 首次上线是否应直接发布 `app/`，而不是继续依赖旧的 `dist/` 构建链？
@@ -62,6 +67,9 @@ Phase 8
 | direct-upload fallback 不再被视作最终形态 | Cloudflare 文档确认 Direct Upload 项目不能切换成 Git integration；最终自动发布需要新建 Git-integrated project |
 | 仓库收敛必须先于 Git 集成重试 | 当前 `main` 缺少部署文件，Cloudflare 后续从 Git 构建必须以 main 上的真实发布契约为准 |
 | 本次合并以 `main` 为用户指定目标分支 | 用户明确要求将 `cloudflare-pages-deploy` worktree 合回 local `main`，并推送到 `origin/main` |
+| `chartmage` Worker 可作为自动发布主路径候选 | Workers Builds 已成功连接 GitHub repo `ilderaj/chart-mage`，且 Cloudflare 自动生成配置 PR 可合入 main；但它的默认域名是 `workers.dev`，不是 `pages.dev` |
+| `chartmage` Worker 作为当前 primary automatic deploy path | PR #1 已合入 `main`，production build `96787207` 成功；`dev` push 也成功生成 non-production preview `https://dev-chartmage.ilderaj.workers.dev` |
+| `chart-mage.pages.dev` 保留为 Pages direct-upload fallback | 当前 Pages Git integration 仍被 `8000011` 阻塞；Pages fallback 可继续手动发布，但不再是自动发布主路径 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
@@ -69,6 +77,7 @@ Phase 8
 | `fatal: unable to access 'https://github.com/ilderaj/chart-mage.git/': LibreSSL SSL_connect: SSL_ERROR_SYSCALL` | 1 | 目前仅记录为外部 Git 网络阻塞；不影响本次规划产出，但会影响后续首次推送与自动部署验证 |
 | `.worktrees/` 当前未被 Git ignore | 1 | 已在执行开始阶段补充 `.gitignore` 保护，后续再创建 worktree |
 | Cloudflare Pages API 创建 Git-integrated project 返回 `8000011` | 1 | 已确认普通 Pages API 与 direct-upload project 创建正常，根因定位为 Cloudflare Pages GitHub 安装状态异常；当前改走 direct-upload fallback，上线后等待外部修复 |
+| Cloudflare Pages Git-integrated probe project 创建仍返回 `8000011` | 2 | 2026-04-30 用临时项目名 `chart-mage-git-probe-20260430` 复测，未触碰生产项目；仍失败，因此不删除 / 重建当前 `chart-mage` production project |
 | 系统 Python 受 PEP 668 限制，无法直接 `pip install blake3` | 1 | 已改用 session 私有 virtualenv 安装 `blake3`，完成 Pages asset hash / upload 流程 |
 
 ## Completion Review 2026-04-29

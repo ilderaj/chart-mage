@@ -1,5 +1,95 @@
 # Progress
 
+## 2026-04-30 Worker Git deployment convergence
+
+- **Status:** complete
+- Actions taken:
+  - 已读取 Workers / Wrangler 技能与当前 Cloudflare deploy 任务文件，确认这是同一发布链路收敛任务的延续。
+  - 已通过 Cloudflare API 确认 Worker `chartmage` 存在，具备 static assets，`https://chartmage.ilderaj.workers.dev` 返回 `200`。
+  - 已发现 GitHub 上存在 Cloudflare 自动创建的 PR #1 `Add Cloudflare Workers configuration`，head 为 `cloudflare/workers-autoconfig`，base 为 `main`。
+  - 已确认 PR #1 状态：`MERGEABLE` / `CLEAN`，status check `Workers Builds: chartmage` 为 `SUCCESS`。
+  - 已反查 Worker build IDs：default branch trigger 监听 `main` 并执行 `npm run build` + `npx wrangler deploy`；non-production trigger 监听非 `main` 并执行 `npm run build` + `npx wrangler versions upload`。
+  - 已确认 PR #1 主要添加 `.gitignore` Wrangler 忽略项、`wrangler.jsonc`、`deploy` / `preview` scripts 和 Wrangler devDependency；`wrangler.jsonc` 的 assets directory 为 `dist`，符合当前 Gulp build output。
+  - 已确认 `*.pages.dev` 不能直接作为 Worker 的免费二级域名；Worker 免费域名是 `chartmage.ilderaj.workers.dev`，若要短域名应使用 custom domain，或继续使用 Pages 项目 `chart-mage.pages.dev`。
+  - 已合并 Cloudflare 自动创建的 PR #1 到 `origin/main`，确认 production build `96787207` 成功。
+  - 已验证 `https://chartmage.ilderaj.workers.dev/` 包含 `workspaceFileFrame` / `workspaceSplit`，`/intro.html` 与 `/index.html?maestro=1` 均返回 `200`。
+  - 已将 `origin/main` 合入 `dev`，解决 `package-lock.json` 冲突，运行 `npm run build:check` 与 `npx wrangler deploy --dry-run` 通过后推送 `origin/dev`。
+  - 已确认 `origin/dev` build `ad9ca3eb-0585-4dce-a342-73536f8c4802` 成功，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+  - 已执行 `git fetch --prune origin`，清理删除后的 `origin/cloudflare/workers-autoconfig` remote-tracking ref。
+  - 已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`；后续 PR head `6aa4d12` 触发 build `7ccd4eda-7ab6-4829-b495-71130f30c4a4`，结果为 `success`，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+  - 已将部署 runbook 更新为 Worker primary / Pages fallback，避免继续把 direct-upload Pages 描述为当前自动发布目标。
+- Files created/modified:
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
+## 2026-04-30 Dev-to-main convergence PR
+
+- **Status:** in_progress
+- Actions taken:
+  - 已确认 `dev -> main` 原本没有打开 PR。
+  - 已创建 PR #2：`https://github.com/ilderaj/chart-mage/pull/2`。
+  - 已确认 PR #2 不需要强制 approval，Cloudflare Worker check 已触发。
+  - 已继续更新 runbook 和 planning 文件，准备提交并推送到 `dev`，让 PR #2 包含最终收敛说明。
+  - 已运行 `git diff --check`，无空白错误。
+  - 已运行 `npm run build:check`，Gulp build 通过；仅出现既有 `fs.Stats constructor` deprecation warning。
+  - 已确认本次 build 未产生需要提交的 `dist` 改动，工作区仅剩 runbook 与 planning 文件变更。
+  - 已确认 PR head `6aa4d12` 的 Worker build `7ccd4eda-7ab6-4829-b495-71130f30c4a4` 成功；准备推送最终状态记录并等待最后一轮 PR check 后合并。
+- Files created/modified:
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
+## 2026-04-30
+
+### Phase 10: Branch cleanup and latest fallback publish
+- **Status:** in_progress
+- Actions taken:
+  - 已读取仓库记忆与现有 Cloudflare / editor demo 任务文件，确认用户目标链路为 `feature -> local dev -> origin/dev -> PR -> origin/main -> Cloudflare Pages`。
+  - 已运行 session catchup；无未同步输出。
+  - 已确认当前工作区在 `dev`，工作区干净，`dev` 与 `origin/dev` 同步在 `41d81c056c7cb4f8eaee876d40eda807600c65a8`。
+  - 已确认 origin 默认分支为 `main`，但本地 `master` 与 `origin/master` 仍存在，均指向 `46e7d209dbb2e912a3d4934c925af2cbc2947365`。
+  - 已确认 `gh` 已登录，后续 GitHub 操作需显式使用 `-R ilderaj/chart-mage`。
+  - 已通过 Cloudflare API 确认当前 Pages 项目仍是 direct-upload fallback，latest deployment `010f65fe` 的 trigger type 为 `ad_hoc`，metadata commit 为 `24ef1a3`。
+  - 已通过线上 / 本地源码对比确认：线上缺少 `workspaceFileFrame` / `workspaceSplit`，本地已包含，因此当前生产站点不是最新页面版本。
+  - 已检查 `dev -> main` 当前没有打开的 PR。
+  - 已尝试按风险评估流程运行 `./scripts/harness checkpoint . --quiet`，但仓库没有可用的 `scripts/harness` 工具；本次分支删除回滚点改用 Git 提交哈希记录。
+  - 已执行 `git push origin --delete master`，远端 `origin/master` 删除成功。
+  - 已执行 `git branch -d master`，本地 `master` 删除成功。
+  - 已验证 `git ls-remote --heads origin master main dev` 只返回 `main` 与 `dev`，`git remote show origin` 也只显示 `main` / `dev` tracked。
+  - 已运行 `npm run build:check`，Gulp default task 完成。
+  - 已运行 `npm run pages:deploy`，Wrangler 成功发布 production deployment `f83819ca`。
+  - 已验证 `https://chart-mage.pages.dev/` 与 `https://f83819ca.chart-mage.pages.dev/` 均包含 `workspaceFileFrame` / `workspaceSplit`。
+  - 已验证 `https://chart-mage.pages.dev/intro.html` 规范化到 `/intro` 后返回 `200`，`https://chart-mage.pages.dev/index.html?maestro=1` 规范化到 `/?maestro=1` 后返回 `200`。
+  - 已通过 Cloudflare API 确认 latest deployment `f83819ca` 为 production / success，但 trigger type 仍为 `ad_hoc`。
+  - 已用临时项目名 `chart-mage-git-probe-20260430` 复测 Git-integrated Pages 创建，仍返回 `8000011`；未创建临时项目，也未触碰生产项目。
+- Files created/modified:
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
+### Phase 9: Manual redeploy fallback completion
+- **Status:** complete
+- Actions taken:
+  - 已按 convergence plan 复核当前任务完成度：整体仍因 Cloudflare Pages GitHub installation `8000011` 处于 blocked，不是完全完成。
+  - 已确认 Task 1 仓库部署文件收敛已经存在于当前分支。
+  - 已确认 Task 2 仍缺 Wrangler 手动 redeploy fallback 所需依赖、npm scripts 和 runbook 文档，准备继续补齐本地可执行部分。
+  - 已通过 Cloudflare 文档复核 Direct Upload + Wrangler 当前命令模型，确认 direct-upload 项目可以使用 Wrangler 部署目录，并且 preview branch alias 通过 `--branch` 指定。
+  - 已执行 `npm install --save-dev wrangler@latest`，安装结果为 `wrangler@4.86.0`，`npm audit` 为 0 vulnerabilities。
+  - 已更新 `package.json`，新增 `pages:deploy`、`pages:deploy:preview`、`pages:list` scripts。
+  - 已更新 `docs/deployment/cloudflare-pages.md`，记录手动 production redeploy、preview-style redeploy、deployment list 和 `npx wrangler login` 认证要求。
+  - 已运行验证：`git diff --check`、`npm run build:check`、`npx wrangler --version`、两个本地 HTTP probes、`npm run pages:list`、VS Code Problems 检查。
+  - `npm run pages:list` 已在当前环境完成 OAuth 登录并列出 deployment `010f65fe-098e-41bf-9582-40887adf4630`。
+- Files created/modified:
+  - package.json (updated)
+  - package-lock.json (updated)
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ## 2026-04-29
 
 ### Phase 8: Merge cloudflare-pages-deploy into main
@@ -135,6 +225,19 @@
 | Worktree cleanup verification | `git worktree list --porcelain` | 只剩主工作区 | 仅列出 `/Users/jared/Vibings/ChartMage` | passed |
 | Branch cleanup verification | `git branch --list cloudflare-pages-deploy` | 无输出 | 无输出 | passed |
 | Worktree directory verification | `test -d .worktrees/cloudflare-pages-deploy && echo exists || echo missing` | `missing` | `missing` | passed |
+| Wrangler install check | `npx wrangler --version` | Wrangler prints a version | `wrangler 4.86.0` | passed |
+| Manual Pages list script | `npm run pages:list` | Deployment list includes existing production deployment | listed `010f65fe-098e-41bf-9582-40887adf4630` for `chart-mage` | passed |
+| Post-Wrangler build check | `npm run build:check` | Gulp default task completes | `cleanDist`、`buildUseref`、`copyImages`、`default` 完成 | passed |
+| Post-Wrangler editor entry probe | `curl -I 'http://127.0.0.1:8000/index.html?maestro=1'` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Post-Wrangler intro entry probe | `curl -I http://127.0.0.1:8000/intro.html` | 返回 `200` | `HTTP/1.0 200 OK` | passed |
+| Problems check | VS Code Problems for package/runbook/planning files | no errors | no errors found | passed |
+| Origin master cleanup | `git ls-remote --heads origin master main dev` | only `main` and `dev` returned | `main` and `dev` returned; no `master` | passed |
+| Local master cleanup | `git branch --all --verbose --no-abbrev` | no local `master`, no `origin/master` | only local `dev` / `main` and `origin/dev` / `origin/main`; `upstream/master` remains | passed |
+| Latest Pages deploy | `npm run pages:deploy` | production deployment succeeds | deployment `f83819ca` created | passed |
+| Production latest structure | `curl -fsSL https://chart-mage.pages.dev/ | grep -n -E "workspaceFileFrame|workspaceSplit"` | latest workspace selectors present | selectors present | passed |
+| Production intro entry | `curl -I -L https://chart-mage.pages.dev/intro.html` | final response `200` | `/intro` returned `200` | passed |
+| Production editor entry | `curl -I -L 'https://chart-mage.pages.dev/index.html?maestro=1'` | final response `200` | `/?maestro=1` returned `200` | passed |
+| Git integration probe | Cloudflare Pages create project with source `github` | should succeed if GitHub installation is healthy | failed with `8000011` | blocked |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
@@ -143,6 +246,7 @@
 | 2026-04-29 | Cloudflare Pages Git-integrated project creation failed with API error `8000011` | 1 | 用 direct-upload project 对照实验确认是 Cloudflare GitHub 安装阻塞；经用户确认后改走 direct-upload fallback |
 | 2026-04-29 | System Python blocked `pip install blake3` with PEP 668 | 1 | 改用 session 私有 virtualenv 安装 `blake3` 并继续完成资产上传 |
 | 2026-04-29 | Direct Upload project cannot be converted to Git integration | review | 记录为架构约束；后续需要新建 Git-integrated Pages 项目并切换入口 |
+| 2026-04-30 | Git-integrated probe project creation still failed with `8000011` | 2 | 记录为当前自动部署阻塞；保留生产 direct-upload project，不执行删除 / 重建 |
 | 2026-04-29 | `git stash apply stash@{0}` failed with `README.md: needs merge` | 1 | 先执行 `git add README.md` 标记冲突已解决，再重新应用 stash 成功 |
 | 2026-04-29 | `curl -I http://127.0.0.1:8000/index.html?maestro=1` failed with `zsh: no matches found` | 1 | 使用引号包住带 query string 的 URL 后重新执行成功 |
 | 2026-04-29 | `curl -I http://127.0.0.1:8000/intro.html` failed because no server was listening on port 8000 | 1 | 启动 VS Code task `serve-chartmage-app` 后重新执行成功 |

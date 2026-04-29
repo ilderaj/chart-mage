@@ -51,6 +51,28 @@
 - 2026-04-30 清理前复核：`.worktrees/cloudflare-pages-deploy` 工作区干净，分支头为 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0`；`cloudflare-pages-deploy` 已是 `main` 祖先。
 - 2026-04-30 清理前复核：远端不存在 `origin/cloudflare-pages-deploy`，本次只需要删除本地 worktree 和本地分支。
 - 2026-04-30 清理执行复核：`.worktrees/cloudflare-pages-deploy` worktree 已移除，本地 `cloudflare-pages-deploy` 分支已删除；如需恢复，可从提交 `8b4ff4c0af24a6fd693973cff351c85fea7e27a0` 重建分支和 worktree。
+- 2026-04-30 convergence 复核：当前分支已包含 Task 1 仓库部署文件收敛结果，包括 `app/_headers`、README 部署说明、`docs/deployment/cloudflare-pages.md`、`serve:app`、`build`、`build:check` 与 `uat:serve` 复用。
+- 2026-04-30 convergence 复核：Task 2 尚未完成；`package.json` 缺少 `wrangler` devDependency 与 `pages:deploy` / `pages:deploy:preview` / `pages:list` scripts，runbook 也缺少 Wrangler 手动 redeploy 命令说明。
+- 2026-04-30 convergence 执行：已安装 `wrangler@4.86.0`，新增 `pages:deploy`、`pages:deploy:preview`、`pages:list` scripts，并在 runbook 中记录认证和 manual redeploy 用法。
+- 2026-04-30 convergence 验证：`npm run pages:list` 已能读取 `chart-mage` 项目部署列表，并显示 production deployment `010f65fe-098e-41bf-9582-40887adf4630`。
+- 2026-04-30 发布链路复核：当前工作区在 `dev`，本地干净，`dev` 与 `origin/dev` 同步在 `41d81c056c7cb4f8eaee876d40eda807600c65a8`；`main` 与 `origin/main` 同步在 `ae9c52d689b29828bb2ad5d45bd8a0554ecd6649`。
+- 2026-04-30 发布链路复核：origin 仓库 `ilderaj/chart-mage` 的 GitHub 默认分支为 `main`，`origin/HEAD -> origin/main`；但本地与远端仍存在残留 `master`，均指向历史提交 `46e7d209dbb2e912a3d4934c925af2cbc2947365`。
+- 2026-04-30 发布链路复核：`dev` 相对 `main` 只有 Wrangler/manual deploy 支持与部署任务记录差异；编辑器 demo 对齐提交已经存在于 `main` 历史中。
+- 2026-04-30 线上版本复核：`https://chart-mage.pages.dev/` 源码只包含旧的 `Diagram Input` / `Live Preview` 结构，缺少 `workspaceFileFrame` / `workspaceSplit`；本地 `app/index.html` 已包含这些 selector，说明线上未包含最新编辑器对齐版本。
+- 2026-04-30 Cloudflare API 复核：当前 `chart-mage` Pages 项目 latest deployment 仍为 `010f65fe-098e-41bf-9582-40887adf4630`，trigger type 为 `ad_hoc`，metadata commit 为 `24ef1a370233a051f3d903f6635bcebeed369955`；这解释了为什么 `main` 后续提交没有自动上线。
+- 2026-04-30 GitHub PR 复核：当前不存在 `dev -> main` 的打开 PR。
+- 2026-04-30 `master` 清理复核：`git push origin --delete master` 成功删除远端 `origin/master`，`git branch -d master` 成功删除本地 `master`；`origin` 现在只剩 `main` 和 `dev`，`origin/HEAD -> origin/main`。
+- 2026-04-30 fallback 发布复核：`npm run pages:deploy` 成功将当前 `app/` 发布为 production deployment `f83819ca-2a01-4e23-a1de-ecb977650586`，生产 URL `https://chart-mage.pages.dev/` 已包含 `workspaceFileFrame` / `workspaceSplit`。
+- 2026-04-30 fallback 发布复核：Cloudflare API 显示 latest deployment `f83819ca` 为 `success`，trigger type 仍为 `ad_hoc`，metadata commit 为 `41d81c056c7cb4f8eaee876d40eda807600c65a8`，`commit_dirty = true` 来自本次 planning 文件未提交改动。
+- 2026-04-30 Git integration 探测：使用临时项目名 `chart-mage-git-probe-20260430`、GitHub repo `ilderaj/chart-mage`、production branch `main` 创建 Git-integrated Pages project，仍返回 `8000011`；当前不能安全替换 `chart-mage` direct-upload 项目。
+- 2026-04-30 Worker 复核：用户创建的 Worker `chartmage` 存在，`has_assets = true`，`compatibility_date = 2026-04-29`，`compatibility_flags = ["nodejs_compat"]`，observability enabled，当前 `https://chartmage.ilderaj.workers.dev` 返回 `200`。
+- 2026-04-30 Worker Builds 复核：Cloudflare 为 repo `ilderaj/chart-mage` 创建了 PR #1 `Add Cloudflare Workers configuration`，状态检查 `Workers Builds: chartmage` 为 success，PR mergeable/clean。
+- 2026-04-30 Worker Builds 复核：default branch trigger `8b77d198-4c3b-42b3-9585-0052216eab5b` 监听 `main`，build command 为 `npm run build`，deploy command 为 `npx wrangler deploy`；non-production trigger `8ec87900-413c-48bd-9d19-e2be8c8db4b3` 监听非 `main` 分支，deploy command 为 `npx wrangler versions upload`，`dev` 预览 URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+- 2026-04-30 Worker 配置复核：Cloudflare 自动生成的 `wrangler.jsonc` 指向 Worker name `chartmage`，assets directory 为 `dist`，这与当前 `npm run build` 生成的 Gulp output 一致。
+- 2026-04-30 域名复核：`*.pages.dev` 是 Cloudflare Pages 项目的免费二级域名，Worker 的免费二级域名形态是 `<worker>.<account-subdomain>.workers.dev`；`chartmage.pages.dev` 不能作为 Worker 的 `workers.dev` 域名直接配置，只能通过 Pages 项目名或自有 custom domain 达成类似短域名。
+- 2026-04-30 Worker 自动发布验证：PR #1 已合入 `origin/main`，main production build `96787207` 成功，`https://chartmage.ilderaj.workers.dev/` 已包含最新 `workspaceFileFrame` / `workspaceSplit` 结构，`/intro.html` 与 `/index.html?maestro=1` 均返回 `200`。
+- 2026-04-30 Worker preview 验证：`origin/dev` push 触发 build `ad9ca3eb-0585-4dce-a342-73536f8c4802`，最终 `status = stopped`、`build_outcome = success`，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
+- 2026-04-30 GitHub PR 收敛：已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`，用于把 Pages fallback scripts / runbook / task records 收敛进 `main` 并通过 Worker build check 验证。
 
 ## Technical Decisions
 | Decision | Rationale |
@@ -67,6 +89,11 @@
 | 仓库存在老旧 Gulp 工具链，与 Cloudflare 现代构建镜像的长期兼容性未完全验证 | 实施计划中避免把首次上线绑定在该构建链上 |
 | direct-upload fallback 已上线但不是最终自动发布形态 | 需要建立新的 Git-integrated Pages 项目或重新创建 `chart-mage` 项目后迁移域名 |
 | 部署文件尚未进入当前 `main` | 需要先把 `cloudflare-pages-deploy` 分支中的非 planning 文件合入 `main` |
+| 当前 `chart-mage.pages.dev` 没有最新编辑器结构 | 用 Wrangler direct-upload fallback 先发布当前 `app/`，再继续处理 Git integration 阻塞 |
+| `origin/master` / 本地 `master` 残留 | 已按用户要求清理；保留 `upstream/master`，因为它属于上游仓库历史引用，不是 origin 发布链路的一部分 |
+| `dev -> origin/dev -> PR -> origin/main -> Pages` 不能自动触发 production | 当前 Cloudflare 项目仍是 direct upload；要么修复 Cloudflare GitHub installation 后新建 Git-integrated Pages project，要么后续改走 GitHub Actions + Wrangler direct-upload CI 并配置 Cloudflare API token secret |
+| Worker `chartmage` 与 Pages `chart-mage` 并存 | Worker 现在是可自动化候选主入口；Pages 仍可保留为 fallback，但文档和 package scripts 需要明确哪一个是 primary deploy target |
+| `chartmage.pages.dev` 域名诉求不能由 Worker 免费域名满足 | `*.pages.dev` 属于 Pages 产品；Worker 只能使用 `*.workers.dev` 免费域名或绑定 custom domain |
 
 ## Resources
 - https://developers.cloudflare.com/pages/get-started/git-integration/
