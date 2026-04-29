@@ -11,6 +11,7 @@ Close Reason:
 ## Requirements
 - Roadmap 保持 private，不作为公开站点或 README 导航内容。
 - Roadmap 使用英文，并覆盖约 5 个版本。
+- Roadmap 需要明确所有主要用户场景都必须有 Maestro 测试用例覆盖。
 - 页面关键位置未来需要明确 credit 原始项目和作者，并只导向原始 repo。
 - 后续清理所有导向原作者 contact/profile/GitHub 等路径，除 credit 中的原 repo 链接外不再保留。
 - Roadmap 必须包含全面设计重构、现代化、体验优化和额外观察到的改进点。
@@ -25,6 +26,8 @@ Close Reason:
    - Rewrite README around the maintained fork, credit, local usage, UAT, roadmap summary, and modernization direction.
 4. Verification - complete
    - Check markdown formatting, unwanted public roadmap links, and obvious stale personal-contact references in updated docs.
+5. Maestro coverage requirement update - complete
+   - Add all-scenarios Maestro coverage policy to private roadmap and sync planning state.
 
 ## Decisions
 - Use `planning/active/project-roadmap-readme/private_roadmap.md` for the roadmap because the user requested a private roadmap.

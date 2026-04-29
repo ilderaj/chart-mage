@@ -9,6 +9,11 @@ Visibility: private/internal. Do not publish this file, link it from the public 
 - Remove legacy contact/profile paths that route users to the original author, including old feedback email links, old analytics ownership, and copy written in the original author's personal voice.
 - Keep the app local-first unless a future version intentionally adds sharing or collaboration. Local browser storage remains the default trust model.
 - Modernize gradually: protect the existing static app, Mermaid rendering pipeline, and Maestro UAT coverage while improving architecture and experience.
+- Every meaningful user-facing scenario must have Maestro coverage before it is considered release-ready.
+
+## Maestro Coverage Policy
+
+Every version must add or update Maestro browser UAT flows for all scenarios it changes or introduces. Coverage should include happy paths, important recovery paths, modal and drawer interactions, persistence behavior, export behavior, unsupported-browser or mobile fallback behavior where practical, and public credit/contact surfaces. Manual checks are allowed only as temporary notes while a scenario is being made testable; they should not be the final acceptance standard for release-ready work.
 
 ## Version 1 - Fork Identity, Credit, And Ownership Cleanup
 
@@ -26,6 +31,7 @@ Success criteria:
 - No public page contains an old personal contact link for the original author.
 - The original repo credit is visible from the public product and README.
 - README no longer speaks in the original author's first-person voice.
+- Maestro coverage verifies public credit surfaces and confirms legacy contact routes are absent from the primary app paths.
 
 ## Version 2 - Unified Design Language Across Intro, App, And Fallbacks
 
@@ -43,6 +49,7 @@ Success criteria:
 - Landing, editor, About, syntax help, drawer, modal, and browser fallback screens read as one design system.
 - The first viewport clearly communicates Chart Mage as the product.
 - Key actions remain obvious: start drawing, create chart, search charts, rename, delete, export, open syntax help.
+- Maestro coverage exists for every redesigned path, including intro, editor, drawer, modals, syntax help, export entry points, and fallback states that can be exercised in automation.
 
 ## Version 3 - Authoring Experience And Syntax Resilience
 
@@ -60,7 +67,7 @@ Scope:
 Success criteria:
 - Full-width colon input produces valid sequence syntax without requiring manual cleanup.
 - A user can understand what failed and where when a diagram cannot render.
-- Library and export behavior remain covered by Maestro or equivalent browser UAT flows.
+- Maestro coverage verifies all authoring scenarios changed in this version, including punctuation normalization, syntax errors, quick inserts, library actions, and export behavior.
 
 ## Version 4 - Modern Architecture And Dependency Hardening
 
@@ -79,6 +86,7 @@ Success criteria:
 - Core chart creation, editing, saving, renaming, deleting, rendering, and exporting remain behaviorally stable.
 - Dependency audit risk is materially lower or explicitly documented where upgrades are deferred.
 - Parser and storage behavior can be verified without manual browser testing.
+- Existing Maestro scenarios stay green, and any refactored UI/storage/rendering path has matching Maestro coverage before the refactor is accepted.
 
 ## Version 5 - Distribution, Collaboration, And Product Readiness
 
@@ -97,6 +105,7 @@ Success criteria:
 - Production deployment is reproducible from the repository's documented contract.
 - Pull requests can be previewed safely before merge.
 - Users have a reliable backup/export story without forcing an account system.
+- Release and preview workflows run the full Maestro suite, and new distribution, import/export, accessibility, and collaboration-adjacent scenarios are covered before release.
 
 ## Cross-Version Backlog
 
@@ -104,4 +113,5 @@ Success criteria:
 - Replace IE-specific fallback strategy with a modern unsupported-browser policy.
 - Document ownership boundaries for third-party libraries and vendored assets.
 - Add a lightweight security/privacy checklist for future changes.
+- Maintain a scenario-to-Maestro-flow coverage map so new roadmap items cannot ship without explicit UAT ownership.
 - Revisit the product name only if trademark, domain, or positioning issues arise.
