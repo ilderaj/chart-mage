@@ -9,7 +9,7 @@
     "build:check": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1",
     "maestro:install": "./scripts/install-maestro.sh",
-    "uat:serve": "python3 -m http.server 8000 --directory app",
+    "uat:serve": "npm run serve:app",
     "uat:smoke": "./scripts/run-maestro-web-smoke.sh",
     "uat:smoke:headed": "./scripts/run-maestro-web-smoke.sh --headed"
   },
