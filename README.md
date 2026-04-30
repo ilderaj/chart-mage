@@ -98,13 +98,14 @@ For future UAT coverage, add more YAML flows under `.maestro/flows/` and run the
 
 ## Deployment
 
-Production is currently running on Cloudflare Pages at `https://chart-mage.pages.dev` via a temporary direct-upload fallback.
+Production is currently running on Cloudflare Workers at `https://chartmage.paymond.me`.
 
-- Current mode: direct-upload fallback
-- Production URL: `https://chart-mage.pages.dev`
-- Intended production branch: `main`
-- Git integration / automatic preview deployments: temporarily blocked until the Cloudflare Pages GitHub installation is repaired
-- First-stage publish surface: `app/`
+- Current mode: GitHub-connected Cloudflare Workers Builds
+- Production URL: `https://chartmage.paymond.me`
+- Worker fallback URL: `https://chartmage.ilderaj.workers.dev`
+- Production branch: `main`
+- Preview URL for `dev`: `https://dev-chartmage.ilderaj.workers.dev`
+- Publish output: `dist/`
 - Operational runbook: [docs/deployment/cloudflare-pages.md](docs/deployment/cloudflare-pages.md)
 
 ### Local preview

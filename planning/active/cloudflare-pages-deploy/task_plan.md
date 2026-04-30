@@ -7,10 +7,10 @@
 ## Current State
 Status: active
 Archive Eligible: no
-Close Reason: Production is live on Cloudflare Pages via a direct-upload fallback, and the latest `app/` snapshot was redeployed on 2026-04-30 as deployment `f83819ca`. Local and origin `master` have been removed. GitHub-connected Worker `chartmage` is now verified as the primary automatic deployment path; PR #2 is open to converge the remaining `dev` deployment runbook / fallback changes into `main`.
+Close Reason: Production is live on Worker custom domain `https://chartmage.paymond.me`. GitHub-connected Worker `chartmage` is verified as the primary automatic deployment path; `https://chartmage.ilderaj.workers.dev` remains available as the Worker fallback URL, and Pages remains only a historical fallback.
 
 ## Current Phase
-Phase 11
+Phase 13
 
 ## Companion Plan
 - Path: `docs/superpowers/plans/2026-04-29-cloudflare-pages-deployment.md`
@@ -32,6 +32,7 @@ Phase 11
 10. 清理本地 / 远端 `master`，核验 `dev -> origin/dev -> PR -> origin/main -> Pages` 目标链路，并用 fallback 发布最新 `app/` 快照（已完成；Git 自动部署仍被 `8000011` 阻塞）
 11. 验证并收敛 GitHub-connected Worker `chartmage`：合入 `wrangler.jsonc`，确认 `main` 自动 production build 和非生产 preview build，整理域名策略（已完成；PR #2 进行中）
 12. 将 `dev` 中剩余 Pages fallback / runbook 收敛通过 PR 合入 `main`，触发 Worker production 自动发布并最终验证（进行中）
+13. 将 Worker `chartmage` 的生产自有域名切换为 `chartmage.paymond.me`，确认 `paymond.me` zone、DNS / Worker custom domain 配置和线上访问（已完成）
 
 ## Risk Assessment
 
@@ -70,6 +71,7 @@ Phase 11
 | `chartmage` Worker 可作为自动发布主路径候选 | Workers Builds 已成功连接 GitHub repo `ilderaj/chart-mage`，且 Cloudflare 自动生成配置 PR 可合入 main；但它的默认域名是 `workers.dev`，不是 `pages.dev` |
 | `chartmage` Worker 作为当前 primary automatic deploy path | PR #1 已合入 `main`，production build `96787207` 成功；`dev` push 也成功生成 non-production preview `https://dev-chartmage.ilderaj.workers.dev` |
 | `chart-mage.pages.dev` 保留为 Pages direct-upload fallback | 当前 Pages Git integration 仍被 `8000011` 阻塞；Pages fallback 可继续手动发布，但不再是自动发布主路径 |
+| `chartmage.paymond.me` 作为新的 Worker production custom domain | 用户确认该域名应已迁移到 Cloudflare；本阶段在 Worker route / custom domain 层完成对外入口切换 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
