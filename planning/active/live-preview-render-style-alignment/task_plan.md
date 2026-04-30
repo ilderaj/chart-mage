@@ -12,7 +12,7 @@
 
 ## Current State
 
-Status: waiting_execution
+Status: waiting_review
 Archive Eligible: no
 Close Reason:
 
