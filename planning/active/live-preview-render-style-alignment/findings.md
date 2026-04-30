@@ -67,3 +67,12 @@
 - `chart-default.css` 应优先改 Mermaid 元素样式。
 - `main.css` 应优先改 preview viewport framing 和 `#graphDiv` fit/actual 尺寸策略。
 - `app.js` 只在 CSS 无法解决序列图比例时调整 `sequenceDiagram` 的 `actorMargin` / `width` / `height`。
+
+## 实施后发现
+
+- 采用 CSS-first 方案已足够完成当前视觉 token 对齐；`app/js/app.js` 未修改，Mermaid geometry 参数保持不变。
+- `app/css/main.css` 已将 preview 点阵改为 18px、收紧 `.chart` padding、约束 `#graphDiv` fit 宽度，并为 `.diagram` header/toolbar 增加 scoped compact rules，避免窄 preview 面板中 `Live Preview` 和 toolbar 换行。
+- `app/css/chart-default.css` 已将 sequence actor、lifeline、message、note 和字体样式对齐 intro demo token。
+- Maestro 对 SVG 可访问文本的支持不完全稳定：`Alice` 和 `John` 可断言，但 `Text in note` 在 Maestro 中不可见。已将 `.maestro/flows/web-preview-style-alignment.yaml` 调整为稳定断言 preview load、actor text 和 Fit/100% 切换；note 样式通过浏览器 computed-style 验证覆盖。
+- 浏览器验证使用 `index.html?maestro=1` 时，集成浏览器 513px 宽会绕过正常移动端 redirect，因此 desktop editor 会横向溢出。这是自动化入口/窄 viewport 的已知限制，不纳入本窄任务的 mobile editor redesign。
+- 关键 computed-style 验证结果：`.actor` stroke `rgb(83, 58, 253)`、`.actor-line` stroke `rgb(205, 216, 229)`、`.messageLine0` stroke `rgb(28, 30, 84)`、`.messageText` fill `rgb(66, 84, 102)`、`.note` fill `rgb(255, 251, 230)`、`.note` stroke `rgb(155, 104, 41)`、`.noteText` fill `rgb(155, 104, 41)`、`.diagram` background-size `18px 18px, 100% 100%`。

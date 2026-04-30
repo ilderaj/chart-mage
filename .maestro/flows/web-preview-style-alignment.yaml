@@ -1,0 +1,20 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - preview
+  - visual-alignment
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- assertVisible: "Live Preview"
+- assertVisible: "Fit"
+- assertVisible: "100%"
+- assertVisible: "Alice"
+- assertVisible: "John"
+- tapOn: "100%"
+- assertVisible: "Alice"
+- assertVisible: "John"
+- tapOn: "Fit"
+- assertVisible: "Alice"
+- assertVisible: "John"
