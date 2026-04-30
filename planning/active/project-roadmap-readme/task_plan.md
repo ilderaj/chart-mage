@@ -28,12 +28,16 @@ Close Reason:
    - Check markdown formatting, unwanted public roadmap links, and obvious stale personal-contact references in updated docs.
 5. Maestro coverage requirement update - complete
    - Add all-scenarios Maestro coverage policy to private roadmap and sync planning state.
+6. Backlogs folder setup - complete
+   - Add issue-level backlog files for bug fixes, new features, issues, and Maestro coverage mapping.
 
 ## Decisions
 - Use `planning/active/project-roadmap-readme/private_roadmap.md` for the roadmap because the user requested a private roadmap.
 - Do not publish or link the private roadmap from README.
 - Credit should point to the original repository only: `https://github.com/heyjunlin/chart-mage`.
 - README should describe this as a maintained fork and avoid personal contact/profile links for the original author.
+- Use root-level `backlogs/` for concrete issue-sized work items that support roadmap versions or capture small standalone needs outside the roadmap.
+- Backlog documentation should stay English and include a Maestro coverage field for user-facing scenarios.
 
 ## Errors Encountered
 | Error | Attempt | Resolution |

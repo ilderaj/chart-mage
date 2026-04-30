@@ -27,40 +27,51 @@
 .cluster text {
   fill: #061b31;
 }
+#chart svg {
+  font-family: var(--font-sans);
+  font-feature-settings: var(--font-feature-settings);
+}
 .actor {
-  stroke: #425466;
-  fill: white;
+  stroke: #533afd;
+  fill: #ffffff;
+  rx: 4;
 }
 text.actor {
   fill: #061b31;
   stroke: none;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
 }
 .actor-line {
   stroke-width: 1;
   stroke-dasharray: 3, 3;
-  stroke: #64748d;
+  stroke: #cdd8e5;
 }
 .messageLine0 {
-  stroke-width: 1.5;
-  stroke-dasharray: "2 2";
+  stroke-width: 1.4;
+  stroke-dasharray: none;
   marker-end: "url(#arrowhead)";
-  stroke: #425466;
+  stroke: #1c1e54;
 }
 .messageLine1 {
-  stroke-width: 1.5;
-  stroke-dasharray: 2, 2;
-  stroke: #425466;
+  stroke-width: 1.2;
+  stroke-dasharray: 4, 3;
+  stroke: #1c1e54;
 }
 #arrowhead {
-  fill: #425466;
+  fill: #1c1e54;
 }
 #crosshead path {
-  fill: #425466 !important;
-  stroke: #425466 !important;
+  fill: #1c1e54 !important;
+  stroke: #1c1e54 !important;
 }
 .messageText {
-  fill: #061b31;
+  fill: #425466;
   stroke: none;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 400;
 }
 .labelBox {
   stroke: #425466;
@@ -81,12 +92,16 @@ text.actor {
   stroke: #425466;
 }
 .note {
-  stroke: #d9b75e;
-  fill: #fff1ba;
+  stroke: #9b6829;
+  fill: #fffbe6;
+  rx: 4;
 }
 .noteText {
-  fill: #061b31;
+  fill: #9b6829;
   stroke: none;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 400;
 }
 /** Section styling */
 .section {
