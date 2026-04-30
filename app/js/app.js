@@ -171,7 +171,7 @@ $(function() {
   });
 
   /*** 两个功能按钮 ***/
-  $("#export-diagram").click(function(event) {
+  $(document).on("click", "#export-diagram, .export-trigger", function(event) {
     event.preventDefault();
 
     var svg = $("#graphDiv")[0];
@@ -274,7 +274,7 @@ $(function() {
   var modal = {
     _sequenceDiagramExample: "participant Alice\nparticipant John\nAlice ->> John: No need to memorize the syntax.\nJohn -->> Alice: You will be hinted during typing.\nNote right of John: Text in note",
 
-    _flowchartExample: "((Terminal)) ->> Process\nProcess ->> Decision?\nDecision? - No ->> Process 1\nDecision? - Yes ->> Process 2\nsubgraph Subgraph Title\n  Process 2 ->> Process 3\nend",
+    _flowchartExample: "((Start)) ->> Has draft?\nHas draft? - yes ->> Open editor\nHas draft? - no ->> New chart\nOpen editor ->> Edit\nNew chart ->> Edit",
 
     _charts: JSON.parse(localStorage.getItem("spells")),
 

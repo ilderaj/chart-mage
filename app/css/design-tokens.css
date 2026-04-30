@@ -47,6 +47,20 @@
 
 	--transition-base: 180ms ease;
 	--focus-ring: 0 0 0 2px rgba(83, 58, 253, 0.24);
+
+	/* v2 prototype additions */
+	--gradient-brand: linear-gradient(135deg, #533afd 0%, #8b5cf6 45%, #ea2261 78%, #f96bee 100%);
+	--gradient-mark: linear-gradient(135deg, #4434d4 0%, #533afd 35%, #8b5cf6 70%, #ea2261 100%);
+	--gradient-soft: linear-gradient(180deg, rgba(83, 58, 253, 0.06) 0%, rgba(83, 58, 253, 0) 100%);
+	--color-canvas-bg: #fbfcfe;
+	--color-canvas-grid: rgba(83, 58, 253, 0.10);
+	--color-editor-bg: #ffffff;
+	--color-editor-gutter: #f6f9fc;
+	--color-editor-active: rgba(83, 58, 253, 0.05);
+	--color-syntax-keyword: #533afd;
+	--color-syntax-string: #108c3d;
+	--color-syntax-arrow: #ea2261;
+	--color-syntax-comment: #94a3b8;
 }
 
 html {
