@@ -148,13 +148,13 @@
 
         <div class="workspaceSplit">
           <section class="editor workspacePanel">
-            <div class="workspaceHeader">
+            <div class="workspaceHeader pane-header">
               <div class="workspaceCopy">
                 <p class="workspaceEyebrow">Input</p>
                 <h2 class="workspaceTitle">Diagram Input</h2>
                 <p class="workspaceDescription">Write Mermaid-style syntax with inline hints. Every change renders directly into the paired preview surface.</p>
               </div>
-              <div class="workspaceStatus">Autosave . local</div>
+              <div class="workspaceStatus">Autosave &middot; local</div>
             </div>
             <div class="workspaceBody editorBody">
               <div class="quickInsertBar" aria-label="Syntax shortcuts">
@@ -166,23 +166,37 @@
               <textarea id="code" name="code">
               </textarea>
             </div>
+            <div class="pane-footer pane-footer-input" aria-hidden="true">
+              <span class="ok">&#9679; parsed ok</span>
+              <span class="muted">&middot;</span>
+              <span class="mono">local autosave</span>
+              <span class="spacer"></span>
+              <span class="mono">Mermaid syntax</span>
+            </div>
           </section>
 
           <section class="diagram workspacePanel">
-            <div class="workspaceHeader">
+            <div class="workspaceHeader pane-header">
               <div class="workspaceCopy">
                 <p class="workspaceEyebrow">Output</p>
                 <h2 class="workspaceTitle">Live Preview</h2>
                 <p class="workspaceDescription">Inspect the rendered diagram in real time and export the current canvas to PNG when it is ready to share.</p>
               </div>
-              <div class="previewToolbar" aria-label="Preview tools">
-                <button type="button" class="preview-chip active" data-preview-mode="fit">Fit</button>
-                <button type="button" class="preview-chip" data-preview-mode="actual">100%</button>
-                <button type="button" class="preview-chip preview-chip-disabled" disabled>Dark</button>
-              </div>
+              <span class="pane-render-state mono ok" aria-hidden="true">&#9679; rendered</span>
             </div>
             <div class="workspaceBody previewBody">
               <div class="chart" id="chart"></div>
+            </div>
+            <div class="pane-footer pane-footer-preview previewToolbar" aria-label="Preview tools">
+              <span class="mono muted preview-meta">canvas</span>
+              <span class="spacer"></span>
+              <button type="button" class="preview-chip active" data-preview-mode="fit">Fit</button>
+              <button type="button" class="preview-chip" data-preview-mode="actual">100%</button>
+              <button type="button" class="preview-chip preview-chip-disabled" disabled>Dark</button>
+              <a href="#" class="export-trigger" role="button" aria-label="Export PNG">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5M2 13h12"/></svg>
+                Export
+              </a>
             </div>
           </section>
         </div>

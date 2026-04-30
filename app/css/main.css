@@ -417,6 +417,8 @@ main {
 
 .workspacePanel {
 	min-height: 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .workspaceHeader {
@@ -424,30 +426,42 @@ main {
 	justify-content: space-between;
 	align-items: center;
 	gap: 18px;
-	padding: 14px 18px 10px;
+	padding: 0 16px;
+	height: 44px;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	border-bottom: 1px solid var(--color-border);
+	background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
 	position: relative;
 	z-index: 1;
 }
 
 .workspaceCopy {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	gap: 12px;
-	max-width: 360px;
+	gap: 10px;
+	min-width: 0;
+	max-width: none;
 }
 
 .workspaceStatus {
 	display: inline-flex;
 	align-items: center;
-	padding: 7px 10px;
+	padding: 4px 8px;
 	border-radius: var(--radius-sm);
 	background: rgba(83, 58, 253, 0.08);
 	border: 1px solid rgba(83, 58, 253, 0.12);
 	font-family: var(--font-mono);
-	font-size: 11px;
-	letter-spacing: 0.08em;
+	font-size: 10px;
+	letter-spacing: 0.10em;
 	text-transform: uppercase;
 	color: var(--color-brand);
+}
+
+/* Pane chrome v2 — eyebrow + description hidden inside the slim 44px header. */
+.workspaceHeader .workspaceEyebrow,
+.workspaceHeader .workspaceDescription {
+	display: none;
 }
 
 .workspaceEyebrow {
@@ -461,27 +475,36 @@ main {
 
 .workspaceTitle {
 	margin: 0;
-	font-size: 20px;
-	line-height: 1.1;
-	letter-spacing: -0.02em;
+	font-size: 13px;
+	font-weight: var(--font-weight-medium);
+	line-height: 1;
+	letter-spacing: 0;
 	color: var(--color-heading);
+	font-feature-settings: "ss01" 1;
 }
 
 .workspaceDescription {
 	display: none;
 }
 
+.pane-render-state {
+	font-family: var(--font-mono);
+	font-size: 11px;
+	color: var(--color-success);
+	letter-spacing: 0.04em;
+}
+
 .workspaceBody {
 	flex: 1 1 auto;
 	min-height: 0;
-	padding: 0 22px 22px;
+	padding: 14px 22px 16px;
 }
 
 .quickInsertBar {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	padding: 0 0 14px;
+	padding: 0 0 12px;
 }
 
 .quick-chip,
@@ -513,12 +536,6 @@ main {
 .preview-chip:disabled {
 	opacity: 0.45;
 	cursor: not-allowed;
-}
-
-.previewToolbar {
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
 }
 
 .editor {
@@ -554,7 +571,6 @@ main {
 
 .diagram .workspaceHeader {
 	gap: 10px;
-	padding: 12px 16px 8px;
 }
 
 .diagram .workspaceCopy {
@@ -564,21 +580,66 @@ main {
 	gap: 8px;
 }
 
-.diagram .workspaceTitle {
-	white-space: nowrap;
-	font-size: 18px;
-	letter-spacing: 0;
-}
-
-.diagram .previewToolbar {
-	flex: 0 0 auto;
-	flex-wrap: nowrap;
+/* Footer-hosted preview tools (Fit / 100% / Dark / Export). */
+.previewToolbar {
+	display: flex;
 	gap: 6px;
+	align-items: center;
+	flex-wrap: nowrap;
 }
 
-.diagram .preview-chip {
-	padding: 5px 8px;
+.pane-footer {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-shrink: 0;
+	padding: 0 14px;
+	height: 38px;
+	box-sizing: border-box;
+	border-top: 1px solid var(--color-border);
+	background: var(--color-bg);
+	font-family: var(--font-mono);
+	font-size: 11px;
+	font-feature-settings: "tnum";
+	color: var(--color-text-muted);
+}
+
+.pane-footer .ok { color: var(--color-syntax-string); }
+.pane-footer .muted { color: var(--color-border-strong); }
+.pane-footer .mono { font-family: var(--font-mono); }
+.pane-footer .spacer { flex: 1; }
+
+.pane-footer .preview-chip {
+	padding: 4px 8px;
 	font-size: 10px;
+	letter-spacing: 0.06em;
+}
+
+.pane-footer .export-trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-left: 4px;
+	padding: 5px 10px;
+	border-radius: var(--radius-sm);
+	background: var(--color-heading);
+	color: var(--color-text-inverse);
+	font-family: var(--font-sans);
+	font-size: 12px;
+	font-weight: var(--font-weight-regular);
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color var(--transition-base);
+}
+
+.pane-footer .export-trigger:hover {
+	background: var(--color-brand-strong);
+	color: var(--color-text-inverse);
+}
+
+.pane-footer .export-trigger svg {
+	width: 11px;
+	height: 11px;
 }
 
 .chart-definiton {
