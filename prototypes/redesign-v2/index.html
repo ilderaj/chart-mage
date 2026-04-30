@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChartMage · Redesign Prototype v2</title>
+<link rel="stylesheet" href="../../app/css/design-tokens.css">
+<style>
+/* ============================================================
+   ChartMage Redesign Prototype v2
+   - Stage 1 review artifact, no app/ integration.
+   - Reuses tokens from app/css/design-tokens.css.
+   - Adds prototype-only tokens (gradients, editor surfaces).
+   ============================================================ */
+
+:root {
+  /* Prototype-only token additions (candidates to merge into design-tokens.css) */
+  --gradient-brand: linear-gradient(135deg, #533afd 0%, #8b5cf6 45%, #ea2261 78%, #f96bee 100%);
+  --gradient-mark: linear-gradient(135deg, #4434d4 0%, #533afd 35%, #8b5cf6 70%, #ea2261 100%);
+  --gradient-soft: linear-gradient(180deg, rgba(83,58,253,0.06) 0%, rgba(83,58,253,0) 100%);
+  --color-canvas-grid: rgba(83, 58, 253, 0.10);
+  --color-canvas-bg: #fbfcfe;
+  --color-editor-bg: #ffffff;
+  --color-editor-gutter: #f6f9fc;
+  --color-editor-gutter-text: #64748d;
+  --color-editor-active: rgba(83, 58, 253, 0.05);
+  --color-syntax-keyword: #533afd;
+  --color-syntax-string: #108c3d;
+  --color-syntax-arrow: #ea2261;
+  --color-syntax-comment: #94a3b8;
+  --proto-bg: #eef2f8;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--proto-bg);
+  font-family: var(--font-sans);
+  font-feature-settings: var(--font-feature-settings);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== Proto chrome ===== */
+.proto-bar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 28px;
+  display: flex; align-items: center; gap: 18px;
+}
+.proto-bar h1 {
+  font-size: 13px; font-weight: 400; margin: 0;
+  color: var(--color-heading); letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 8px;
+}
+.proto-bar h1 .v {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--color-brand-subtle);
+  color: var(--color-brand);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.proto-bar nav { display: flex; gap: 2px; flex-wrap: wrap; }
+.proto-bar nav a {
+  font-size: 12px; font-weight: 400;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: 5px 10px; border-radius: 4px;
+  transition: all 180ms ease;
+}
+.proto-bar nav a:hover { color: var(--color-heading); background: var(--color-brand-subtle); }
+.proto-bar .badge {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(21,190,83,0.18);
+  color: #108c3d;
+  border: 1px solid rgba(21,190,83,0.4);
+}
+
+/* base buttons (modals / states / mobile) */
+.button-primary, .button-secondary {
+  appearance: none;
+  font-family: inherit;
+  font-size: 14px; font-weight: 400;
+  letter-spacing: -0.005em;
+  padding: 10px 16px; border-radius: 6px;
+  min-height: 40px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 180ms ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.button-primary {
+  background: var(--color-heading);
+  color: #fff;
+  border-color: var(--color-heading);
+  box-shadow: 0 6px 16px -8px rgba(6,27,49,0.30), 0 2px 5px -1px rgba(6,27,49,0.14);
+}
+.button-primary:hover { background: #0a2a4a; border-color: #0a2a4a; }
+.button-primary:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.button-secondary {
+  background: var(--color-surface);
+  color: var(--color-heading);
+  border-color: var(--color-border);
+}
+.button-secondary:hover { border-color: var(--color-brand); color: var(--color-brand); }
+.button-secondary:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.proto-section {
+  padding: 56px 28px 72px;
+  border-bottom: 1px dashed var(--color-border-strong);
+}
+.proto-section:nth-of-type(even) { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0)); }
+.proto-section > header {
+  max-width: 1280px; margin: 0 auto 32px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap;
+}
+.proto-section > header > div { max-width: 560px; }
+.proto-section .label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-brand);
+  margin-bottom: 8px;
+}
+.proto-section h2 {
+  font-size: 28px; font-weight: 300;
+  letter-spacing: -0.02em; line-height: 1.15;
+  margin: 0 0 8px;
+}
+.proto-section .desc { font-size: 14px; color: var(--color-text-muted); line-height: 1.5; }
+
+.proto-stage {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* =================================================================
+   01 · Tokens
+   ================================================================= */
+.tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.swatch {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.swatch .chip {
+  height: 56px;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.swatch .name {
+  font-size: 12px; color: var(--color-heading); font-weight: 400;
+}
+.swatch .hex {
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);
+}
+
+.type-stack {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 32px;
+  display: flex; flex-direction: column; gap: 18px;
+}
+.type-row { display: flex; align-items: baseline; gap: 16px; padding-bottom: 14px; border-bottom: 1px dashed var(--color-border); }
+.type-row:last-child { border: 0; padding: 0; }
+.type-row .meta { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); width: 220px; flex-shrink: 0; }
+.type-display { font-size: 56px; font-weight: 300; line-height: 1.03; letter-spacing: -1.4px; color: var(--color-heading); font-feature-settings: "ss01" 1; }
+.type-large   { font-size: 40px; font-weight: 300; line-height: 1.15; letter-spacing: -0.96px; color: var(--color-heading); font-feature-settings: "ss01" 1; }
+.type-section { font-size: 28px; font-weight: 300; line-height: 1.10; letter-spacing: -0.64px; color: var(--color-heading); font-feature-settings: "ss01" 1; }
+.type-sub     { font-size: 22px; font-weight: 300; line-height: 1.12; letter-spacing: -0.22px; color: var(--color-heading); font-feature-settings: "ss01" 1; }
+.type-body-l  { font-size: 18px; font-weight: 300; line-height: 1.40; color: var(--color-text); font-feature-settings: "ss01" 1; }
+.type-body    { font-size: 16px; font-weight: 300; line-height: 1.40; color: var(--color-text); font-feature-settings: "ss01" 1; }
+.type-button  { font-size: 14px; font-weight: 400; line-height: 1.0;  color: var(--color-heading); font-feature-settings: "ss01" 1; }
+.type-caption { font-size: 12px; font-weight: 400; line-height: 1.35; color: var(--color-text-muted); font-feature-settings: "ss01" 1; }
+.type-mono    { font-family: var(--font-mono); font-size: 12px; line-height: 2; color: var(--color-heading); }
+
+.shadow-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.shadow-card {
+  background: var(--color-surface);
+  border-radius: 8px;
+  padding: 20px;
+  height: 120px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.shadow-card.l1 { box-shadow: var(--shadow-soft); }
+.shadow-card.l2 { box-shadow: var(--shadow-card); }
+.shadow-card.l3 { box-shadow: var(--shadow-elevated); }
+.shadow-card.l4 { box-shadow: var(--shadow-deep); }
+.shadow-card.lr { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+.shadow-card .lvl { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.shadow-card .nm  { font-size: 14px; color: var(--color-heading); }
+
+.radius-grid { display: flex; gap: 14px; flex-wrap: wrap; }
+.radius-card {
+  width: 120px; height: 90px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);
+}
+
+/* =================================================================
+   02 · Logo
+   ================================================================= */
+.logo-stage {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 48px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.logo-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.logo-cell .meta { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.12em; }
+
+.cm-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit;
+}
+.cm-logo .mark {
+  display: inline-block;
+  border-radius: 6px;
+  background: var(--gradient-mark);
+  position: relative;
+  box-shadow: 0 4px 10px rgba(83,58,253,0.25), inset 0 0 0 1px rgba(255,255,255,0.18);
+  flex-shrink: 0;
+}
+.cm-logo .mark svg { display: block; width: 100%; height: 100%; }
+.cm-logo.size-sm .mark { width: 24px; height: 24px; border-radius: 5px; }
+.cm-logo.size-md .mark { width: 32px; height: 32px; border-radius: 7px; }
+.cm-logo.size-lg .mark { width: 56px; height: 56px; border-radius: 12px; }
+.cm-logo .word {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01" 1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--color-heading);
+}
+.cm-logo.size-sm .word { font-size: 15px; }
+.cm-logo.size-md .word { font-size: 19px; }
+.cm-logo.size-lg .word { font-size: 28px; }
+.cm-logo .word b { font-weight: 500; }
+
+/* mono lockup variant */
+.cm-logo.mono .mark { background: var(--color-heading); box-shadow: none; }
+.cm-logo.mono .mark svg path,
+.cm-logo.mono .mark svg circle,
+.cm-logo.mono .mark svg line { stroke: #fff; }
+
+/* =================================================================
+   03 · Intro page (single-screen minimal)
+   ================================================================= */
+.intro-frame {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+  position: relative;
+}
+.intro-frame::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 50% at 12% 8%, rgba(83,58,253,0.10), transparent 60%),
+    radial-gradient(45% 40% at 92% 14%, rgba(249,107,238,0.10), transparent 60%),
+    radial-gradient(40% 30% at 50% 95%, rgba(234,34,97,0.05), transparent 70%);
+  pointer-events: none;
+}
+.intro-shell {
+  position: relative;
+  min-height: 720px;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 40px 40px;
+  display: flex; flex-direction: column;
+}
+
+.intro-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.intro-fork-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 12px; color: var(--color-text-muted);
+  font-feature-settings: "ss01" 1;
+  box-shadow: var(--shadow-soft);
+}
+.intro-fork-pill b { font-weight: 500; color: var(--color-heading); }
+.intro-fork-pill svg { width: 12px; height: 12px; }
+.intro-fork-pill a { color: var(--color-brand); text-decoration: none; }
+
+.intro-stage {
+  flex: 1;
+  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  padding: 32px 0;
+}
+.intro-stage .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-brand);
+  margin-bottom: 18px;
+  display: inline-flex; align-items: center; gap: 8px;
+  align-self: flex-start;
+}
+.intro-stage .eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--color-success); box-shadow: 0 0 0 4px rgba(21,190,83,0.18);
+}
+.intro-stage h1 {
+  font-size: clamp(40px, 5.4vw, 64px);
+  font-weight: 300; letter-spacing: -0.03em; line-height: 1.04;
+  color: var(--color-heading);
+  margin: 0 0 16px;
+}
+.intro-stage h1 em {
+  font-style: normal;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.intro-stage p.lede {
+  font-size: 18px; font-weight: 300; color: var(--color-text);
+  line-height: 1.5; max-width: 620px; margin: 0 0 32px;
+}
+
+/* try-it composer */
+.try-it {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  text-align: left;
+}
+.try-it .pane { display: flex; flex-direction: column; min-height: 300px; }
+.try-it .pane + .pane { border-left: 1px solid var(--color-border); background: var(--color-canvas-bg); }
+.try-it .pane-head {
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  padding: 0 16px;
+  height: 38px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+.try-it .pane-head > * { font-size: 10px; }
+.try-it .pane-head .dotrow { display: flex; gap: 4px; }
+.try-it .pane-head .dotrow span { width: 8px; height: 8px; border-radius: 999px; background: var(--color-border-strong); }
+.try-it .pane-head .dotrow span:first-child { background: #ea2261; }
+.try-it .pane-head .dotrow span:nth-child(2) { background: #f5a623; }
+.try-it .pane-head .dotrow span:last-child { background: #15be53; }
+
+.try-body {
+  flex: 1;
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 12.5px; line-height: 1.9;
+  background: var(--color-editor-bg);
+  overflow: auto;
+}
+.try-body .gutter {
+  background: var(--color-editor-gutter);
+  color: var(--color-editor-gutter-text);
+  text-align: right;
+  padding: 14px 10px 14px 14px;
+  user-select: none;
+  border-right: 1px solid var(--color-border);
+  font-size: 11px;
+}
+.try-body .gutter span { display: block; }
+.try-code {
+  padding: 14px 16px;
+  white-space: pre;
+  flex: 1;
+  text-align: left;
+  color: var(--color-heading);
+}
+.try-code .kw  { color: var(--color-syntax-keyword); }
+.try-code .arr { color: var(--color-syntax-arrow); }
+.try-code .str { color: var(--color-syntax-string); }
+.try-code .com { color: var(--color-syntax-comment); }
+
+.try-preview {
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  background-image: radial-gradient(var(--color-canvas-grid) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: 0 0;
+  position: relative;
+}
+.try-preview svg { max-width: 92%; max-height: 92%; }
+
+.intro-actions {
+  margin-top: 28px;
+  display: inline-flex; gap: 12px; align-items: center;
+}
+.intro-actions .button-primary,
+.intro-actions .button-secondary {
+  padding: 12px 22px; border-radius: 6px;
+  font-size: 15px;
+  min-height: 40px;
+}
+.intro-actions .button-primary {
+  background: var(--color-heading);
+  border-color: var(--color-heading);
+  box-shadow: 0 12px 24px -10px rgba(6,27,49,0.35), 0 4px 8px -2px rgba(6,27,49,0.18);
+}
+.intro-actions .button-primary:hover { background: #0a2a4a; border-color: #0a2a4a; }
+.intro-actions .hint {
+  font-size: 12px; color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+.intro-actions kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--color-heading);
+}
+
+.intro-footnote {
+  text-align: center;
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 12px; color: var(--color-text-muted);
+  font-feature-settings: "ss01" 1;
+}
+.intro-footnote a { color: var(--color-brand); text-decoration: none; }
+.intro-footnote a:hover { text-decoration: underline; }
+.intro-footnote .sep { margin: 0 8px; color: var(--color-border-strong); }
+
+/* =================================================================
+   04 · Editor — Top nav anatomy
+   ================================================================= */
+.app-nav {
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow-soft);
+}
+.app-nav .nav-left { display: flex; align-items: center; gap: 14px; }
+.app-nav .divider { width: 1px; height: 22px; background: var(--color-border); }
+
+.chart-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 6px 5px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 13px; color: var(--color-heading);
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+.chart-pill:hover { border-color: var(--color-brand-soft); background: var(--color-brand-subtle); }
+.chart-pill .type-tag {
+  font-family: var(--font-mono);
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+  background: var(--color-brand-subtle); color: var(--color-brand);
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+.chart-pill .caret { color: var(--color-text-muted); }
+
+.save-state {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--color-text-muted);
+  font-feature-settings: "ss01" 1;
+}
+.save-state .dot {
+  width: 6px; height: 6px; border-radius: 999px; background: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(21,190,83,0.18);
+}
+.save-state.dirty .dot { background: #f5a623; box-shadow: 0 0 0 3px rgba(245,166,35,0.2); }
+
+.app-nav .nav-search {
+  flex: 1;
+  position: relative;
+  max-width: 320px;
+  margin-left: 8px;
+}
+.app-nav .nav-search input {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 7px 10px 7px 32px;
+  font-size: 13px; color: var(--color-heading);
+  outline: none;
+  transition: all 180ms ease;
+}
+.app-nav .nav-search input:focus { border-color: var(--color-brand); box-shadow: var(--focus-ring); background: var(--color-surface); }
+.app-nav .nav-search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--color-text-muted); }
+.app-nav .nav-search kbd {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-mono); font-size: 10px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  padding: 1px 5px; border-radius: 3px; color: var(--color-text-muted);
+}
+
+.app-nav .nav-right { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--color-heading);
+  font-size: 13px; padding: 6px 10px;
+  border-radius: 6px; cursor: pointer;
+  font-feature-settings: "ss01" 1;
+  transition: all 180ms ease;
+}
+.nav-btn:hover { background: var(--color-brand-subtle); color: var(--color-brand); }
+.nav-btn svg { width: 14px; height: 14px; }
+.nav-btn.primary {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #fff;
+  box-shadow: var(--shadow-elevated);
+}
+.nav-btn.primary:hover { background: var(--color-brand-hover); border-color: var(--color-brand-hover); color: #fff; }
+
+/* annotation arrows for anatomy callouts */
+.anatomy-wrap { position: relative; padding: 60px 80px 60px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; }
+.callout {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-brand);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: flex; align-items: center; gap: 6px;
+}
+.callout::before { content: ""; width: 22px; height: 1px; background: var(--color-brand); }
+.callout.right::before { display: none; }
+.callout.right::after  { content: ""; width: 22px; height: 1px; background: var(--color-brand); }
+.callout.below { flex-direction: column; gap: 4px; align-items: flex-start; }
+.callout.below::before { width: 1px; height: 18px; }
+
+/* =================================================================
+   05 · Editor — Input pane anatomy
+   ================================================================= */
+.editor-pane, .preview-pane {
+  background: var(--color-editor-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  display: flex; flex-direction: column;
+  min-height: 440px;
+  overflow: hidden;
+}
+.pane-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 14px;
+  height: 44px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.pane-header .pane-title {
+  font-size: 13px; color: var(--color-heading);
+  font-feature-settings: "ss01" 1;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.pane-header .pane-title svg { width: 14px; height: 14px; color: var(--color-brand); }
+.pane-icon-btn {
+  background: transparent; border: 1px solid transparent;
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 5px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+.pane-icon-btn:hover { background: var(--color-brand-subtle); color: var(--color-brand); }
+.pane-icon-btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.pane-icon-btn.active { background: var(--color-brand-subtle); color: var(--color-brand); }
+.pane-icon-btn svg { width: 14px; height: 14px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 12px; color: var(--color-heading);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 180ms ease;
+  flex-shrink: 0;
+}
+.chip:hover { border-color: var(--color-brand); color: var(--color-brand); background: var(--color-brand-subtle); }
+.chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.chip.accent { color: var(--color-brand); border-color: var(--color-brand-soft); }
+.chip.subtle {
+  background: transparent; border-color: var(--color-border);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans); font-size: 11px;
+  padding: 2px 8px;
+}
+.chip.subtle:hover { color: var(--color-brand); border-color: var(--color-brand-soft); background: var(--color-brand-subtle); }
+
+/* inline tool-strip variant (lives inside pane-header) */
+.tool-strip.inline {
+  background: transparent; border-bottom: 0;
+  padding: 0; gap: 4px;
+  display: inline-flex; align-items: center;
+}
+.tool-strip.inline .pane-icon-btn { width: 26px; height: 24px; }
+.tool-strip.inline .zoom-readout { font-size: 11px; padding: 0 4px; min-width: 38px; }
+.tool-strip.inline .export-btn { font-size: 12px; padding: 4px 9px; margin-left: 4px; }
+
+/* code body with gutter */
+.code-body {
+  flex: 1;
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 13px; line-height: 1.85;
+  background: var(--color-editor-bg);
+  overflow: auto;
+}
+.code-gutter {
+  background: var(--color-editor-gutter);
+  color: var(--color-editor-gutter-text);
+  text-align: right;
+  padding: 14px 10px 14px 14px;
+  user-select: none;
+  border-right: 1px solid var(--color-border);
+  font-size: 11px;
+  line-height: 1.85 / (13/11);
+  /* keep gutter rhythm matching code body */
+  line-height: 1.85;
+  font-size: 12px;
+}
+.code-gutter span { display: block; }
+.code-content {
+  padding: 14px 16px;
+  white-space: pre;
+  flex: 1;
+}
+.code-content .line.active { background: var(--color-editor-active); margin: 0 -16px; padding: 0 16px; }
+.code-content .kw  { color: var(--color-syntax-keyword); font-weight: 500; }
+.code-content .arr { color: var(--color-syntax-arrow); font-weight: 500; }
+.code-content .str { color: var(--color-syntax-string); }
+.code-content .com { color: var(--color-syntax-comment); font-style: italic; }
+.code-content .id  { color: var(--color-heading); }
+
+.pane-footer {
+  display: flex; align-items: center; gap: 12px;
+  padding: 6px 14px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-feature-settings: "tnum";
+  color: var(--color-text-muted);
+}
+.pane-footer .ok { color: #108c3d; }
+.pane-footer .warn { color: #b45309; }
+.pane-footer .spacer { flex: 1; }
+.pane-footer .pane-icon-btn { width: 22px; height: 22px; border-radius: 4px; }
+.pane-footer .pane-icon-btn svg { width: 12px; height: 12px; }
+
+/* =================================================================
+   06 · Editor — Preview pane
+   ================================================================= */
+.tool-strip {
+  display: flex; gap: 4px; align-items: center;
+  padding: 6px 10px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+.tool-group { display: flex; gap: 2px; align-items: center; padding: 0 6px; }
+.tool-group + .tool-group { border-left: 1px solid var(--color-border); }
+.tool-strip .pane-icon-btn { width: 30px; height: 26px; }
+.tool-strip .zoom-readout {
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);
+  padding: 0 6px; min-width: 44px; text-align: center;
+}
+.tool-strip .spacer { flex: 1; }
+.tool-strip .export-btn {
+  font-family: var(--font-sans);
+  font-size: 12px; font-weight: 400;
+  padding: 5px 10px;
+  background: var(--color-heading);
+  color: #fff;
+  border-radius: 5px;
+  border: 1px solid var(--color-heading);
+  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tool-strip .export-btn:hover { background: #0a2a4a; }
+.tool-strip .export-btn svg { width: 12px; height: 12px; }
+
+.canvas-stage {
+  flex: 1;
+  position: relative;
+  background-color: var(--color-canvas-bg);
+  background-image: radial-gradient(var(--color-canvas-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.canvas-stage svg { max-width: 88%; max-height: 88%; filter: drop-shadow(0 8px 18px rgba(50,50,93,0.12)); }
+.canvas-corner {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  background: rgba(255,255,255,0.86);
+  border: 1px solid var(--color-border);
+  padding: 3px 8px;
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+}
+.canvas-corner.bl { bottom: 12px; left: 12px; }
+.canvas-corner.br { bottom: 12px; right: 12px; display: inline-flex; align-items: center; gap: 6px; }
+.canvas-corner.br .pulse { width: 6px; height: 6px; border-radius: 999px; background: var(--color-success); animation: pulse 1.6s infinite; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(21,190,83,0.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(21,190,83,0); }
+}
+
+/* =================================================================
+   07 · Editor — Full layout
+   ================================================================= */
+.editor-frame {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow-elevated);
+}
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 4px 1fr;
+  gap: 0;
+  margin-top: 16px;
+  height: 540px;
+}
+.editor-grid > .editor-pane,
+.editor-grid > .preview-pane { height: 100%; min-height: 0; }
+.editor-grid .resizer {
+  background: transparent;
+  cursor: col-resize;
+  position: relative;
+}
+.editor-grid .resizer::before {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 2px; height: 32px; transform: translate(-50%, -50%);
+  background: var(--color-border-strong);
+  border-radius: 2px;
+}
+
+/* =================================================================
+   08 · Drawer (My Charts)
+   ================================================================= */
+.drawer-stage {
+  position: relative;
+  height: 560px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(45deg, rgba(83,58,253,0.04) 0 1px, transparent 1px 8px),
+    var(--color-bg);
+}
+.drawer-stage .scrim {
+  position: absolute; inset: 0;
+  background: var(--color-overlay);
+  backdrop-filter: blur(2px);
+}
+.drawer {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: 380px;
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: var(--shadow-deep);
+  display: flex; flex-direction: column;
+  z-index: 40;
+}
+.drawer-head { padding: 16px 18px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--color-border); }
+.drawer-head h3 { margin: 0; font-size: 18px; font-weight: 300; letter-spacing: -0.01em; color: var(--color-heading); }
+.drawer-head .count { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); margin-left: 4px; }
+.drawer-head .pane-icon-btn { margin-left: auto; }
+
+.drawer-search { padding: 10px 14px; border-bottom: 1px solid var(--color-border); background: var(--color-bg); }
+.drawer-search input {
+  width: 100%; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: 6px;
+  padding: 7px 10px; font-size: 13px;
+  outline: none;
+}
+.drawer-search input:focus { border-color: var(--color-brand); box-shadow: var(--focus-ring); }
+
+.drawer-toolbar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.drawer-toolbar select {
+  background: transparent; border: 1px solid var(--color-border);
+  border-radius: 4px; font-size: 11px; padding: 2px 6px;
+  color: var(--color-heading);
+}
+.drawer-toolbar .spacer { flex: 1; }
+
+.drawer-list { flex: 1; overflow-y: auto; padding: 6px; }
+.chart-row {
+  display: grid; grid-template-columns: 32px 1fr auto;
+  align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+.chart-row:hover { background: var(--color-brand-subtle); }
+.chart-row:focus-visible { outline: none; background: var(--color-brand-subtle); box-shadow: var(--focus-ring); }
+.chart-row.active { background: rgba(83,58,253,0.10); }
+.chart-row .icon {
+  width: 32px; height: 32px; border-radius: 6px;
+  background: var(--gradient-soft);
+  border: 1px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-brand);
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 500;
+  text-transform: uppercase;
+}
+.chart-row .icon.flow { color: #ea2261; background: rgba(234,34,97,0.06); }
+.chart-row .meta-block { min-width: 0; }
+.chart-row .name { font-size: 14px; color: var(--color-heading); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chart-row .sub { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); }
+.chart-row .row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity 180ms ease; }
+.chart-row:hover .row-actions { opacity: 1; }
+
+.drawer-empty { padding: 48px 24px; text-align: center; }
+.drawer-empty .glyph { width: 72px; height: 72px; margin: 0 auto 14px; border-radius: 16px; background: var(--gradient-soft); display: flex; align-items: center; justify-content: center; border: 1px dashed var(--color-brand-soft); }
+.drawer-empty h4 { margin: 0 0 6px; font-weight: 400; font-size: 16px; color: var(--color-heading); }
+.drawer-empty p { font-size: 13px; color: var(--color-text-muted); margin: 0 0 14px; }
+
+.drawer-foot {
+  padding: 10px 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex; align-items: center; gap: 8px;
+}
+.drawer-foot .button-secondary { padding: 7px 12px; font-size: 12px; }
+
+/* =================================================================
+   09 · Modals
+   ================================================================= */
+.modal-board { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.modal-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+  position: relative;
+  z-index: 50;
+}
+.modal-head { padding: 16px 20px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 10px; }
+.modal-head h3 { margin: 0; font-size: 17px; font-weight: 300; letter-spacing: -0.01em; color: var(--color-heading); }
+.modal-head .modal-tag { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); margin-left: auto; text-transform: uppercase; letter-spacing: 0.1em; }
+.modal-body { padding: 18px 20px; }
+.modal-foot { padding: 12px 20px; border-top: 1px solid var(--color-border); display: flex; gap: 8px; justify-content: flex-end; background: var(--color-bg); }
+
+/* New chart picker */
+.new-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.new-tile {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 180ms ease;
+  background: var(--color-surface);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.new-tile:hover { border-color: var(--color-brand); box-shadow: var(--shadow-elevated); }
+.new-tile:focus-visible { outline: none; border-color: var(--color-brand); box-shadow: var(--focus-ring); }
+.new-tile.selected { border-color: var(--color-brand); background: var(--color-brand-subtle); }
+.new-tile h4 { margin: 0; font-size: 15px; color: var(--color-heading); font-weight: 400; }
+.new-tile p { margin: 0; font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
+.new-tile .tile-mark { width: 32px; height: 32px; border-radius: 7px; background: var(--gradient-mark); }
+.new-tile.flow .tile-mark { background: linear-gradient(135deg, #ea2261, #f96bee); }
+
+.modal-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px; color: var(--color-heading);
+  outline: none;
+  margin-top: 12px;
+}
+.modal-input:focus { border-color: var(--color-brand); box-shadow: var(--focus-ring); }
+.modal-input-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-muted); }
+
+/* About w/ fork credit */
+.about-credit {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--gradient-soft);
+  border: 1px solid var(--color-brand-soft);
+  border-radius: 8px;
+}
+.about-credit .credit-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-brand); margin-bottom: 6px; }
+.about-credit p { margin: 0; font-size: 13px; color: var(--color-heading); line-height: 1.5; }
+.about-credit a { color: var(--color-brand); text-decoration: none; font-weight: 500; }
+.about-credit a:hover { text-decoration: underline; }
+.about-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: var(--color-text-muted); font-family: var(--font-mono); }
+.about-meta span b { color: var(--color-heading); font-weight: 500; }
+
+/* Help syntax */
+.help-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.help-cols h4 { margin: 0 0 8px; font-size: 13px; color: var(--color-heading); font-weight: 500; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+.help-cols code { display: block; font-family: var(--font-mono); font-size: 12px; line-height: 1.9; padding: 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; color: var(--color-heading); white-space: pre; }
+
+/* =================================================================
+   10 · Empty / error states
+   ================================================================= */
+.state-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.state-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 28px 22px;
+  min-height: 240px;
+  display: flex; flex-direction: column;
+}
+.state-card .label { font-family: var(--font-mono); font-size: 10px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px; }
+.state-card h4 { margin: 0 0 8px; font-weight: 400; color: var(--color-heading); font-size: 17px; }
+.state-card p  { margin: 0 0 14px; font-size: 13px; color: var(--color-text-muted); line-height: 1.5; }
+.state-card .glyph { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+.state-card.empty .glyph { background: var(--gradient-soft); border: 1px dashed var(--color-brand-soft); color: var(--color-brand); }
+.state-card.error .glyph { background: rgba(234,34,97,0.08); color: #ea2261; border: 1px solid rgba(234,34,97,0.2); }
+.state-card.notfound .glyph { background: rgba(245,166,35,0.10); color: #b45309; border: 1px solid rgba(245,166,35,0.25); }
+.state-card .actions { margin-top: auto; display: flex; gap: 8px; }
+
+.parse-ribbon {
+  margin-top: 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px;
+  background: rgba(234,34,97,0.06);
+  border: 1px solid rgba(234,34,97,0.22);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--color-heading);
+}
+.parse-ribbon .ico { color: #ea2261; flex-shrink: 0; }
+.parse-ribbon code { font-family: var(--font-mono); font-size: 12px; background: rgba(234,34,97,0.10); padding: 1px 5px; border-radius: 3px; color: #ea2261; }
+.parse-ribbon .line-ref { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted); }
+
+/* =================================================================
+   11 · Mobile
+   ================================================================= */
+.mobile-board { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.mobile-frame {
+  width: 340px; max-width: 100%;
+  margin: 0 auto;
+  height: 700px;
+  background: var(--color-surface);
+  border: 8px solid #061b31;
+  border-radius: 38px;
+  box-shadow:
+    0 30px 50px -20px rgba(6,27,49,0.35),
+    0 12px 24px -8px rgba(50,50,93,0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.08);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+/* notch + camera lens */
+.mobile-frame::before {
+  content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 116px; height: 26px;
+  background: #061b31;
+  border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+  z-index: 3;
+}
+.mobile-frame::after {
+  content: ""; position: absolute; top: 9px; left: calc(50% + 30px);
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #1d2433;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  z-index: 4;
+}
+.mobile-status {
+  position: relative; z-index: 2;
+  padding: 8px 22px 0;
+  display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-feature-settings: "tnum";
+  color: var(--color-heading);
+  height: 32px;
+}
+.mobile-status .glyphs { display: inline-flex; gap: 5px; align-items: center; color: var(--color-heading); }
+.mobile-status .glyphs svg { width: 13px; height: 11px; }
+
+.mobile-shell {
+  flex: 1;
+  padding: 18px 22px 22px;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+}
+.mobile-shell .cm-logo { margin-bottom: 22px; }
+.mobile-shell h2 {
+  font-size: 26px; font-weight: 300; line-height: 1.12;
+  letter-spacing: -0.02em; color: var(--color-heading);
+  margin: 0 0 10px;
+  font-feature-settings: "ss01" 1;
+}
+.mobile-shell h2 em {
+  font-style: normal;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.mobile-shell p {
+  font-size: 14px; color: var(--color-text);
+  line-height: 1.55; margin: 0 0 22px;
+  max-width: 28ch;
+}
+.mobile-shell .preview-thumb {
+  margin: 4px 0 22px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-canvas-bg);
+  background-image: radial-gradient(var(--color-canvas-grid) 1px, transparent 1px);
+  background-size: 12px 12px;
+  height: 132px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+.mobile-shell .preview-thumb svg { display: block; margin: 12px auto; max-width: 86%; max-height: 108px; }
+.mobile-shell .preview-thumb .lock {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.85) 100%);
+  display: flex; align-items: flex-end; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  padding-bottom: 10px;
+}
+.mobile-cta {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--color-heading); color: #fff;
+  padding: 13px 16px; border-radius: 10px;
+  font-size: 14px; font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  box-shadow: 0 8px 18px -8px rgba(6,27,49,0.4);
+}
+.mobile-cta.ghost {
+  background: transparent; color: var(--color-brand);
+  border: 1px solid var(--color-brand-soft);
+  box-shadow: none;
+  margin-top: 10px;
+  font-weight: 400;
+}
+.mobile-shell .footnote {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 11px; color: var(--color-text-muted);
+  text-align: center;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.mobile-shell .footnote a { color: var(--color-text-muted); text-decoration: none; border-bottom: 1px dotted var(--color-border-strong); }
+
+.editor-gate {
+  padding: 56px 32px;
+  text-align: center;
+  background: var(--gradient-soft);
+  border: 1px dashed var(--color-brand-soft);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.editor-gate h3 { font-size: 22px; font-weight: 300; letter-spacing: -0.01em; color: var(--color-heading); margin: 0 0 8px; }
+.editor-gate p { color: var(--color-text-muted); font-size: 14px; line-height: 1.55; margin: 0 auto 24px; max-width: 36ch; }
+.editor-gate .gate-glyph {
+  width: 84px; height: 84px;
+  margin: 0 auto 20px;
+  border-radius: 20px;
+  background: var(--gradient-mark);
+  box-shadow: var(--shadow-elevated);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.editor-gate .gate-glyph::after {
+  content: "";
+  position: absolute; inset: -10px;
+  border-radius: 24px;
+  border: 1px dashed var(--color-brand-soft);
+  opacity: 0.6;
+}
+.editor-gate .gate-meta {
+  display: inline-flex; align-items: center; gap: 14px;
+  margin-top: 18px;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+.editor-gate .gate-meta .pill {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 4px 10px; border-radius: 999px;
+  color: var(--color-heading);
+}
+
+/* utilities */
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.muted { color: var(--color-text-muted); }
+.mono { font-family: var(--font-mono); font-size: 12px; }
+
+@media (max-width: 1024px) {
+  .tokens-grid { grid-template-columns: repeat(3, 1fr); }
+  .shadow-grid { grid-template-columns: repeat(3, 1fr); }
+  .modal-board, .help-cols, .new-grid, .mobile-board { grid-template-columns: 1fr; }
+  .editor-grid { grid-template-columns: 1fr; height: auto; }
+  .editor-grid .resizer { display: none; }
+  .editor-grid > .editor-pane, .editor-grid > .preview-pane { height: 460px; }
+  .try-it { grid-template-columns: 1fr; }
+  .try-it .pane + .pane { border-left: 0; border-top: 1px solid var(--color-border); }
+  .state-grid { grid-template-columns: 1fr; }
+  .logo-stage { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Logo SVG sprite (reused via <use>) ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cm-mark" viewBox="0 0 32 32">
+      <!-- mark glyph: two rounded nodes joined by a line, drawn in white on transparent
+           so the gradient background shows through. -->
+      <g fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round">
+        <line x1="10" y1="10" x2="22" y2="22"/>
+      </g>
+      <circle cx="10" cy="10" r="3.6" fill="#ffffff"/>
+      <circle cx="22" cy="22" r="3.6" fill="#ffffff" opacity="0.92"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ===== Proto chrome ===== -->
+<div class="proto-bar">
+  <h1>ChartMage Redesign Prototype <span class="v">v2</span></h1>
+  <nav>
+    <a href="#tokens">01·Tokens</a>
+    <a href="#logo">02·Logo</a>
+    <a href="#intro">03·Intro</a>
+    <a href="#nav">04·Nav</a>
+    <a href="#input">05·Input</a>
+    <a href="#preview">06·Preview</a>
+    <a href="#editor">07·Editor</a>
+    <a href="#drawer">08·Drawer</a>
+    <a href="#modals">09·Modals</a>
+    <a href="#states">10·States</a>
+    <a href="#mobile">11·Mobile</a>
+  </nav>
+  <span class="badge">REVIEW</span>
+</div>
+
+<!-- =================================================================
+     01 · Tokens
+     ================================================================= -->
+<section class="proto-section" id="tokens">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">01 · Design Tokens</div>
+        <h2>Stripe-tinted system, sharpened.</h2>
+        <p class="desc">All surfaces below consume <code class="mono">app/css/design-tokens.css</code>. v2 introduces four prototype-only tokens (<code class="mono">--gradient-brand</code>, <code class="mono">--gradient-mark</code>, <code class="mono">--color-canvas-grid</code>, <code class="mono">--color-editor-*</code>) — shown last for review.</p>
+      </div>
+    </header>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-text-muted);text-transform:uppercase;margin:0 0 10px">Color · core</h3>
+    <div class="tokens-grid">
+      <div class="swatch"><div class="chip" style="background:#533afd"></div><div class="name">Brand</div><div class="hex">#533afd · --color-brand</div></div>
+      <div class="swatch"><div class="chip" style="background:#4434d4"></div><div class="name">Brand · hover</div><div class="hex">#4434d4 · --color-brand-hover</div></div>
+      <div class="swatch"><div class="chip" style="background:#1c1e54"></div><div class="name">Brand · strong</div><div class="hex">#1c1e54 · --color-brand-strong</div></div>
+      <div class="swatch"><div class="chip" style="background:#061b31"></div><div class="name">Heading</div><div class="hex">#061b31 · --color-heading</div></div>
+      <div class="swatch"><div class="chip" style="background:#425466"></div><div class="name">Text</div><div class="hex">#425466 · --color-text</div></div>
+      <div class="swatch"><div class="chip" style="background:#64748d"></div><div class="name">Text · muted</div><div class="hex">#64748d · --color-text-muted</div></div>
+      <div class="swatch"><div class="chip" style="background:#ea2261"></div><div class="name">Danger / Ruby</div><div class="hex">#ea2261 · --color-danger</div></div>
+      <div class="swatch"><div class="chip" style="background:#15be53"></div><div class="name">Success</div><div class="hex">#15be53 · --color-success</div></div>
+    </div>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-text-muted);text-transform:uppercase;margin:24px 0 10px">Color · surfaces & borders</h3>
+    <div class="tokens-grid">
+      <div class="swatch"><div class="chip" style="background:#ffffff;border:1px solid #e5edf5"></div><div class="name">Surface</div><div class="hex">#ffffff · --color-surface</div></div>
+      <div class="swatch"><div class="chip" style="background:#f6f9fc"></div><div class="name">BG</div><div class="hex">#f6f9fc · --color-bg</div></div>
+      <div class="swatch"><div class="chip" style="background:#eef4fb"></div><div class="name">Surface · muted</div><div class="hex">#eef4fb · --color-surface-muted</div></div>
+      <div class="swatch"><div class="chip" style="background:#e5edf5"></div><div class="name">Border</div><div class="hex">#e5edf5 · --color-border</div></div>
+    </div>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-brand);text-transform:uppercase;margin:24px 0 10px">v2 additions (prototype-only)</h3>
+    <div class="tokens-grid">
+      <div class="swatch"><div class="chip" style="background:var(--gradient-brand)"></div><div class="name">Gradient · brand</div><div class="hex">--gradient-brand</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--gradient-mark)"></div><div class="name">Gradient · mark</div><div class="hex">--gradient-mark</div></div>
+      <div class="swatch"><div class="chip" style="background:radial-gradient(rgba(83,58,253,0.10) 1px, transparent 1px); background-size: 12px 12px; background-color: #fbfcfe"></div><div class="name">Canvas · grid</div><div class="hex">--color-canvas-grid + bg</div></div>
+      <div class="swatch"><div class="chip" style="background:var(--color-editor-gutter); border:1px solid var(--color-border)"></div><div class="name">Editor · gutter</div><div class="hex">--color-editor-gutter</div></div>
+    </div>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-text-muted);text-transform:uppercase;margin:32px 0 10px">Type scale</h3>
+    <div class="type-stack">
+      <div class="type-row"><div class="meta">Display 56/300/-1.4px<br>ss01</div><div class="type-display">Beautiful diagrams.</div></div>
+      <div class="type-row"><div class="meta">Large 40/300/-0.96px<br>ss01</div><div class="type-large">Sequence + flowchart.</div></div>
+      <div class="type-row"><div class="meta">Section 28/300/-0.64px</div><div class="type-section">Make it click.</div></div>
+      <div class="type-row"><div class="meta">Sub 22/300/-0.22px</div><div class="type-sub">Diagram input</div></div>
+      <div class="type-row"><div class="meta">Body L 18/300</div><div class="type-body-l">Type a few lines, watch it draw itself.</div></div>
+      <div class="type-row"><div class="meta">Body 16/300</div><div class="type-body">Renders with Mermaid in your browser. Local-first, no account.</div></div>
+      <div class="type-row"><div class="meta">Button 14/400</div><div class="type-button">+ New chart</div></div>
+      <div class="type-row"><div class="meta">Caption 12/400</div><div class="type-caption">Last edited 3 minutes ago · 14 lines</div></div>
+      <div class="type-row"><div class="meta">Mono 12/500</div><div class="type-mono">Alice-&gt;&gt;Bob: hello {ss01 OFF, tnum context}</div></div>
+    </div>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-text-muted);text-transform:uppercase;margin:32px 0 10px">Elevation</h3>
+    <div class="shadow-grid">
+      <div class="shadow-card l1"><span class="lvl">L1 · Soft</span><span class="nm">--shadow-soft</span></div>
+      <div class="shadow-card l2"><span class="lvl">L2 · Card</span><span class="nm">--shadow-card</span></div>
+      <div class="shadow-card l3"><span class="lvl">L3 · Elevated</span><span class="nm">--shadow-elevated</span></div>
+      <div class="shadow-card l4"><span class="lvl">L4 · Deep</span><span class="nm">--shadow-deep</span></div>
+      <div class="shadow-card lr"><span class="lvl">Focus ring</span><span class="nm">--focus-ring</span></div>
+    </div>
+
+    <h3 class="mono" style="font-size:11px;letter-spacing:.12em;color:var(--color-text-muted);text-transform:uppercase;margin:32px 0 10px">Radius</h3>
+    <div class="radius-grid">
+      <div class="radius-card" style="border-radius:4px">4 · sm</div>
+      <div class="radius-card" style="border-radius:6px">6 · md</div>
+      <div class="radius-card" style="border-radius:8px">8 · lg</div>
+      <div class="radius-card" style="border-radius:12px">12 · panel</div>
+      <div class="radius-card" style="border-radius:999px">999 · pill</div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     02 · Logo
+     ================================================================= -->
+<section class="proto-section" id="logo">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">02 · Brand mark & wordmark</div>
+        <h2>The connector, sharpened.</h2>
+        <p class="desc">Two nodes joined on a slanted edge inside a gradient plate. Reads as "diagram object" instead of an abstract square. Single SVG symbol, three sizes, plus a monochrome lockup for footers and dark surfaces.</p>
+      </div>
+    </header>
+    <div class="logo-stage">
+      <div class="logo-cell">
+        <div class="meta">28px · Nav</div>
+        <a class="cm-logo size-sm" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+      </div>
+      <div class="logo-cell">
+        <div class="meta">36px · Hero / About</div>
+        <a class="cm-logo size-md" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+      </div>
+      <div class="logo-cell">
+        <div class="meta">56px · Splash / Marketing</div>
+        <a class="cm-logo size-lg" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+      </div>
+      <div class="logo-cell">
+        <div class="meta">Mono · Footer</div>
+        <a class="cm-logo size-sm mono" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+      </div>
+      <div class="logo-cell">
+        <div class="meta">Mark only · Favicon / App icon</div>
+        <span class="cm-logo size-md"><span class="mark"><svg><use href="#cm-mark"/></svg></span></span>
+      </div>
+      <div class="logo-cell">
+        <div class="meta">Reverse · Dark surface</div>
+        <div style="background:#061b31;padding:14px 18px;border-radius:10px">
+          <a class="cm-logo size-md" href="#" style="color:#fff"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word" style="color:#fff">Chart<b>Mage</b></span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     03 · Intro page (single-screen minimal)
+     ================================================================= -->
+<section class="proto-section" id="intro">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">03 · Intro · single-screen minimal</div>
+        <h2>Logo, one promise, one input.</h2>
+        <p class="desc">No feature grid, no testimonials, no dark band. The page is a working composer with a clear escape hatch into the editor. Fork credit lives in a lightweight footer per private roadmap V1.</p>
+      </div>
+    </header>
+
+    <div class="intro-frame">
+      <div class="intro-shell">
+        <div class="intro-topbar">
+          <a class="cm-logo size-sm" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+          <span class="intro-fork-pill">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 1a2 2 0 100 4 2 2 0 000-4zM3 3a2 2 0 114 0v.5a2.5 2.5 0 01-1.5 2.293V8.5a1 1 0 001 1H8V8.207A2 2 0 119 8.207V9.5a2 2 0 01-2 2H6.5v1.207a2 2 0 11-1 0V5.793A2.001 2.001 0 013 3z"/></svg>
+              Forked from <a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">heyjunlin/chart-mage</a>
+          </span>
+        </div>
+
+        <div class="intro-stage">
+          <div class="eyebrow"><span class="dot"></span>Local-first · Mermaid in your browser</div>
+          <h1>Beautiful diagrams from <em>a few lines of text</em>.</h1>
+          <p class="lede">Sequence and flowchart, drawn as you type. No account. No upload. Your charts stay in this browser.</p>
+
+          <div class="try-it">
+            <div class="pane">
+              <div class="pane-head">
+                <span>Diagram Input</span>
+                <span class="dotrow"><span></span><span></span><span></span></span>
+              </div>
+              <div class="try-body">
+                <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+                <div class="try-code"><span class="kw">sequenceDiagram</span>
+<span class="id">Alice</span><span class="arr">-&gt;&gt;</span><span class="id">Bob</span>: <span class="str">Hi Bob</span>
+<span class="id">Bob</span><span class="arr">--&gt;&gt;</span><span class="id">Alice</span>: <span class="str">Hi Alice</span>
+<span class="id">Alice</span><span class="arr">-&gt;&gt;</span><span class="id">Bob</span>: <span class="str">How are you?</span>
+<span class="id">Bob</span><span class="arr">--&gt;&gt;</span><span class="id">Alice</span>: <span class="str">I'm good 👋</span>
+<span class="com">%% try editing this</span></div>
+              </div>
+            </div>
+            <div class="pane">
+              <div class="pane-head">
+                <span>Live Preview</span>
+                <span class="mono" style="color:var(--color-success)">● rendered</span>
+              </div>
+              <div class="try-preview">
+                <!-- Static SVG preview (sequence) -->
+                <svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="aliceGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#533afd"/><stop offset="1" stop-color="#8b5cf6"/>
+                    </linearGradient>
+                    <linearGradient id="bobGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#ea2261"/><stop offset="1" stop-color="#f96bee"/>
+                    </linearGradient>
+                  </defs>
+                  <g font-family="var(--font-sans), system-ui" font-size="12" fill="#061b31">
+                    <!-- actor heads -->
+                    <rect x="40" y="14" width="80" height="30" rx="6" fill="url(#aliceGrad)"/>
+                    <rect x="240" y="14" width="80" height="30" rx="6" fill="url(#bobGrad)"/>
+                    <text x="80" y="34" text-anchor="middle" fill="#fff" font-weight="500">Alice</text>
+                    <text x="280" y="34" text-anchor="middle" fill="#fff" font-weight="500">Bob</text>
+                    <!-- lifelines -->
+                    <line x1="80" y1="46" x2="80" y2="200" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+                    <line x1="280" y1="46" x2="280" y2="200" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+                    <!-- messages -->
+                    <g stroke="#533afd" stroke-width="1.6" fill="none">
+                      <line x1="84" y1="80" x2="276" y2="80"/>
+                      <polygon points="276,80 268,76 268,84" fill="#533afd" stroke="none"/>
+                    </g>
+                    <text x="180" y="74" text-anchor="middle" fill="#425466">Hi Bob</text>
+
+                    <g stroke="#ea2261" stroke-width="1.4" fill="none" stroke-dasharray="5 4">
+                      <line x1="276" y1="116" x2="84" y2="116"/>
+                      <polygon points="84,116 92,112 92,120" fill="#ea2261" stroke="none"/>
+                    </g>
+                    <text x="180" y="110" text-anchor="middle" fill="#425466">Hi Alice</text>
+
+                    <g stroke="#533afd" stroke-width="1.6" fill="none">
+                      <line x1="84" y1="152" x2="276" y2="152"/>
+                      <polygon points="276,152 268,148 268,156" fill="#533afd" stroke="none"/>
+                    </g>
+                    <text x="180" y="146" text-anchor="middle" fill="#425466">How are you?</text>
+
+                    <g stroke="#ea2261" stroke-width="1.4" fill="none" stroke-dasharray="5 4">
+                      <line x1="276" y1="188" x2="84" y2="188"/>
+                      <polygon points="84,188 92,184 92,192" fill="#ea2261" stroke="none"/>
+                    </g>
+                    <text x="180" y="182" text-anchor="middle" fill="#425466">I'm good 👋</text>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="intro-actions">
+            <a class="button-primary" href="#editor">Open in editor →</a>
+            <span class="hint">or press <kbd>↵</kbd> to start with this sample</span>
+          </div>
+        </div>
+
+        <div class="intro-footnote">
+          ChartMage <span class="sep">·</span>
+          Forked &amp; maintained — original by Junlin Shang
+          <span class="sep">·</span>
+          <a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">source</a>
+          <span class="sep">·</span>
+          <a href="#">privacy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     04 · Editor — Top nav anatomy
+     ================================================================= -->
+<section class="proto-section" id="nav">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">04 · Editor · top nav</div>
+        <h2>One bar, six jobs.</h2>
+        <p class="desc">Logo · chart pill (name + type, click to rename) · save state · search (cmd-K) · My Charts · Help · Export · primary "+ New". Floating, glass, rounded — visually detached from the workspace below.</p>
+      </div>
+    </header>
+
+    <div class="anatomy-wrap">
+      <div class="app-nav">
+        <div class="nav-left">
+          <a class="cm-logo size-sm" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+          <span class="divider"></span>
+          <button class="chart-pill" type="button">
+            <span class="type-tag">Seq</span>
+            Sample sequence diagram
+            <svg class="caret" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5l3 3 3-3"/></svg>
+          </button>
+          <span class="save-state"><span class="dot"></span>Saved · 2 min ago</span>
+        </div>
+
+        <div class="nav-search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+          <input placeholder="Search charts" />
+          <kbd>⌘K</kbd>
+        </div>
+
+        <div class="nav-right">
+          <button class="nav-btn" type="button" id="show-charts-button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+            My Charts
+          </button>
+          <button class="nav-btn" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 11v.01M6.5 6a1.5 1.5 0 113 0c0 1-1.5 1.25-1.5 2.5"/></svg>
+            Help
+          </button>
+          <button class="nav-btn" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5M2 13h12"/></svg>
+            Export
+          </button>
+          <button class="nav-btn primary" type="button" id="new-flowchart-button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3v10M3 8h10"/></svg>
+            New chart
+          </button>
+        </div>
+      </div>
+
+      <div class="callout below" style="left:80px;top:8px"><span></span>brand lockup · 28px</div>
+      <div class="callout below" style="left:240px;top:8px"><span></span>chart pill = rename trigger</div>
+      <div class="callout below" style="left:520px;top:8px"><span></span>cmd-K search</div>
+      <div class="callout right" style="right:120px;top:8px"><span></span>primary CTA<span style="margin-left:6px"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     05 · Editor — Input pane anatomy
+     ================================================================= -->
+<section class="proto-section" id="input">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">05 · Editor · input pane</div>
+        <h2>Input as a real editor surface, kept quiet.</h2>
+        <p class="desc">Pane header has only the title and a context label. No floating chip toolbar. The footer offers a single discreet <code class="mono">+ snippet</code> trigger that opens a command palette — same gravity as <kbd class="mono">⌘K</kbd>. Code body has an explicit gutter, syntax tinting, active-line highlight, parse status.</p>
+      </div>
+    </header>
+
+    <div style="max-width:780px">
+      <div class="editor-pane">
+        <div class="pane-header">
+          <span class="pane-title">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h10v10H3z"/><path d="M5 6h6M5 8h4M5 10h6"/></svg>
+            Diagram Input
+          </span>
+          <span class="mono muted">sequence · sample.mmd</span>
+        </div>
+
+        <div class="code-body">
+          <div class="code-gutter">
+            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          </div>
+          <div class="code-content"><span class="line"><span class="kw">sequenceDiagram</span></span>
+<span class="line"><span class="id">Alice</span><span class="arr">-&gt;&gt;</span><span class="id">Bob</span>: <span class="str">Hi Bob</span></span>
+<span class="line active"><span class="id">Bob</span><span class="arr">--&gt;&gt;</span><span class="id">Alice</span>: <span class="str">Hi Alice</span></span>
+<span class="line"><span class="com">%% loop block</span></span>
+<span class="line"><span class="kw">loop</span> every minute</span>
+<span class="line"><span class="id">  Alice</span><span class="arr">-&gt;&gt;</span><span class="id">Bob</span>: <span class="str">Are you ok?</span></span>
+<span class="line"><span class="id">  Bob</span><span class="arr">--&gt;&gt;</span><span class="id">Alice</span>: <span class="str">Yes</span></span>
+<span class="line"><span class="kw">end</span></span>
+<span class="line"><span class="kw">Note over</span> Alice,Bob: handshake complete</span>
+<span class="line"></span></div>
+        </div>
+
+        <div class="pane-footer">
+          <span class="ok">● parsed ok</span>
+          <span class="muted">·</span>
+          <span>10 lines</span>
+          <span class="spacer"></span>
+          <button class="chip subtle" type="button">+ snippet</button>
+          <span>Ln 3, Col 18</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     06 · Editor — Preview pane
+     ================================================================= -->
+<section class="proto-section" id="preview">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">06 · Editor · preview pane</div>
+        <h2>Canvas, then chrome.</h2>
+        <p class="desc">Tool strip collapses into the pane header: Fit / zoom − / readout / + / Export. Copy-SVG, theme, and reset live in a Cmd-K palette — not the chrome. Dot-grid background ties the canvas to the brand. Bottom-right pulse confirms render health.</p>
+      </div>
+    </header>
+
+    <div style="max-width:780px">
+      <div class="preview-pane">
+        <div class="pane-header">
+          <span class="pane-title">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.5"/><circle cx="11" cy="11" r="2.5"/><line x1="7.5" y1="7.5" x2="9.5" y2="9.5"/></svg>
+            Live Preview
+          </span>
+          <span class="mono muted">mermaid · sequence</span>
+          <span class="spacer" style="flex:1"></span>
+          <span class="mono" style="color:var(--color-success)">● rendered</span>
+        </div>
+
+        <div class="canvas-stage">
+          <svg viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="aliceGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#533afd"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient>
+              <linearGradient id="bobGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ea2261"/><stop offset="1" stop-color="#f96bee"/></linearGradient>
+            </defs>
+            <g font-family="var(--font-sans), system-ui" font-size="13" fill="#061b31">
+              <rect x="50" y="20" width="100" height="34" rx="6" fill="url(#aliceGrad2)"/>
+              <rect x="310" y="20" width="100" height="34" rx="6" fill="url(#bobGrad2)"/>
+              <text x="100" y="42" text-anchor="middle" fill="#fff" font-weight="500">Alice</text>
+              <text x="360" y="42" text-anchor="middle" fill="#fff" font-weight="500">Bob</text>
+              <line x1="100" y1="58" x2="100" y2="240" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+              <line x1="360" y1="58" x2="360" y2="240" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+              <g stroke="#533afd" stroke-width="1.6" fill="none">
+                <line x1="104" y1="92" x2="356" y2="92"/>
+                <polygon points="356,92 348,88 348,96" fill="#533afd" stroke="none"/>
+              </g>
+              <text x="230" y="86" text-anchor="middle" fill="#425466">Hi Bob</text>
+              <g stroke="#ea2261" stroke-width="1.4" fill="none" stroke-dasharray="5 4">
+                <line x1="356" y1="130" x2="104" y2="130"/>
+                <polygon points="104,130 112,126 112,134" fill="#ea2261" stroke="none"/>
+              </g>
+              <text x="230" y="124" text-anchor="middle" fill="#425466">Hi Alice</text>
+              <rect x="80" y="160" width="300" height="36" rx="4" fill="rgba(83,58,253,0.06)" stroke="#d6d9fc"/>
+              <text x="230" y="183" text-anchor="middle" fill="#533afd" font-family="var(--font-mono)" font-size="12">loop · every minute</text>
+              <g stroke="#533afd" stroke-width="1.6" fill="none">
+                <line x1="104" y1="220" x2="356" y2="220"/>
+                <polygon points="356,220 348,216 348,224" fill="#533afd" stroke="none"/>
+              </g>
+              <text x="230" y="214" text-anchor="middle" fill="#425466">Are you ok?</text>
+            </g>
+          </svg>
+          <div class="canvas-corner br"><span class="pulse"></span>38 ms</div>
+        </div>
+        <div class="pane-footer">
+          <span>460 × 260</span>
+          <span class="muted">·</span>
+          <span>1.0×</span>
+          <span class="spacer"></span>
+          <button class="pane-icon-btn" title="Fit" aria-label="Fit"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6V3h3M13 6V3h-3M3 10v3h3M13 10v3h-3"/></svg></button>
+          <button class="pane-icon-btn" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h8"/></svg></button>
+          <span style="min-width:34px;text-align:center">100%</span>
+          <button class="pane-icon-btn" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h8M8 4v8"/></svg></button>
+          <button class="chip subtle" type="button">
+            <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6" style="margin-right:4px"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5M2 13h12"/></svg>
+            Export
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     07 · Editor — Full layout
+     ================================================================= -->
+<section class="proto-section" id="editor">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">07 · Editor · full layout</div>
+        <h2>Everything together.</h2>
+        <p class="desc">Floating nav above a 50/50 workspace inside a soft container. Resize handle in the middle. Bottom-right preview pulse confirms render health at a glance.</p>
+      </div>
+    </header>
+
+    <div class="editor-frame">
+      <div class="app-nav">
+        <div class="nav-left">
+          <a class="cm-logo size-sm" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+          <span class="divider"></span>
+          <button class="chart-pill" type="button">
+            <span class="type-tag">Flow</span>
+            Maestro Smoke Flow
+            <svg class="caret" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5l3 3 3-3"/></svg>
+          </button>
+          <span class="save-state dirty"><span class="dot"></span>Editing…</span>
+        </div>
+        <div class="nav-search">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+          <input placeholder="Search charts" />
+          <kbd>⌘K</kbd>
+        </div>
+        <div class="nav-right">
+          <button class="nav-btn" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+            My Charts
+          </button>
+          <button class="nav-btn" type="button">Help</button>
+          <button class="nav-btn" type="button">Export</button>
+          <button class="nav-btn primary" type="button">+ New chart</button>
+        </div>
+      </div>
+
+      <div class="editor-grid">
+        <div class="editor-pane">
+          <div class="pane-header">
+            <span class="pane-title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3h10v10H3z"/><path d="M5 6h6M5 8h4M5 10h6"/></svg>
+              Diagram Input
+            </span>
+            <span class="mono muted">flowchart · maestro.mmd</span>
+          </div>
+          <div class="code-body">
+            <div class="code-gutter">
+              <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span>
+            </div>
+            <div class="code-content"><span class="line"><span class="kw">graph TD</span></span>
+<span class="line"><span class="id">A</span>[Start] <span class="arr">--&gt;</span> <span class="id">B</span>{Has draft?}</span>
+<span class="line active"><span class="id">B</span> <span class="arr">--</span><span class="str">yes</span><span class="arr">--&gt;</span> <span class="id">C</span>[Open editor]</span>
+<span class="line"><span class="id">B</span> <span class="arr">--</span><span class="str">no</span><span class="arr">--&gt;</span>  <span class="id">D</span>[New chart]</span>
+<span class="line"><span class="id">C</span> <span class="arr">--&gt;</span> <span class="id">E</span>[Edit]</span>
+<span class="line"><span class="id">D</span> <span class="arr">--&gt;</span> <span class="id">E</span></span>
+<span class="line"></span></div>
+          </div>
+          <div class="pane-footer">
+            <span class="ok">● parsed ok</span>
+            <span class="muted">·</span><span>11 nodes</span>
+            <span class="spacer"></span>
+            <button class="chip subtle" type="button">+ snippet</button>
+            <span>Ln 3, Col 24</span>
+          </div>
+        </div>
+
+        <div class="resizer" aria-hidden="true"></div>
+
+        <div class="preview-pane">
+          <div class="pane-header">
+            <span class="pane-title">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.5"/><circle cx="11" cy="11" r="2.5"/><line x1="7.5" y1="7.5" x2="9.5" y2="9.5"/></svg>
+              Live Preview
+            </span>
+            <span class="mono muted">mermaid · graph TD</span>
+            <span class="spacer" style="flex:1"></span>
+            <span class="mono" style="color:var(--color-success)">● rendered</span>
+          </div>
+          <div class="canvas-stage">
+            <svg viewBox="0 0 380 270" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <marker id="fc-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M0,0 L8,4 L0,8 z" fill="#533afd"/>
+                </marker>
+              </defs>
+              <g font-family="var(--font-sans), system-ui" font-size="12" fill="#061b31">
+                <!-- A: Start, center (190,30) -->
+                <rect x="150" y="14" width="80" height="32" rx="6" fill="#fff" stroke="#533afd"/>
+                <text x="190" y="34" text-anchor="middle">Start</text>
+                <!-- B: Has draft?, diamond center (190,100), half-w 50, half-h 22 -->
+                <polygon points="190,78 240,100 190,122 140,100" fill="#fff" stroke="#533afd"/>
+                <text x="190" y="104" text-anchor="middle">Has draft?</text>
+                <!-- C: Open editor, center (90,170) -->
+                <rect x="40" y="154" width="100" height="32" rx="6" fill="#fff" stroke="#533afd"/>
+                <text x="90" y="174" text-anchor="middle">Open editor</text>
+                <!-- D: New chart, center (290,170) -->
+                <rect x="240" y="154" width="100" height="32" rx="6" fill="#fff" stroke="#533afd"/>
+                <text x="290" y="174" text-anchor="middle">New chart</text>
+                <!-- E: Edit, center (190,240) -->
+                <rect x="150" y="224" width="80" height="32" rx="6" fill="#fff" stroke="#533afd"/>
+                <text x="190" y="244" text-anchor="middle">Edit</text>
+
+                <!-- merge trunks (no arrowhead, lighter) -->
+                <g stroke="#cdd2e0" stroke-width="1.25" fill="none" stroke-linejoin="round" stroke-linecap="round">
+                  <path d="M90,186 V210 H190"/>
+                  <path d="M290,186 V210 H190"/>
+                </g>
+
+                <!-- arrows -->
+                <g stroke="#533afd" stroke-width="1.25" fill="none" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#fc-arrow)">
+                  <path d="M190,46 V76"/>
+                  <path d="M140,100 H90 V152"/>
+                  <path d="M240,100 H290 V152"/>
+                  <path d="M190,210 V222"/>
+                </g>
+
+                <!-- branch labels (inline, no box) -->
+                <g font-family="var(--font-mono)" font-size="10">
+                  <text x="114" y="96" fill="#108c3d">yes</text>
+                  <text x="248" y="96" fill="#ea2261">no</text>
+                </g>
+              </g>
+            </svg>
+            <div class="canvas-corner br"><span class="pulse"></span>32 ms</div>
+          </div>
+          <div class="pane-footer">
+            <span>380 × 270</span>
+            <span class="muted">·</span>
+            <span>1.0×</span>
+            <span class="spacer"></span>
+            <button class="pane-icon-btn" title="Fit" aria-label="Fit"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6V3h3M13 6V3h-3M3 10v3h3M13 10v3h-3"/></svg></button>
+            <button class="pane-icon-btn" title="Zoom out" aria-label="Zoom out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h8"/></svg></button>
+            <span style="min-width:34px;text-align:center">100%</span>
+            <button class="pane-icon-btn" title="Zoom in" aria-label="Zoom in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h8M8 4v8"/></svg></button>
+            <button class="chip subtle" type="button">
+              <svg viewBox="0 0 16 16" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.6" style="margin-right:4px"><path d="M8 2v9M4.5 7.5L8 11l3.5-3.5M2 13h12"/></svg>
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     08 · Drawer (My Charts)
+     ================================================================= -->
+<section class="proto-section" id="drawer">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">08 · My Charts · slide-in drawer</div>
+        <h2>Library, not a modal.</h2>
+        <p class="desc">Right-side drawer, 380px. Search, sort, per-row hover actions (rename / duplicate / delete). Type tag at left. Empty state has its own glyph + sample-chart shortcut. Existing rename / delete jQuery modals stay wired underneath.</p>
+      </div>
+    </header>
+
+    <div class="drawer-stage">
+      <div class="scrim"></div>
+      <aside class="drawer">
+        <div class="drawer-head">
+          <h3>My Charts</h3>
+          <span class="count">· 4</span>
+          <button class="pane-icon-btn" title="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+        </div>
+        <div class="drawer-search">
+          <input placeholder="Search by name…">
+        </div>
+        <div class="drawer-toolbar">
+          <span>Sort</span>
+          <select><option>Last edited</option><option>Name A→Z</option><option>Type</option></select>
+          <span class="spacer"></span>
+          <button class="pane-icon-btn" title="Grid view" aria-label="Grid view"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="4" height="4"/><rect x="9" y="3" width="4" height="4"/><rect x="3" y="9" width="4" height="4"/><rect x="9" y="9" width="4" height="4"/></svg></button>
+          <button class="pane-icon-btn active" title="List view" aria-label="List view"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 5h10M3 8h10M3 11h10"/></svg></button>
+        </div>
+        <div class="drawer-list">
+          <div class="chart-row active">
+            <div class="icon">Seq</div>
+            <div class="meta-block">
+              <div class="name">Sample sequence diagram</div>
+              <div class="sub">Edited 2 min ago · 10 lines</div>
+            </div>
+            <div class="row-actions">
+              <button class="pane-icon-btn" title="Rename"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13l3-1 7-7-2-2-7 7-1 3z"/></svg></button>
+              <button class="pane-icon-btn" title="Duplicate"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="8" height="10" rx="1"/><path d="M3 5v8h6"/></svg></button>
+              <button class="pane-icon-btn" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h8M6 5V3h4v2M5 5l1 9h4l1-9"/></svg></button>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="icon flow">Flow</div>
+            <div class="meta-block">
+              <div class="name">Sample flowchart</div>
+              <div class="sub">Edited yesterday · 8 nodes</div>
+            </div>
+            <div class="row-actions">
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13l3-1 7-7-2-2-7 7-1 3z"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="8" height="10" rx="1"/><path d="M3 5v8h6"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h8M6 5V3h4v2M5 5l1 9h4l1-9"/></svg></button>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="icon flow">Flow</div>
+            <div class="meta-block">
+              <div class="name">Maestro Smoke Flow</div>
+              <div class="sub">Edited 3 days ago · 11 nodes</div>
+            </div>
+            <div class="row-actions">
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13l3-1 7-7-2-2-7 7-1 3z"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="8" height="10" rx="1"/><path d="M3 5v8h6"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h8M6 5V3h4v2M5 5l1 9h4l1-9"/></svg></button>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="icon">Seq</div>
+            <div class="meta-block">
+              <div class="name">Onboarding handshake</div>
+              <div class="sub">Edited last week · 14 lines</div>
+            </div>
+            <div class="row-actions">
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13l3-1 7-7-2-2-7 7-1 3z"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="3" width="8" height="10" rx="1"/><path d="M3 5v8h6"/></svg></button>
+              <button class="pane-icon-btn"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h8M6 5V3h4v2M5 5l1 9h4l1-9"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="drawer-foot">
+          <button class="button-secondary">Import .mmd</button>
+          <span class="mono muted" style="margin-left:auto">Local · 4 charts · 18 KB</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     09 · Modals
+     ================================================================= -->
+<section class="proto-section" id="modals">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">09 · Modals</div>
+        <h2>One modal grammar.</h2>
+        <p class="desc">Same head/body/foot frame across New chart, Help, About. Existing IDs (<code class="mono">#newFlowchart</code>, <code class="mono">#newSequenceDiagram</code>, <code class="mono">#about-chart-mage</code>, <code class="mono">#flowchart-syntax</code>, <code class="mono">#sequence-diagram-syntax</code>) are preserved so jQuery handlers keep binding.</p>
+      </div>
+    </header>
+
+    <div class="modal-board">
+      <!-- New chart picker -->
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>New chart</h3>
+          <span class="modal-tag">step 1 / 2</span>
+        </div>
+        <div class="modal-body">
+          <p class="muted" style="font-size:13px;margin:0 0 14px">Pick a chart kind. You can change it any time.</p>
+          <div class="new-grid">
+            <div class="new-tile selected">
+              <span class="tile-mark"></span>
+              <h4>Sequence</h4>
+              <p>Two or more participants exchanging messages. Loops, alts, notes.</p>
+            </div>
+            <div class="new-tile flow">
+              <span class="tile-mark"></span>
+              <h4>Flowchart</h4>
+              <p>Boxes, decisions, edges. Top-down or left-right.</p>
+            </div>
+          </div>
+          <div style="margin-top:18px">
+            <span class="modal-input-label">Name</span>
+            <input class="modal-input" id="flowchart-name-input" placeholder="e.g. Login handshake" value="Login handshake" />
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="button-secondary">Cancel</button>
+          <button class="button-primary">Create</button>
+        </div>
+      </div>
+
+      <!-- About w/ fork credit -->
+      <div class="modal-card">
+        <div class="modal-head">
+          <h3>About ChartMage</h3>
+          <span class="modal-tag">v · forked</span>
+        </div>
+        <div class="modal-body">
+          <p style="margin:0;font-size:14px;color:var(--color-text);line-height:1.55">A local-first diagramming companion for sequence and flowchart syntax, rendered with Mermaid in your browser. No account, no upload — your charts stay here.</p>
+          <div class="about-credit">
+            <div class="credit-label">Original project</div>
+            <p>ChartMage was originally created by <b>Junlin Shang</b>. This is a maintained fork — design, modernization, and bug fixes happen here. The original source remains the canonical credit:</p>
+            <p style="margin-top:8px"><a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">github.com/heyjunlin/chart-mage&nbsp;↗</a></p>
+          </div>
+          <div class="about-meta">
+            <span><b>Engine</b> Mermaid</span>
+            <span><b>Storage</b> Local · browser</span>
+            <span><b>Telemetry</b> none</span>
+            <span><b>License</b> MIT</span>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="button-secondary">Close</button>
+        </div>
+      </div>
+
+      <!-- Syntax help -->
+      <div class="modal-card" style="grid-column:1 / -1">
+        <div class="modal-head">
+          <h3>Syntax help</h3>
+          <span class="modal-tag">sequence · flowchart</span>
+        </div>
+        <div class="modal-body">
+          <div class="help-cols">
+            <div>
+              <h4>sequence</h4>
+              <code>sequenceDiagram
+  Alice-&gt;&gt;Bob: hello
+  Bob--&gt;&gt;Alice: hey
+  Note over Alice,Bob: handshake
+  loop every minute
+    Alice-&gt;&gt;Bob: ok?
+  end</code>
+            </div>
+            <div>
+              <h4>flowchart</h4>
+              <code>graph TD
+  A[Start] --&gt; B{Has draft?}
+  B --yes--&gt; C[Open editor]
+  B --no--&gt;  D[New chart]
+  C --&gt; E[Edit]
+  D --&gt; E</code>
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="button-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     10 · Empty / error states
+     ================================================================= -->
+<section class="proto-section" id="states">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">10 · States</div>
+        <h2>The happy path is the rare path.</h2>
+        <p class="desc">Empty library, render error, chart-not-found, parse-error ribbon. All consume the same tokens and treat error tone with ruby (not red), warning tone with lemon.</p>
+      </div>
+    </header>
+
+    <div class="state-grid">
+      <div class="state-card empty">
+        <div class="label">Empty</div>
+        <div class="glyph"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="16" height="14" rx="2"/><path d="M7 9h8M7 13h5"/></svg></div>
+        <h4>No charts yet</h4>
+        <p>Your library is empty. Start with a sample to see how the editor feels.</p>
+        <div class="actions">
+          <button class="button-primary">+ New chart</button>
+          <button class="button-secondary">Load sample</button>
+        </div>
+      </div>
+
+      <div class="state-card error">
+        <div class="label">Render error</div>
+        <div class="glyph"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="8"/><path d="M11 7v5M11 15v.01"/></svg></div>
+        <h4>We couldn't render this diagram</h4>
+        <p>Mermaid threw on line 3. Fix the input or roll back to the last working version.</p>
+        <div class="actions">
+          <button class="button-primary">Show error detail</button>
+          <button class="button-secondary">Undo last edit</button>
+        </div>
+      </div>
+
+      <div class="state-card notfound">
+        <div class="label">Chart not found</div>
+        <div class="glyph"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="6"/><path d="M14 14l5 5"/></svg></div>
+        <h4>That chart isn't here</h4>
+        <p>The link points to a chart in a different browser. Charts are local to where you created them.</p>
+        <div class="actions">
+          <button class="button-primary">Back to my charts</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="parse-ribbon">
+      <span class="ico">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="9" r="7"/><path d="M9 6v4M9 12v.01"/></svg>
+      </span>
+      <div>
+        <div><b>Parse error</b> &nbsp; <span class="line-ref">line 3, col 18</span></div>
+        <div style="margin-top:4px;color:var(--color-text)">Expected an arrow like <code>--&gt;</code> or <code>--&gt;&gt;</code>, found <code>-&gt;</code>. Did you mean <code>Bob--&gt;&gt;Alice</code>?</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     11 · Mobile
+     ================================================================= -->
+<section class="proto-section" id="mobile">
+  <div class="proto-stage">
+    <header>
+      <div>
+        <div class="label">11 · Mobile</div>
+        <h2>Mobile is for landing only.</h2>
+        <p class="desc">The editor stays desktop-only (min-width 768px lock). On mobile the intro reduces to brand, promise, and an explicit "come back on desktop" message. No fake editor, no horizontal scroll.</p>
+      </div>
+    </header>
+
+    <div class="mobile-board">
+      <div>
+        <div class="mono muted" style="margin-bottom:10px">intro · 340 wide</div>
+        <div class="mobile-frame">
+          <div class="mobile-status">
+            <span>9:41</span>
+            <span class="glyphs" aria-hidden="true">
+              <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 9.5v1M5 7.5v3M8 5.5v5M11 3.5v7M14 1.5v9"/></svg>
+              <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 4.5C3.5 2.5 12.5 2.5 14.5 4.5M3.5 6.5C5 5 11 5 12.5 6.5M5.5 8.5C6.5 7.5 9.5 7.5 10.5 8.5M8 10.2v.1"/></svg>
+              <svg viewBox="0 0 22 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="2" width="17" height="8" rx="2"/><rect x="3" y="4" width="10" height="4" rx="0.5" fill="currentColor"/><path d="M19.5 5v2"/></svg>
+            </span>
+          </div>
+          <div class="mobile-shell">
+            <a class="cm-logo size-md" href="#"><span class="mark"><svg><use href="#cm-mark"/></svg></span><span class="word">Chart<b>Mage</b></span></a>
+            <h2>Diagrams from <em>a few lines</em> of text.</h2>
+            <p>The editor is a desktop experience — your charts wait for you in this same browser when you’re back at a laptop.</p>
+
+            <div class="preview-thumb" aria-hidden="true">
+              <svg viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg">
+                <g font-family="var(--font-sans), system-ui" font-size="10" fill="#061b31">
+                  <rect x="30" y="10" width="60" height="22" rx="5" fill="#533afd"/><text x="60" y="25" text-anchor="middle" fill="#fff">Alice</text>
+                  <rect x="230" y="10" width="60" height="22" rx="5" fill="#ea2261"/><text x="260" y="25" text-anchor="middle" fill="#fff">Bob</text>
+                  <line x1="60" y1="34" x2="60" y2="100" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+                  <line x1="260" y1="34" x2="260" y2="100" stroke="#cdd8e5" stroke-dasharray="3 4"/>
+                  <g stroke="#533afd" stroke-width="1.4" fill="none"><line x1="64" y1="56" x2="256" y2="56"/><polygon points="256,56 250,53 250,59" fill="#533afd" stroke="none"/></g>
+                  <text x="160" y="52" text-anchor="middle" fill="#425466">Hi Bob</text>
+                  <g stroke="#ea2261" stroke-width="1.2" fill="none" stroke-dasharray="4 3"><line x1="256" y1="82" x2="64" y2="82"/><polygon points="64,82 70,79 70,85" fill="#ea2261" stroke="none"/></g>
+                  <text x="160" y="78" text-anchor="middle" fill="#425466">Hi Alice</text>
+                </g>
+              </svg>
+              <div class="lock">· desktop only ·</div>
+            </div>
+
+            <a class="mobile-cta" href="#">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4l6 5 6-5M2 4h12v8H2z"/></svg>
+              Email me a reminder
+            </a>
+            <a class="mobile-cta ghost" href="#">Read the syntax docs</a>
+
+            <div class="footnote">
+              Forked from <a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">heyjunlin/chart-mage</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="mono muted" style="margin-bottom:10px">editor gate · &lt;768px viewport</div>
+        <div class="editor-gate">
+          <div class="gate-glyph"><svg width="36" height="36" viewBox="0 0 32 32" aria-hidden="true"><use href="#cm-mark"/></svg></div>
+          <h3>Editor needs a wider screen</h3>
+          <p>Sequence and flowchart authoring relies on a split editor. Resize your browser to at least 768px or come back on a laptop.</p>
+          <button class="button-primary">Back to landing</button>
+          <div class="gate-meta">
+            <span class="pill">min 768px</span>
+            <span>desktop · chrome · safari · firefox</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer style="padding:32px 28px;text-align:center;color:var(--color-text-muted);font-size:12px;font-family:var(--font-mono)">
+  ChartMage · redesign prototype v2 · 2026-04-30 · review only
+</footer>
+
+</body>
+</html>
