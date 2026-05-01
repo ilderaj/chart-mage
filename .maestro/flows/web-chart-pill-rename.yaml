@@ -1,0 +1,19 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - nav
+  - rename
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- tapOn:
+    id: "current-chart-pill"
+- assertVisible: "Rename"
+- tapOn:
+    id: "rename-input"
+- inputText: "Renamed From Pill"
+- tapOn: "Save"
+- assertNotVisible: "Rename"
+- assertVisible: "Renamed From Pill"
+- assertVisible: "Saved locally"

@@ -9,7 +9,11 @@ tags:
 - assertVisible: "Diagram Input"
 - assertVisible: "Live Preview"
 - tapOn:
+    id: "new-chart-button"
+- assertVisible: "New chart"
+- assertVisible:
     id: "new-flowchart-button"
+- tapOn: "Flowchart"
 - assertVisible: "Chart Name"
 - tapOn:
     id: "flowchart-name-input"

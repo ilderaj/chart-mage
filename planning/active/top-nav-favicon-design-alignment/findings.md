@@ -26,3 +26,8 @@
 - 对话、评审、计划内容使用中文；代码、文档/UI strings 保持英文。
 - 不要破坏现有 Maestro 稳定 id，除非同步更新 flows 与 spec。
 - 当前部署路径是 Cloudflare Worker，不能把计划写回 Cloudflare Pages 路径。
+
+## 2026-05-01 Final Validation Notes
+- Maestro Web 不支持 `pressKey: "CMD+K"` 这一组合键写法；`web-nav-search.yaml` 最终通过 `#maestro-trigger-nav-search-shortcut` 触发同一条 app-level `Meta+K` keydown handler 完成覆盖。
+- `drawer-count` 的 saved-count 文本并不稳定，不能作为搜索快捷键是否打开 drawer 的可靠断言；`drawer-search` 的显隐是更稳定的结构性验证点。
+- `npm run uat:smoke` 与 `npm run build:check` 已在最终代码状态下通过，当前无未解决阻塞项。

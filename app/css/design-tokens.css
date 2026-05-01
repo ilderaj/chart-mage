@@ -21,6 +21,9 @@
 	--color-brand-strong: #1c1e54;
 	--color-border: #e5edf5;
 	--color-border-strong: #cdd8e5;
+	--color-nav-glass: rgba(255, 255, 255, 0.88);
+	--color-nav-border: rgba(214, 221, 235, 0.9);
+	--color-nav-search-bg: rgba(246, 249, 252, 0.92);
 	--color-danger: #ea2261;
 	--color-danger-hover: #d11b57;
 	--color-success: #15be53;
@@ -30,6 +33,7 @@
 	--shadow-card: 0 15px 35px rgba(23, 23, 23, 0.08);
 	--shadow-elevated: 0 30px 45px -30px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
 	--shadow-deep: 0 14px 21px -14px rgba(3, 3, 39, 0.25), 0 8px 17px -8px rgba(0, 0, 0, 0.1);
+	--shadow-nav: 0 24px 45px -30px rgba(43, 65, 101, 0.24), 0 16px 28px -24px rgba(83, 58, 253, 0.3);
 
 	--radius-sm: 4px;
 	--radius-md: 6px;

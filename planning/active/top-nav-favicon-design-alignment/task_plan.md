@@ -1,12 +1,12 @@
 # Top Nav And Favicon Design Alignment Plan
 
 ## Current State
-Status: waiting_review
-Archive Eligible: no
-Close Reason:
+Status: completed
+Archive Eligible: yes
+Close Reason: 顶栏、favicon、spec 与标准 Maestro suite 已完成对齐，并已从隔离 worktree 同步回本地 `dev` workspace 后再次验证通过。
 
 ## Goal
-全面检视 ChartMage 当前编辑器顶栏、favicon、设计规格与 Maestro 覆盖，制定严格对齐新设计的实施方案；本轮只输出计划供 review，不改业务代码。
+全面检视并对齐 ChartMage 当前编辑器顶栏、favicon、设计规格与 Maestro 覆盖，并在隔离 worktree 内完成实现、验证与交叉复核。
 
 ## Scope
 - 对齐编辑器顶栏到设计稿中的单一浮动玻璃栏：brand lockup、chart pill/rename trigger、save state、search、My Charts、Help、Export、primary New action。
@@ -15,7 +15,6 @@ Close Reason:
 - 使用 subagents 做分域审查，并设置交叉检查环节，避免实现、spec、UAT 各自漂移。
 
 ## Non-Goals
-- 本轮不执行代码修改。
 - 不重构 Mermaid/CodeMirror 核心逻辑。
 - 不变更部署路径；当前部署仍以 Cloudflare Worker 静态资产为准。
 
@@ -29,7 +28,7 @@ Close Reason:
 | Save state | `#save-state-pill` says `Saved locally`; workspace header duplicates status | Keep visible compact state in nav: dot + `Saved locally` or spec-approved copy; update alongside workspace status | Maestro assert visible; JS unit-by-behavior via browser interaction |
 | Cmd-K search | No top-nav search; drawer search exists only after opening My Charts | Add nav search input with visible `Search charts` and shortcut hint; focus with Cmd-K; route query to drawer search/results | Maestro tap/search path; Playwright keyboard shortcut check |
 | My Charts | `#show-charts-button` exists and opens drawer | Keep same id/behavior; restyle as text+icon nav action | Existing flows plus nav-specific flow |
-| Help | `#show-syntax` is icon-only | Text+icon `Help` action opens existing syntax modal based on current chart type | New Maestro `web-nav-actions.yaml` |
+| Help | `#show-syntax` is icon-only | Text+icon `Help` action opens existing syntax modal based on current chart type | New Maestro `web-top-nav-actions.yaml` |
 | Export | `#export-diagram` is icon-only; preview footer also has `.export-trigger` | Text+icon `Export` action keeps existing export handler | Maestro entry-point assertion; manual/download limitation noted |
 | Primary new action | Two nav buttons: `New Sequence Diagram` and `New Flowchart` | One primary `+ New chart` action; preserve old modal ids via a picker or delegated buttons | Updated smoke/create-sequence flows |
 | Favicon | `favicon.svg` is new mark; `favicon.png` is old black arrow; `browser.html` only references PNG | SVG and PNG fallback show the same new brand mark; all HTML entrypoints use consistent icon links | Browser tab screenshot; file/asset inspection; HTML grep |
@@ -37,7 +36,7 @@ Close Reason:
 ## Implementation Plan For Review
 
 ### Phase 1: Spec And Acceptance Criteria
-Status: waiting_review
+Status: completed
 
 Files to modify after approval:
 - `DESIGN.md`
@@ -48,14 +47,14 @@ Files to modify after approval:
 Steps:
 - Add a ChartMage editor top-nav spec under the adoption notes in `DESIGN.md`: one floating rounded glass bar, 28px brand lockup, chart pill rename trigger, save state, Cmd-K search, My Charts, Help, Export, and one primary `+ New chart` CTA.
 - Add favicon identity acceptance criteria: `favicon.svg` is the source visual, `favicon.png` is a matching fallback, and `index.html`, `intro.html`, and `browser.html` all declare the same icon set.
-- Update `.maestro/README.md` to list the new nav/fav flows and clarify which visual checks require Playwright/manual screenshot because Maestro cannot inspect browser tab favicon pixels or `backdrop-filter` quality.
-- Update `backlogs/maestro-coverage.md`: add rows for editor top-nav anatomy, chart pill rename, Cmd-K nav search, top-nav action continuity, favicon entrypoint consistency; mark them `missing` before implementation and `covered` only after flows are added to the standard command or documented suite.
+- Update `.maestro/README.md` to list the new nav/fav flows and clarify which visual checks require Playwright/manual screenshot because Maestro cannot inspect browser tab favicon pixels or `backdrop-filter` quality; those fallbacks supplement release verification but do not count as Maestro coverage.
+- Update `backlogs/maestro-coverage.md`: add rows for editor top-nav anatomy, chart pill rename, Cmd-K nav search, top-nav action continuity, favicon entrypoint consistency; mark them `missing` before implementation and `covered` only after Maestro flows are added to the standard command or documented suite.
 
 Acceptance gate:
 - Every design requirement in the gap matrix maps to one spec line and one verification path.
 
 ### Phase 2: Favicon And Brand Asset Alignment
-Status: waiting_review
+Status: completed
 
 Files to modify after approval:
 - `app/images/favicon.svg`
@@ -76,7 +75,7 @@ Acceptance gate:
 - Grep finds no HTML entrypoint that references only `images/favicon.png`.
 
 ### Phase 3: Editor Top Nav DOM And Behavior
-Status: waiting_review
+Status: completed
 
 Files to modify after approval:
 - `app/index.html`
@@ -84,10 +83,10 @@ Files to modify after approval:
 
 Steps:
 - Restructure `<nav class="app-nav">` into three logical regions matching the prototype: left brand/chart state, center search, right actions.
-- Preserve existing behavior ids: `show-charts-button`, `show-syntax`, `export-diagram`, `new-flowchart-button`, `current-chart-name`, `current-chart-type`, `save-state-pill`.
+- Stable DOM id contract for implementation and UAT: `show-charts-button`, `show-syntax`, `export-diagram`, `new-flowchart-button`, `new-sequence-diagram-button`, `current-chart-name`, `current-chart-type`, `save-state-pill`, plus the planned new ids `current-chart-pill` and `nav-search-input`.
 - Add `current-chart-pill` as a real button and also bind it into the existing rename path by setting `data-chart-id` and `data-chart-name` in `updateShellMeta()`.
 - Add `nav-search-input`; clicking or Cmd-K opens the drawer, mirrors the value into `drawer-search`, and calls existing `renderChartsCollections()` so search behavior remains single-sourced.
-- Replace the two visible nav creation buttons with one visible `+ New chart` CTA. Preferred implementation: open a small `new-chart-picker` modal/popover with Flowchart and Sequence choices that delegate to existing `#newFlowchart` and `#newSequenceDiagram`; fallback if scope must stay smaller: primary CTA opens existing flowchart modal while a sequence path remains available inside the picker. The final implementation must keep `new-flowchart-button` and `new-sequence-diagram-button` available as stable ids, even if one is nested in the picker instead of the main bar.
+- Replace the two visible nav creation buttons with one visible `+ New chart` CTA. Preferred implementation: open a small `new-chart-picker` modal/popover with Flowchart and Sequence choices that delegate to existing `#newFlowchart` and `#newSequenceDiagram`; fallback if scope must stay smaller: primary CTA opens existing flowchart modal while a sequence path remains available inside the picker. Keep the stable id contract above addressable even if one action moves into the picker instead of the main bar.
 - Keep About and mail links out of the primary top nav unless a spec update explicitly says they remain top-level; current design only calls for Help and Export.
 
 Acceptance gate:
@@ -95,7 +94,7 @@ Acceptance gate:
 - Chart pill rename updates `#current-chart-name`, `#workspace-file-name`, and drawer row text.
 
 ### Phase 4: Editor Top Nav CSS Alignment
-Status: waiting_review
+Status: completed
 
 Files to modify after approval:
 - `app/css/design-tokens.css`
@@ -114,7 +113,7 @@ Acceptance gate:
 - Long chart name does not resize the nav or overlap actions.
 
 ### Phase 5: Maestro And Visual Regression Coverage
-Status: waiting_review
+Status: completed
 
 Files to modify after approval:
 - `.maestro/flows/web-smoke.yaml`
@@ -124,7 +123,8 @@ Files to modify after approval:
 - New `.maestro/flows/web-top-nav-alignment.yaml`
 - New `.maestro/flows/web-nav-search.yaml`
 - New `.maestro/flows/web-chart-pill-rename.yaml`
-- New `.maestro/flows/web-favicon-entrypoints.yaml` if Maestro can reliably inspect page source/DOM links; otherwise document this as Playwright-only.
+- New `.maestro/flows/web-top-nav-actions.yaml`
+- New `.maestro/flows/web-favicon-entrypoints.yaml` to verify favicon entrypoint consistency at the HTML/DOM layer.
 - `scripts/run-maestro-web-smoke.sh`
 - `package.json`
 
@@ -133,15 +133,16 @@ Steps:
 - Add `web-top-nav-alignment.yaml` assertions: `ChartMage`, `Sample sequence diagram`, `Saved locally`, `Search charts`, `My Charts`, `Help`, `Export`, `New chart` are visible on first editor load.
 - Add `web-nav-search.yaml`: create/search/filter through nav search, assert drawer results and empty state.
 - Add `web-chart-pill-rename.yaml`: tap chart pill, rename current chart, assert nav and workspace file name update.
-- Add or document a favicon check. Maestro likely cannot validate tab favicon pixels, so use Playwright/browser screenshot as the strict visual check and reserve Maestro for HTML entrypoint reachability.
+- Add `web-favicon-entrypoints.yaml` as a planned Maestro flow for favicon entrypoint consistency. Its scope is HTML/DOM verification only: assert the expected favicon link declarations exist across the supported HTML entrypoints.
+- Keep rendered browser-tab favicon pixels, cache-refresh behavior, and final visual appearance in Playwright/browser screenshot/manual verification. Those checks supplement release confidence but do not change the Maestro-covered boundary.
 - Update runner from one hardcoded flow to either a documented suite list or an optional flow argument that runs all standard flows. The standard `npm run uat:smoke` should cover every flow marked `covered` in `backlogs/maestro-coverage.md`.
 
 Acceptance gate:
 - `npm run uat:smoke` passes after implementation and includes the updated/new nav flows.
-- Any visual-only assertions not covered by Maestro are explicitly listed with a screenshot verification command/checklist.
+- Any visual-only assertions not covered by Maestro are explicitly listed with a screenshot verification command/checklist and remain outside Maestro `covered` status.
 
 ### Phase 6: Build, Browser Verification, And Cross-Agent Review
-Status: waiting_review
+Status: completed
 
 Verification commands after approval and implementation:
 - `npm run build`
@@ -157,16 +158,22 @@ Cross-agent protocol:
 
 Acceptance gate:
 - Planning files contain final decisions, verification results, and any known non-automated visual checks.
-- No spec row is marked covered without an actual flow or documented Playwright/manual fallback.
+- No spec row is marked Maestro-covered without an actual Maestro flow in the standard UAT command or a documented suite; Playwright/manual fallback remains a separate verification note.
 
 ## Decisions
 - 使用新 task id `top-nav-favicon-design-alignment`，不复用 `cloudflare-pages-deploy`，避免部署任务与设计对齐任务混杂。
-- 当前任务状态为 `waiting_review`，因为用户要求先分析并输出 implementation plan。
+- 所有实现工作继续在隔离 worktree `top-nav-favicon-design-alignment` 内完成，避免污染主 workspace 的无关改动。
+- `web-nav-search.yaml` 的 Cmd-K 覆盖采用 Maestro-only observer trigger，原因是 Maestro Web 不支持 `pressKey: "CMD+K"`；该 trigger 仅在 `?maestro=1` 下暴露，并回到同一条 app-level shortcut handler。
+- 标准 `npm run uat:smoke` 现作为本任务 Maestro 覆盖的收口命令，最终已完整跑绿。
+
+## Risk Assessment
+| Command | Target | Workspace Boundary | Checkpoint | Rollback |
+|---|---|---|---|---|
+| `git worktree remove --force /Users/jared/Vibings/ChartMage/.worktrees/top-nav-favicon-design-alignment` | 仅删除已同步完成的 feature worktree 目录；不删除主 workspace `/Users/jared/Vibings/ChartMage` 的当前改动 | 仅作用于当前仓库下的 worktree 路径，不触碰其他仓库 | `./scripts/harness checkpoint . --quiet` 不存在；改用主 workspace 已同步且已通过 `npm run build:check` 与 `npm run uat:smoke` 作为回滚基线 | 如误删，可基于仍保留的本地 branch `top-nav-favicon-design-alignment` 重新执行 `git worktree add /Users/jared/Vibings/ChartMage/.worktrees/top-nav-favicon-design-alignment top-nav-favicon-design-alignment` 重建 worktree；主 workspace 当前未提交改动保留完整实现 |
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
 |-------|---------|------------|
 
 ## Open Questions
-- 新 favicon 的目标源是否就是设计稿截图中的紫色渐变节点图标，还是已有 `app/images/favicon.svg` 应进一步更新？需要检视资产后给出建议。
-- 顶栏中的 search 是否已有隐藏/未实现入口，还是需要新增前端搜索行为？需要检视 `app/js/app.js` 后确定。
+- 无。原 open questions 已在实现阶段全部关闭。

@@ -3,10 +3,20 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-FLOW_PATH="${ROOT_DIR}/.maestro/flows/web-smoke.yaml"
 DEBUG_OUTPUT_DIR="${ROOT_DIR}/.maestro/debug-output"
 MAESTRO_BIN="${MAESTRO_BIN:-maestro}"
 HEADLESS=true
+DEFAULT_FLOWS=(
+  ".maestro/flows/web-smoke.yaml"
+  ".maestro/flows/web-create-sequence.yaml"
+  ".maestro/flows/web-rename-chart.yaml"
+  ".maestro/flows/web-delete-chart.yaml"
+  ".maestro/flows/web-top-nav-alignment.yaml"
+  ".maestro/flows/web-nav-search.yaml"
+  ".maestro/flows/web-chart-pill-rename.yaml"
+  ".maestro/flows/web-top-nav-actions.yaml"
+  ".maestro/flows/web-favicon-entrypoints.yaml"
+)
 
 ensure_java() {
   if command -v java >/dev/null 2>&1 && java -version >/dev/null 2>&1; then
@@ -41,6 +51,18 @@ resolve_maestro() {
   exit 1
 }
 
+resolve_flow_path() {
+  local flow_path="$1"
+
+  if [[ "${flow_path}" == /* ]]; then
+    printf '%s\n' "${flow_path}"
+    return 0
+  fi
+
+  flow_path="${flow_path#./}"
+  printf '%s\n' "${ROOT_DIR}/${flow_path}"
+}
+
 if [[ "${1:-}" == "--headed" ]]; then
   HEADLESS=false
   shift
@@ -53,16 +75,26 @@ resolve_maestro
 
 mkdir -p "${DEBUG_OUTPUT_DIR}"
 
-cmd=("${MAESTRO_BIN}" "--platform" "web" "test" "--debug-output=${DEBUG_OUTPUT_DIR}")
-
-if [[ "${HEADLESS}" == "true" ]]; then
-  cmd+=("--headless")
-fi
-
-cmd+=("${FLOW_PATH}")
+flows=("${DEFAULT_FLOWS[@]}")
 
 if [[ "$#" -gt 0 ]]; then
-  cmd+=("$@")
+  flows=("$@")
 fi
 
-exec "${cmd[@]}"
+for flow in "${flows[@]}"; do
+  flow_path="$(resolve_flow_path "${flow}")"
+  flow_name="$(basename "${flow_path}" .yaml)"
+
+  mkdir -p "${DEBUG_OUTPUT_DIR}/${flow_name}"
+
+  cmd=("${MAESTRO_BIN}" "--platform" "web" "test" "--debug-output=${DEBUG_OUTPUT_DIR}/${flow_name}")
+
+  if [[ "${HEADLESS}" == "true" ]]; then
+    cmd+=("--headless")
+  fi
+
+  cmd+=("${flow_path}")
+
+  echo "Running Maestro flow: ${flow_name}"
+  "${cmd[@]}"
+done

@@ -32,28 +32,71 @@ $(function() {
 
     $("#current-chart-name").text(chartName);
     $("#current-chart-type").text(chartType);
+    $("#current-chart-pill")
+      .attr("data-chart-id", controller.currentChart.id)
+      .attr("data-chart-name", chartName)
+      .attr("title", "Rename " + chartName)
+      .attr("aria-label", "Rename " + chartName);
     $("#save-state-pill").text("Saved locally");
-    $("#workspace-file-name").text(chartName + ".cm");
-    $("#workspace-file-type").text(chartType);
-    $("#workspace-file-status").text("Saved locally");
+  }
+
+  function syncSearchInputs(value) {
+    $("#nav-search-input").val(value);
+    $("#drawer-search").val(value);
+  }
+
+  function getActiveSearchValue() {
+    return $("#nav-search-input").val() || $("#drawer-search").val() || "";
+  }
+
+  function isMacShortcutPlatform() {
+    return /Mac|iPhone|iPod|iPad/.test(window.navigator.platform || "");
+  }
+
+  function isEditableTarget(element) {
+    if (!element)
+      return false;
+
+    if ($(".modal:visible").length)
+      return true;
+
+    if ($(element).closest(".modal, .CodeMirror, [contenteditable=''], [contenteditable='true']").length)
+      return true;
+
+    if ($(".CodeMirror-focused").length)
+      return true;
+
+    return element.isContentEditable || /^(input|textarea|select)$/i.test(element.tagName || "");
+  }
+
+  function focusNavSearch() {
+    var navSearchInput = $("#nav-search-input")[0];
+    openChartsDrawer();
+    if (navSearchInput) {
+      navSearchInput.focus();
+      navSearchInput.select();
+    }
+  }
+
+  function triggerNavSearchShortcut() {
+    $(document).trigger($.Event("keydown", { metaKey: true, key: "k" }));
+  }
+
+  function openRenameModal(chartId, chartName) {
+    closeChartsDrawer();
+    $("#rename-chart-modal strong").text(chartName);
+    $("#rename-chart-modal form")[0].reset();
+    $("#rename-chart-modal form").attr("data-chart-id", chartId);
+    $("#rename-chart-modal").modal({ closeExisting: false });
   }
 
   function renderChartsCollections(filterText) {
+    var activeFilter = typeof filterText == "string" ? filterText : getActiveSearchValue();
     var allCharts = controller.getAllCharts();
-    var normalizedFilter = (filterText || "").toLowerCase();
+    var normalizedFilter = activeFilter.toLowerCase();
     var visibleCharts = allCharts.filter(function(chart) {
       return normalizedFilter === "" || chart.name.toLowerCase().indexOf(normalizedFilter) != -1 || chart.content.toLowerCase().indexOf(normalizedFilter) != -1;
     });
-
-    var htmlText = visibleCharts.map(function(chart) {
-      var trClass = chart.id == controller.currentChart.id ? "select-chart current-chart" : "select-chart";
-      var chartLabelClass = chart.type == "flowchart" ? "flowchart-label" : "sequence-diagram-label";
-      return "<tr class='" + trClass + "' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>" +
-             "<td><p class='" + chartLabelClass + "'>" + chart.type[0].toUpperCase() + "</p></td>" +
-             "<td style='width:100%;'>" + _.escape(chart.name) + "</td>" +
-             "<td><a class='rename-chart' href='javascript:void(0);' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Rename</a></td>" +
-             "<td><a class='delete-chart' href='javascript:void(0);' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Delete</a></td></tr>";
-    }).join("");
 
     var drawerHtml = visibleCharts.map(function(chart) {
       var currentClass = chart.id == controller.currentChart.id ? "drawerChart current-chart" : "drawerChart";
@@ -62,14 +105,14 @@ $(function() {
              "<div class='drawerChartActions'><span class='drawerChartMeta'>" + chartTimestamp(chart) + "</span><span class='drawerAction drawerRename rename-chart' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Rename</span><span class='drawerAction drawerDelete delete-chart' data-chart-id='" + chart.id + "' data-chart-name='" + _.escape(chart.name) + "'>Delete</span></div></div>";
     }).join("");
 
-    $("#chartsList tbody").html(htmlText);
     $("#drawer-list").html(drawerHtml || "<p class='drawerEmpty'>No charts match your search.</p>");
     $("#drawer-count").text(allCharts.length + " saved");
+    syncSearchInputs(activeFilter);
     updateShellMeta();
   }
 
   function openChartsDrawer() {
-    renderChartsCollections($("#drawer-search").val());
+    renderChartsCollections(getActiveSearchValue());
     $("#charts-drawer").removeClass("hidden");
     $("#drawer-backdrop").removeClass("hidden");
   }
@@ -77,6 +120,20 @@ $(function() {
   function closeChartsDrawer() {
     $("#charts-drawer").addClass("hidden");
     $("#drawer-backdrop").addClass("hidden");
+  }
+
+  function isChartsDrawerOpen() {
+    return !$("#charts-drawer").hasClass("hidden");
+  }
+
+  function publishMaestroAction(action) {
+    if (window.ChartMageMaestro && typeof window.ChartMageMaestro.publishAction == "function") {
+      window.ChartMageMaestro.publishAction(action);
+    }
+  }
+
+  if (window.ChartMageMaestro) {
+    window.ChartMageMaestro.triggerNavSearchShortcut = triggerNavSearchShortcut;
   }
 
   $(".splashscreen").remove();
@@ -99,29 +156,64 @@ $(function() {
 
   $("#show-charts-button").click(function(event) {
     event.preventDefault();
+
+    if (isChartsDrawerOpen()) {
+      closeChartsDrawer();
+      publishMaestroAction("charts-drawer:closed");
+      return;
+    }
+
     openChartsDrawer();
+    publishMaestroAction("charts-drawer:" + controller.getAllCharts().length + "-saved");
+  });
+
+  $("#new-chart-button").click(function(event) {
+    event.preventDefault();
+    $("#new-chart-picker").modal({ closeExisting: false });
+    publishMaestroAction("new-chart-picker");
+  });
+
+  $("#current-chart-pill").click(function(event) {
+    event.preventDefault();
+    openRenameModal(controller.currentChart.id, controller.currentChart.name);
   });
 
   $("#drawer-close, #drawer-backdrop").click(function() {
     closeChartsDrawer();
   });
 
-  $("#drawer-search").on("input", function() {
+  $("#nav-search-input").on("focus", function() {
+    openChartsDrawer();
+    syncSearchInputs(this.value);
+  });
+
+  $("#nav-search-input").on("input", function() {
+    openChartsDrawer();
     renderChartsCollections(this.value);
   });
 
-  $(document).on("mouseenter", ".select-chart, .drawerChart", function() {
+  $("#drawer-search").on("input", function() {
+    syncSearchInputs(this.value);
+    renderChartsCollections(this.value);
+  });
+
+  $(document).on("keydown", function(event) {
+    if (!isMacShortcutPlatform() || !event.metaKey || event.ctrlKey || event.altKey || event.shiftKey || String(event.key).toLowerCase() != "k")
+      return;
+
+    if (isEditableTarget(event.target) || isEditableTarget(document.activeElement))
+      return;
+
+    event.preventDefault();
+    focusNavSearch();
+  });
+
+  $(document).on("mouseenter", ".drawerChart", function() {
     $(this).addClass("active-row");
   });
 
-  $(document).on("mouseleave", ".select-chart, .drawerChart", function() {
+  $(document).on("mouseleave", ".drawerChart", function() {
     $(this).removeClass("active-row");
-  });
-
-  $(document).on("click", ".select-chart", function(event) {
-    if ($(event.target).closest(".delete-chart, .rename-chart").length)
-      return;
-    controller.openChartByID(this.getAttribute("data-chart-id"));
   });
 
   $(document).on("click", ".drawerChart", function(event) {
@@ -155,11 +247,7 @@ $(function() {
   $(document).on("click", ".rename-chart", function(event) {
     event.preventDefault();
     event.stopPropagation();
-    closeChartsDrawer();
-    $("#rename-chart-modal strong").text(getChartNameFromElement(this));
-    $("#rename-chart-modal form")[0].reset();
-    $("#rename-chart-modal form").attr("data-chart-id", getChartIdFromElement(this));
-    $("#rename-chart-modal").modal({ closeExisting: false });
+    openRenameModal(getChartIdFromElement(this), getChartNameFromElement(this));
     return false;
   });
 
@@ -173,6 +261,7 @@ $(function() {
   /*** 两个功能按钮 ***/
   $(document).on("click", "#export-diagram, .export-trigger", function(event) {
     event.preventDefault();
+    publishMaestroAction("export:" + controller.currentChart.type + ":" + controller.currentChart.name);
 
     var svg = $("#graphDiv")[0];
     var svg_xml = (new XMLSerializer).serializeToString(svg);   // extract the data as SVG text
@@ -213,6 +302,8 @@ $(function() {
       $("#flowchart-syntax").modal();
     else if (controller.currentChart.type == "sequenceDiagram")
       $("#sequence-diagram-syntax").modal();
+
+    publishMaestroAction("syntax:" + controller.currentChart.type);
   });
 
   $(document).on("click", ".quick-chip", function() {
