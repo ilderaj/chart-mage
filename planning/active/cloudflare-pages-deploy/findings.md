@@ -73,6 +73,10 @@
 - 2026-04-30 Worker 自动发布验证：PR #1 已合入 `origin/main`，main production build `96787207` 成功，`https://chartmage.ilderaj.workers.dev/` 已包含最新 `workspaceFileFrame` / `workspaceSplit` 结构，`/intro.html` 与 `/index.html?maestro=1` 均返回 `200`。
 - 2026-04-30 Worker preview 验证：`origin/dev` push 触发 build `ad9ca3eb-0585-4dce-a342-73536f8c4802`，最终 `status = stopped`、`build_outcome = success`，preview URL 为 `https://dev-chartmage.ilderaj.workers.dev`。
 - 2026-04-30 GitHub PR 收敛：已创建 PR #2 `Converge Cloudflare deployment workflow`，head `ilderaj:dev`，base `ilderaj:main`，用于把 Pages fallback scripts / runbook / task records 收敛进 `main` 并通过 Worker build check 验证。
+- 2026-04-30 Worker 自有域名复核：`paymond.me` zone 存在于当前 Cloudflare account，zone id 为 `ccbc20f8d2ef2d081055a93400e27aee`，状态为 `active`。
+- 2026-04-30 Worker 自有域名执行：已通过 Workers Domains API 将 `chartmage.paymond.me` attach 到 Worker `chartmage`，domain id 为 `ca3b8369a91a335546174f7b51fd8788531c0a0a`，cert id 为 `b7104188-5d0a-422a-a8b2-e10e8517d49f`，`enabled = true`。
+- 2026-04-30 Worker 自有域名 DNS：Cloudflare 自动创建只读 proxied `AAAA 100::` DNS record `f5571d6d74c856e478356f9418136894`，`meta.origin_worker_id` 指向 Worker domain id；zone 级 Worker routes 仍为空，这是 Workers custom domain 的预期形态。
+- 2026-04-30 Worker 自有域名验证：`https://chartmage.paymond.me/` 返回 `HTTP/2 200`；页面 HTML 包含 `workspaceFileFrame` 与 `workspaceSplit`；`/intro.html` 规范化到 `/intro` 后返回 `200`，`/index.html?maestro=1` 规范化到 `/?maestro=1` 后返回 `200`。
 
 ## Technical Decisions
 | Decision | Rationale |
@@ -94,6 +98,7 @@
 | `dev -> origin/dev -> PR -> origin/main -> Pages` 不能自动触发 production | 当前 Cloudflare 项目仍是 direct upload；要么修复 Cloudflare GitHub installation 后新建 Git-integrated Pages project，要么后续改走 GitHub Actions + Wrangler direct-upload CI 并配置 Cloudflare API token secret |
 | Worker `chartmage` 与 Pages `chart-mage` 并存 | Worker 现在是可自动化候选主入口；Pages 仍可保留为 fallback，但文档和 package scripts 需要明确哪一个是 primary deploy target |
 | `chartmage.pages.dev` 域名诉求不能由 Worker 免费域名满足 | `*.pages.dev` 属于 Pages 产品；Worker 只能使用 `*.workers.dev` 免费域名或绑定 custom domain |
+| `curl ... | rg ...` 验证命令失败 | 当前 shell 环境没有 `rg`；已改用系统 `grep -E` 完成同等 HTML 标记验证 |
 
 ## Resources
 - https://developers.cloudflare.com/pages/get-started/git-integration/

@@ -13,8 +13,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "maestro:install": "./scripts/install-maestro.sh",
     "uat:serve": "npm run serve:app",
-    "uat:smoke": "./scripts/run-maestro-web-smoke.sh",
-    "uat:smoke:headed": "./scripts/run-maestro-web-smoke.sh --headed",
+    "uat:suite": "./scripts/run-maestro-web-smoke.sh",
+    "uat:suite:headed": "./scripts/run-maestro-web-smoke.sh --headed",
+    "uat:smoke": "npm run uat:suite",
+    "uat:smoke:headed": "npm run uat:suite:headed",
     "deploy": "npm run build && wrangler deploy",
     "preview": "npm run build && wrangler dev"
   },

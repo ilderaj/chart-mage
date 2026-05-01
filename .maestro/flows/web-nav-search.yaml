@@ -1,0 +1,38 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - nav
+  - search
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- tapOn:
+    id: "new-chart-button"
+- assertVisible:
+    id: "new-flowchart-button"
+- tapOn: "Flowchart"
+- assertVisible: "Chart Name"
+- tapOn:
+    id: "flowchart-name-input"
+- inputText: "Nav Search Target"
+- tapOn: "Create"
+- tapOn:
+    id: "show-charts-button"
+- tapOn: "Sample sequence diagram"
+- assertVisible: "Sample sequence diagram"
+- assertNotVisible:
+    id: "drawer-search"
+- tapOn:
+    id: "maestro-trigger-nav-search-shortcut"
+- assertVisible:
+    id: "drawer-search"
+- inputText: "Nav Search Target"
+- assertVisible: "Nav Search Target"
+- assertNotVisible: "Sample flowchart"
+- tapOn: "Nav Search Target"
+- assertVisible: "Flow"
+- tapOn:
+    id: "nav-search-input"
+- inputText: "No matching chart here"
+- assertVisible: "No charts match your search."

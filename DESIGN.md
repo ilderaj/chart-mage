@@ -264,6 +264,23 @@ What truly distinguishes Stripe is its shadow system. Rather than the flat or si
 - The editor and Mermaid canvas remain compatibility surfaces. Their colors are aligned to the Stripe palette, but readability and syntax/diagram clarity take precedence over strict aesthetic fidelity.
 - Shared visual primitives live in `app/css/design-tokens.css`, and page-level files should consume those tokens instead of introducing new hard-coded brand colors.
 
+### Editor Top Nav Acceptance Criteria
+
+- The editor top nav renders as one visually detached glass bar with rounded 4px-8px corners, blue-tinted elevation, and a clear gap from the viewport edge and workspace content.
+- The left cluster shows a 28px ChartMage brand lockup and one interactive current-chart pill that exposes the current chart type and name and serves as the rename trigger.
+- The top nav keeps a compact save-state indicator with visible status copy and preserves the current chart context without duplicating a separate workspace caption.
+- The center control exposes `Search charts` as a visible nav search surface, and Cmd-K focuses the same search path used by the chart drawer.
+- The right cluster exposes `My Charts`, `Help`, `Export`, and one primary `+ New chart` action; the legacy split create buttons must not remain as separate top-level buttons.
+- Long chart names truncate inside the current-chart pill only; nav actions remain visible and the bar does not wrap awkwardly.
+- Verification path: visible assertions via Maestro for top-nav content and interaction entry points, plus browser screenshots for glass treatment, spacing, and overflow behavior.
+
+### Favicon Acceptance Criteria
+
+- `app/images/favicon.svg` is the source visual for the current ChartMage mark, and `app/images/favicon.png` is a matching fallback rather than a legacy icon.
+- `app/index.html`, `app/intro.html`, and `app/browser.html` all declare the same favicon set with SVG first and PNG fallback metadata.
+- Browser tabs for each HTML entrypoint no longer show the old black arrow after cache-clear or hard refresh.
+- Verification path: HTML/source inspection for icon declarations, plus browser-tab screenshot or manual tab check for rendered favicon pixels.
+
 ## 8. Responsive Behavior
 
 ### Breakpoints

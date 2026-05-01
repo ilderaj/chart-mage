@@ -7,7 +7,10 @@ tags:
 - clearState
 - openLink: http://127.0.0.1:8000/index.html?maestro=1
 - tapOn:
+    id: "new-chart-button"
+- assertVisible:
     id: "new-flowchart-button"
+- tapOn: "Flowchart"
 - assertVisible: "Chart Name"
 - tapOn:
     id: "flowchart-name-input"

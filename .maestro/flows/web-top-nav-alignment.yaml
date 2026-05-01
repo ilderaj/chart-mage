@@ -1,0 +1,36 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - nav
+  - alignment
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- assertVisible: "Search charts"
+- assertVisible:
+    id: "show-charts-button"
+- assertVisible:
+    id: "show-syntax"
+- assertVisible:
+    id: "export-diagram"
+- assertVisible:
+    id: "new-chart-button"
+- assertNotVisible:
+    id: "new-flowchart-button"
+- assertNotVisible:
+    id: "new-sequence-diagram-button"
+- tapOn:
+    id: "show-charts-button"
+- assertVisible: "2 saved"
+- tapOn:
+    id: "drawer-close"
+- tapOn:
+    id: "new-chart-button"
+- assertVisible: "New chart"
+- assertVisible:
+    id: "new-flowchart-button"
+- assertVisible:
+    id: "new-sequence-diagram-button"
+- tapOn: "Flowchart"
+- assertVisible: "New Flowchart"

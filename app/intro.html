@@ -9,7 +9,7 @@
     <title>Chart Mage - Diagrams at the speed of thought.</title>
 
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="images/favicon.png">
+    <link rel="alternate icon" href="images/favicon.png" type="image/png">
     <!-- build:css css/intro.min.css -->
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/design-tokens.css">
@@ -17,13 +17,17 @@
     <!-- endbuild -->
 
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      window.__chartMageIsMaestro = /(?:^|[?&])maestro=1(?:&|$)/.test(window.location.search);
 
-      ga('create', 'UA-86337828-1', 'auto');
-      ga('send', 'pageview');
+      if (!window.__chartMageIsMaestro) {
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-86337828-1', 'auto');
+        ga('send', 'pageview');
+      }
     </script>
   </head>
 
@@ -176,6 +180,7 @@
 
     </main>
 
+    <script src="js/maestro-observer.js"></script>
     <script type="text/javascript">
       Array.prototype.forEach.call(document.querySelectorAll(".start-drawing"), function(link) {
         link.addEventListener("click", function() {

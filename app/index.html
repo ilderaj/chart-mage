@@ -9,7 +9,7 @@
     <title>Chart Mage - Draw sequence diagrams and flowcharts at lightning speed.</title>
 
     <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-    <link rel="alternate icon" href="images/favicon.png">
+    <link rel="alternate icon" href="images/favicon.png" type="image/png">
     <!-- build:css css/style.min.css -->
     <link rel="stylesheet" href="css/pure-nr-min.css">
     <link rel="stylesheet" href="css/codemirror.css">
@@ -21,19 +21,22 @@
     <!-- endbuild -->
 
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      window.__chartMageIsMaestro = /(?:^|[?&])maestro=1(?:&|$)/.test(window.location.search);
 
-      ga('create', 'UA-86337828-1', 'auto');
-      ga('send', 'pageview');
+      if (!window.__chartMageIsMaestro) {
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-86337828-1', 'auto');
+        ga('send', 'pageview');
+      }
     </script>
   </head>
   <body class="app-shell">
     <script type="text/javascript">
-      var searchParams = new URLSearchParams(window.location.search);
-      var isMaestroAutomation = searchParams.get("maestro") === "1";
+      var isMaestroAutomation = window.__chartMageIsMaestro;
 
       if (isMaestroAutomation) {
         localStorage.setItem("visited", "true");
@@ -53,7 +56,7 @@
             <span class="brand-node brand-node-left"></span>
             <span class="brand-node brand-node-right"></span>
           </span>
-          <span class="brand-word"><strong>chart</strong>mage</span>
+          <span class="brand-word">Chart<strong>Mage</strong></span>
         </a>
         <p>Preparing your local workspace...</p>
       </div>
@@ -69,6 +72,7 @@
     <script src="js/lib/uuid.js"></script>
     <script src="js/seqdef-hint.js"></script>
     <script src="js/flowchart-hint.js"></script>
+    <script src="js/maestro-observer.js"></script>
     <script src="js/app.js"></script>
     <!-- endbuild -->
 
@@ -106,47 +110,43 @@
     </svg>
     
     <nav class="app-nav hidden">
-      <div class="app-nav-brand">
+      <div class="app-nav-left">
         <a href="intro.html" class="brand-logo nav-brand-logo" aria-label="Chart Mage home">
           <span class="brand-mark" aria-hidden="true">
             <span class="brand-line"></span>
             <span class="brand-node brand-node-left"></span>
             <span class="brand-node brand-node-right"></span>
           </span>
-          <span class="brand-word"><strong>chart</strong>mage</span>
+          <span class="brand-word">Chart<strong>Mage</strong></span>
         </a>
-        <div class="nav-chart-meta">
-          <p class="nav-chart-caption">Current chart</p>
-          <div class="nav-chart-pill">
-            <span class="nav-type-pill" id="current-chart-type">Seq</span>
-            <span id="current-chart-name">Sample sequence diagram</span>
-          </div>
-        </div>
+        <span class="nav-divider" aria-hidden="true"></span>
+        <button type="button" class="nav-chart-pill" id="current-chart-pill" aria-label="Rename current chart">
+          <span class="nav-type-pill" id="current-chart-type">Seq</span>
+          <span class="nav-chart-pill-name" id="current-chart-name">Sample sequence diagram</span>
+          <svg class="icon nav-caret" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4.5 6.5L8 10l3.5-3.5"></path></svg>
+        </button>
+        <span class="save-pill" id="save-state-pill">Saved locally</span>
+      </div>
+
+      <div class="app-nav-search">
+        <svg class="nav-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="4.75"></circle><path d="M10.5 10.5L14 14"></path></svg>
+        <input type="search" id="nav-search-input" placeholder="Search charts" aria-label="Search charts" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">&#8984;K</kbd>
       </div>
 
       <div class="app-nav-actions">
-        <span class="save-pill" id="save-state-pill">Saved locally</span>
         <button type="button" id="show-charts-button" class="nav-button">
           <svg class="icon icon-file"><use xlink:href="#icon-file"></use></svg>My Charts
         </button>
-        <a href="#newSequenceDiagram" rel="modal:open" class="nav-button" id="new-sequence-diagram-button">
-          <svg class="icon icon-seq"><use xlink:href="#icon-seq"></use></svg>New Sequence Diagram
-        </a>
-        <a href="#newFlowchart" rel="modal:open" class="nav-button nav-button-primary" id="new-flowchart-button">
-          <svg class="icon icon-flowchart"><use xlink:href="#icon-flowchart"></use></svg>New Flowchart
-        </a>
-        <button type="button" id="show-syntax" class="nav-icon-button" title="Syntax Guide">
-          <svg class="icon icon-help_outline"><use xlink:href="#icon-help_outline"></use></svg>
+        <button type="button" id="show-syntax" class="nav-button" title="Syntax Guide">
+          <svg class="icon icon-help_outline"><use xlink:href="#icon-help_outline"></use></svg>Help
         </button>
-        <button type="button" id="export-diagram" class="nav-icon-button" title="Export PNG">
-          <svg class="icon icon-vertical_align_bottom"><use xlink:href="#icon-vertical_align_bottom"></use></svg>
+        <button type="button" id="export-diagram" class="nav-button" title="Export PNG">
+          <svg class="icon icon-vertical_align_bottom"><use xlink:href="#icon-vertical_align_bottom"></use></svg>Export
         </button>
-        <a href="#about-chart-mage" rel="modal:open" class="nav-icon-button" title="About Chart Mage">
-          <svg class="icon icon-about"><use xlink:href="#icon-about"></use></svg>
-        </a>
-        <a href="mailto:chartmage@gmail.com" class="nav-icon-button" title="Send feedback">
-          <svg class="icon icon-mail"><use xlink:href="#icon-mail"></use></svg>
-        </a>
+        <button type="button" id="new-chart-button" class="nav-button nav-button-primary" aria-haspopup="dialog" aria-controls="new-chart-picker">
+          <span class="nav-plus" aria-hidden="true">+</span>New chart
+        </button>
       </div>
     </nav>
     
@@ -158,11 +158,6 @@
             <span class="windowDot windowDotWarning"></span>
             <span class="windowDot windowDotSuccess"></span>
           </div>
-          <div class="workspaceFileMeta">
-            <span class="workspaceFileName" id="workspace-file-name">Sample sequence diagram.cm</span>
-            <span class="workspaceFileType" id="workspace-file-type">SEQ</span>
-          </div>
-          <div class="workspaceFileStatus" id="workspace-file-status">Saved locally</div>
         </div>
 
         <div class="workspaceSplit">
@@ -238,6 +233,23 @@
       <div class="drawerList" id="drawer-list"></div>
     </aside>
 
+    <div id="new-chart-picker" style="display:none;">
+      <h1 class="modal-headline">New chart</h1>
+      <p class="modal-text">Pick a chart kind, then continue with the existing create flow for that template.</p>
+      <div class="new-chart-picker-options">
+        <a href="#newFlowchart" rel="modal:open" class="new-chart-picker-option" id="new-flowchart-button">
+          <span class="new-chart-picker-tag">Flow</span>
+          <strong>Flowchart</strong>
+          <span>Create boxes, decisions, and connectors.</span>
+        </a>
+        <a href="#newSequenceDiagram" rel="modal:open" class="new-chart-picker-option" id="new-sequence-diagram-button">
+          <span class="new-chart-picker-tag">Seq</span>
+          <strong>Sequence diagram</strong>
+          <span>Model participants, notes, loops, and replies.</span>
+        </a>
+      </div>
+    </div>
+
     <!-- Modal Dialogs-->
     <div id="newFlowchart" style="display:none;">
       <h1 class="modal-headline">New Flowchart</h1>
@@ -269,15 +281,6 @@
           </div>
         </fieldset>
       </form>
-    </div>
-
-    <div id="showChartsList" style="display:none;">
-      <h1 class="modal-headline">My Charts</h1>
-      <p class="modal-text">Your charts are saved in your browser. If you clear your browser's cache, they will be lost.</p>
-      <table class="pure-table" id="chartsList">
-        <tbody>
-        </tbody>
-      </table>
     </div>
 
     <div id="confirm-delete-chart" style="display:none;">

@@ -1,0 +1,34 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - nav
+  - actions
+---
+- clearState
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Sample sequence diagram"
+- tapOn:
+    id: "show-charts-button"
+- assertVisible: "2 saved"
+- assertVisible: "Sample flowchart"
+- tapOn:
+    id: "show-charts-button"
+- assertNotVisible: "2 saved"
+- tapOn:
+    id: "show-syntax"
+- assertVisible: "Magic Spells for Sequence Diagram"
+- assertNotVisible: "Magic Spells for Flowchart"
+- tapOn: "Close"
+- assertNotVisible: "Magic Spells for Sequence Diagram"
+- assertVisible:
+    id: "export-diagram"
+- tapOn:
+    id: "new-chart-button"
+- assertVisible: "New chart"
+- assertVisible:
+    id: "new-flowchart-button"
+- assertVisible:
+    id: "new-sequence-diagram-button"
+- tapOn: "Flowchart"
+- assertVisible: "New Flowchart"
+- assertVisible: "Saved locally"

@@ -1,0 +1,18 @@
+url: http://127.0.0.1:8000/index.html?maestro=1
+tags:
+  - web
+  - favicon
+  - entrypoints
+---
+- openLink: http://127.0.0.1:8000/index.html?maestro=1
+- assertVisible: "Maestro favicon page: index.html"
+- assertVisible: "Maestro favicon link: rel=icon href=images/favicon.svg type=image/svg+xml"
+- assertVisible: "Maestro favicon link: rel=alternate icon href=images/favicon.png type=image/png"
+- openLink: http://127.0.0.1:8000/intro.html?maestro=1
+- assertVisible: "Maestro favicon page: intro.html"
+- assertVisible: "Maestro favicon link: rel=icon href=images/favicon.svg type=image/svg+xml"
+- assertVisible: "Maestro favicon link: rel=alternate icon href=images/favicon.png type=image/png"
+- openLink: http://127.0.0.1:8000/browser.html?maestro=1
+- assertVisible: "Maestro favicon page: browser.html"
+- assertVisible: "Maestro favicon link: rel=icon href=images/favicon.svg type=image/svg+xml"
+- assertVisible: "Maestro favicon link: rel=alternate icon href=images/favicon.png type=image/png"

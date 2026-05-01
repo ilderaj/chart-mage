@@ -1,5 +1,34 @@
 # Progress
 
+## 2026-04-30 Worker custom domain: chartmage.paymond.me
+
+- **Status:** complete
+- Actions taken:
+  - 已读取当前 Cloudflare 部署任务文件、仓库部署记忆、`wrangler.jsonc`、`package.json` 和部署 runbook。
+  - 已确认当前权威部署路径是 Cloudflare Worker `chartmage`，不是 Cloudflare Pages；自有域名应在 Worker 路由 / custom domain 层配置。
+  - 已确认本地 `wrangler.jsonc` 目前没有 `routes` / custom domain 配置，部署文档当前仍将生产 URL 写为 `https://chartmage.ilderaj.workers.dev`。
+  - 已运行 planning session catchup；无未同步输出。
+  - 已确认 Cloudflare 中 `paymond.me` zone 为 active，zone id 为 `ccbc20f8d2ef2d081055a93400e27aee`。
+  - 已确认绑定前 `chartmage.paymond.me` 没有 DNS record、没有 zone Worker route，account Worker Domains 为空。
+  - 已通过 Workers Domains API attach `chartmage.paymond.me` 到 Worker `chartmage`，domain id 为 `ca3b8369a91a335546174f7b51fd8788531c0a0a`，状态为 enabled。
+  - 已确认 Cloudflare 自动创建只读 proxied `AAAA 100::` DNS record，且 account Worker Domains 中 `chartmage.paymond.me` 指向 service `chartmage` / environment `production`。
+  - 已验证 `https://chartmage.paymond.me/` 返回 `HTTP/2 200`。
+  - 已验证 `https://chartmage.paymond.me/` 页面 HTML 包含 `workspaceFileFrame` 与 `workspaceSplit`。
+  - 已验证 `https://chartmage.paymond.me/intro.html` 返回 `200` 并规范化到 `/intro`。
+  - 已验证 `https://chartmage.paymond.me/index.html?maestro=1` 返回 `200` 并规范化到 `/?maestro=1`。
+  - 已将 `chartmage.paymond.me` 写入 `wrangler.jsonc` 的 custom domain route，并更新 README / 部署 runbook。
+  - 已运行 `git diff --check`，无空白错误。
+  - 已运行 `npm run build:check`，Gulp build 通过；仅出现既有 `fs.Stats constructor` deprecation warning。
+  - 已运行 `npx wrangler deploy --dry-run`，Wrangler 成功读取 `dist` 资产并完成 dry-run。
+  - 已通过 VS Code Problems 检查 `wrangler.jsonc`、README、部署 runbook 和 planning 文件，均无问题。
+- Files created/modified:
+  - wrangler.jsonc (updated)
+  - README.md (updated)
+  - docs/deployment/cloudflare-pages.md (updated)
+  - planning/active/cloudflare-pages-deploy/findings.md (updated)
+  - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ## 2026-04-30 Worker Git deployment convergence
 
 - **Status:** complete
