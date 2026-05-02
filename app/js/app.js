@@ -5,6 +5,12 @@ $(function() {
     return type == "flowchart" ? "Flow" : "Seq";
   }
 
+  var inputNormalizer = window.ChartMageInputNormalizer || {
+    normalizeDiagramInput: function(type, input) {
+      return input;
+    }
+  };
+
   function chartTypeClass(type) {
     return type == "flowchart" ? "flowchart" : "sequence";
   }
@@ -561,7 +567,7 @@ $(function() {
     },
 
     _initEditorForSeq: function(content) {
-      var actorPattern = /[^\s:\->][^:\->]*/;
+      var actorPattern = /[^\s:：,\->，][^:：,\->，]*/;
       var arrowPattern = /-x|->|-->|->>|--x|-->>/;
 
       CodeMirror.defineSimpleMode("seqdiagram", {
@@ -577,10 +583,10 @@ $(function() {
           {regex: /(\s*)(note|Note)(\s+)(right of |left of |over )/,
            token: [null, "keyword note", null, "keyword note-direction"],
            sol: true},
-          {regex: /(:)(.+)/, token: ["colon", "message"]},
+          {regex: /([:：])(.+)/, token: ["colon", "message"]},
           {regex: /\s*end\s*$/, token: "keyword dedent", dedent: true, sol: true},
           {regex: /(-->>|-->|->>|->|--x|-x)(\s*)(\+|-)/, token: ["arrow", "before-activation", "activation"]},
-          {regex: /:/, token: "colon"},
+          {regex: /[:：]/, token: "colon"},
           {regex: arrowPattern, token: "arrow"},
           {regex: actorPattern, token: "actor"}
         ]
@@ -725,7 +731,7 @@ $(function() {
 
     renderChart: function() {
       if (this._type == "sequenceDiagram")
-        this._mermaidDraw("sequenceDiagram\n" + this._editor.getValue());
+        this._mermaidDraw("sequenceDiagram\n" + inputNormalizer.normalizeDiagramInput("sequenceDiagram", this._editor.getValue()));
       else if (this._type == "flowchart") {
         var compiled = this._translateFlowchart(this._editor);
         if (compiled && this._direction == "LR") {
