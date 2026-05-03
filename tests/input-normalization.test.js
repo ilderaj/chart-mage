@@ -44,3 +44,17 @@ test("leaves fullwidth question marks in flowchart labels unchanged", function()
     "((Start)) ->> Has draft？"
   );
 });
+
+test("normalizes fullwidth sequence arrows and activation markers", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("sequenceDiagram", "Alice －＞＞＋ Bob：你好\nBob －－＞＞－ Alice：收到"),
+    "Alice ->>+ Bob:你好\nBob -->>- Alice:收到"
+  );
+});
+
+test("normalizes fullwidth flowchart arrows", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("flowchart", "Start －＞＞ End\nDecision？ － yes －＞＞ End"),
+    "Start ->> End\nDecision？ - yes ->> End"
+  );
+});
