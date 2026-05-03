@@ -58,3 +58,17 @@ test("normalizes fullwidth flowchart arrows", function() {
     "Start ->> End\nDecision？ - yes ->> End"
   );
 });
+
+test("normalizes mixed sequence arrows that use Chinese angle quotes", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("sequenceDiagram", "Alice -》》 Bob：你好\nBob --》 Alice：收到"),
+    "Alice ->> Bob:你好\nBob --> Alice:收到"
+  );
+});
+
+test("normalizes mixed flowchart arrows that use Chinese angle quotes", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("flowchart", "Start -》 End\nDecision？ - yes -》》 End"),
+    "Start -> End\nDecision？ - yes ->> End"
+  );
+});

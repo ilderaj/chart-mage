@@ -508,13 +508,15 @@ $(function() {
                 compiled += ('id' + nodes.indexOf(tokenString));
               } else if (token.type == "arrow") {
                 syntaxCheck += "arrow ";
-                if (tokenString == "->>" || tokenString == "－＞＞")
+                tokenString = inputNormalizer.normalizeArrowGlyphs(tokenString);
+                if (tokenString == "->>" || tokenString == "->")
                   tokenString = '-->';
-                if (tokenString == "-->>" || tokenString == "－－＞＞")
+                if (tokenString == "-->>" || tokenString == "-->")
                   tokenString = '-.->';
                 compiled += tokenString;
               } else if (token.type == "arrow-end" || token.type == "arrow-head") {
                 syntaxCheck += token.type + " ";
+                tokenString = inputNormalizer.normalizeArrowGlyphs(tokenString);
                 switch (tokenString) {
                   case "-":
                   case "－":
@@ -525,11 +527,11 @@ $(function() {
                     tokenString = '-.';
                     break; 
                   case "->>":
-                  case "－＞＞":
+                  case "->":
                     tokenString = '-->';
                     break;
                   case "-->>":
-                  case "－－＞＞":
+                  case "-->":
                     tokenString = '.->';
                     break;
                 }
@@ -571,8 +573,8 @@ $(function() {
     },
 
     _initEditorForSeq: function(content) {
-      var actorPattern = /[^\s:：,，\->－＞][^:：,，\->－＞]*/;
-      var arrowPattern = /－－x|－x|－－＞＞|－－＞|－＞＞|－＞|--x|-x|-->>|-->|->>|->/;
+      var actorPattern = /[^\s:：,，\->－＞》][^:：,，\->－＞》]*/;
+      var arrowPattern = /(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》]|[－-]{2}[xｘX]|[－-][xｘX])/;
 
       CodeMirror.defineSimpleMode("seqdiagram", {
         start: [
@@ -589,7 +591,7 @@ $(function() {
            sol: true},
           {regex: /([:：])(.+)/, token: ["colon", "message"]},
           {regex: /\s*end\s*$/, token: "keyword dedent", dedent: true, sol: true},
-          {regex: /(－－＞＞|－－＞|－＞＞|－＞|－－x|－x|-->>|-->|->>|->|--x|-x)(\s*)(\+|-|＋|－)/, token: ["arrow", "before-activation", "activation"]},
+          {regex: /((?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》]|[－-]{2}[xｘX]|[－-][xｘX]))(\s*)(\+|-|＋|－)/, token: ["arrow", "before-activation", "activation"]},
           {regex: /[:：]/, token: "colon"},
           {regex: arrowPattern, token: "arrow"},
           {regex: actorPattern, token: "actor"}
@@ -658,17 +660,17 @@ $(function() {
     },
 
     _initEditorForFlowchart: function(content) {
-      var arrowPattern = /－＞＞|－－＞＞|->>|-->>/;
+      var arrowPattern = /(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》])/;
       var arrowEndPattern = /－\s|－－\s|-\s|--\s/;
-      var arrowMessagePattern = /[^\s:\->－＞][^:\->－＞]*/;
-      var arrowHeadPattern = /\s－＞＞|\s－－＞＞|\s->>|\s-->>/;
+      var arrowMessagePattern = /[^\s:\->－＞》][^:\->－＞》]*/;
+      var arrowHeadPattern = /\s(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》])/;
       var arrowWithMessagePattern = new RegExp("(" + arrowEndPattern.source + ")" +
                                                "(" + arrowMessagePattern.source + ")" +
                                                "(" + arrowHeadPattern.source + ")");
       var terminalPattern = /[(（][(（][^\s\->].*?[)）][)）]/;
       var decisionPattern = /[^\s\->].*?(\?|\？)/;
-      var processPattern = /[^\(（\s\->－＞][^\?\？]*/;
-      var processPatternGreedy = /[^\(（\s\->－＞][^\?\？]*/;
+      var processPattern = /[^\(（\s\->－＞》][^\?\？]*/;
+      var processPatternGreedy = /[^\(（\s\->－＞》][^\?\？]*/;
       var processArrowPattern = new RegExp("(" + processPattern.source + ")" + "(" + arrowPattern.source + ")");
       var processArrowWithMessagePattern = new RegExp("(" + processPattern.source + ")" + arrowWithMessagePattern.source);
       

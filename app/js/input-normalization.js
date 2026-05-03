@@ -8,12 +8,12 @@
 
   function normalizeArrowGlyphs(line) {
     return line
-      .replace(/－－＞＞/g, "-->>")
-      .replace(/－－＞/g, "-->")
-      .replace(/－＞＞/g, "->>")
-      .replace(/－＞/g, "->")
-      .replace(/－－[xｘX]/g, "--x")
-      .replace(/－[xｘX]/g, "-x");
+      .replace(/[－-][－-][>＞》][>＞》]/g, "-->>")
+      .replace(/[－-][－-][>＞》]/g, "-->")
+      .replace(/[－-][>＞》][>＞》]/g, "->>")
+      .replace(/[－-][>＞》]/g, "->")
+      .replace(/[－-][－-][xｘX]/g, "--x")
+      .replace(/[－-][xｘX]/g, "-x");
   }
 
   function normalizeActivationGlyphs(line) {
@@ -57,14 +57,14 @@
       return input;
 
     if (type == "sequenceDiagram") {
-      if (!/[：，－＞＋ｘX]/.test(input))
+      if (!/[：，－＞》＋ｘX]/.test(input))
         return input;
 
       return input.split("\n").map(normalizeSequenceLine).join("\n");
     }
 
     if (type == "flowchart") {
-      if (!/[（）」－＞]/.test(input) && !/[)）][)）]/.test(input) && !/[(（][(（]/.test(input))
+      if (!/[（）」－＞》]/.test(input) && !/[)）][)）]/.test(input) && !/[(（][(（]/.test(input))
         return input;
 
       return input.split("\n").map(normalizeFlowchartLine).join("\n");
