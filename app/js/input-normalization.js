@@ -6,6 +6,12 @@
 })(typeof self != "undefined" ? self : this, function() {
   "use strict";
 
+  function normalizeFlowchartLine(line) {
+    return line
+      .replace(/[(（][(（]/g, "((")
+      .replace(/[)）][)）]/g, "))");
+  }
+
   function normalizeSequenceLine(line) {
     var normalizedLine = line;
     var notePattern = /^(\s*(?:Note|note)\s+(?:right of |left of |over )[^：:\n]*)(：)(.*)$/;
@@ -13,7 +19,7 @@
 
     if (notePattern.test(normalizedLine)) {
       normalizedLine = normalizedLine.replace(notePattern, function(match, prefix, colon, suffix) {
-        return prefix.replace(/，/g, ", ") + ":" + suffix;
+        return prefix.replace(/\s*，\s*/g, ", ") + ":" + suffix;
       });
       return normalizedLine;
     }
@@ -25,17 +31,29 @@
   }
 
   function normalizeDiagramInput(type, input) {
-    if (typeof input != "string" || input.indexOf("：") == -1)
+    if (typeof input != "string")
       return input;
 
-    if (type != "sequenceDiagram")
-      return input;
+    if (type == "sequenceDiagram") {
+      if (input.indexOf("：") == -1 && input.indexOf("，") == -1)
+        return input;
 
-    return input.split("\n").map(normalizeSequenceLine).join("\n");
+      return input.split("\n").map(normalizeSequenceLine).join("\n");
+    }
+
+    if (type == "flowchart") {
+      if (!/[（）」]/.test(input) && !/[)）][)）]/.test(input) && !/[(（][(（]/.test(input))
+        return input;
+
+      return input.split("\n").map(normalizeFlowchartLine).join("\n");
+    }
+
+    return input;
   }
 
   return {
     normalizeDiagramInput: normalizeDiagramInput,
+    normalizeFlowchartLine: normalizeFlowchartLine,
     normalizeSequenceLine: normalizeSequenceLine
   };
 });

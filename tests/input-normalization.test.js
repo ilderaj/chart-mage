@@ -30,3 +30,17 @@ test("leaves non-sequence input unchanged", function() {
     "开始：准备 ->> 结束"
   );
 });
+
+test("normalizes fullwidth terminal delimiters for flowcharts", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("flowchart", "（（Start）） ->> Has draft？\nHas draft？ - yes ->> Open editor"),
+    "((Start)) ->> Has draft？\nHas draft？ - yes ->> Open editor"
+  );
+});
+
+test("leaves fullwidth question marks in flowchart labels unchanged", function() {
+  assert.equal(
+    inputNormalizer.normalizeDiagramInput("flowchart", "((Start)) ->> Has draft？"),
+    "((Start)) ->> Has draft？"
+  );
+});

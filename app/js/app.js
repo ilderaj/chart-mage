@@ -661,10 +661,10 @@ $(function() {
       var arrowWithMessagePattern = new RegExp("(" + arrowEndPattern.source + ")" +
                                                "(" + arrowMessagePattern.source + ")" +
                                                "(" + arrowHeadPattern.source + ")");
-      var terminalPattern = /\(\([^\s\->].*?\)\)/;
+      var terminalPattern = /[(（][(（][^\s\->].*?[)）][)）]/;
       var decisionPattern = /[^\s\->].*?(\?|\？)/;
-      var processPattern = /[^\(\s\->][^\?\？]*?/;
-      var processPatternGreedy = /[^\(\s\->][^\?\？]*/;
+      var processPattern = /[^\(（\s\->][^\?\？]*?/;
+      var processPatternGreedy = /[^\(（\s\->][^\?\？]*/;
       var processArrowPattern = new RegExp("(" + processPattern.source + ")" + "(" + arrowPattern.source + ")");
       var processArrowWithMessagePattern = new RegExp("(" + processPattern.source + ")" + arrowWithMessagePattern.source);
       
