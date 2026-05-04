@@ -5,6 +5,12 @@ $(function() {
     return type == "flowchart" ? "Flow" : "Seq";
   }
 
+  var inputNormalizer = window.ChartMageInputNormalizer || {
+    normalizeDiagramInput: function(type, input) {
+      return input;
+    }
+  };
+
   function chartTypeClass(type) {
     return type == "flowchart" ? "flowchart" : "sequence";
   }
@@ -502,24 +508,30 @@ $(function() {
                 compiled += ('id' + nodes.indexOf(tokenString));
               } else if (token.type == "arrow") {
                 syntaxCheck += "arrow ";
-                if (tokenString == "->>")
+                tokenString = inputNormalizer.normalizeArrowGlyphs(tokenString);
+                if (tokenString == "->>" || tokenString == "->")
                   tokenString = '-->';
-                if (tokenString == "-->>")
+                if (tokenString == "-->>" || tokenString == "-->")
                   tokenString = '-.->';
                 compiled += tokenString;
               } else if (token.type == "arrow-end" || token.type == "arrow-head") {
                 syntaxCheck += token.type + " ";
+                tokenString = inputNormalizer.normalizeArrowGlyphs(tokenString);
                 switch (tokenString) {
                   case "-":
+                  case "－":
                     tokenString = '--';
                     break;
                   case "--":
+                  case "－－":
                     tokenString = '-.';
                     break; 
                   case "->>":
+                  case "->":
                     tokenString = '-->';
                     break;
                   case "-->>":
+                  case "-->":
                     tokenString = '.->';
                     break;
                 }
@@ -561,8 +573,8 @@ $(function() {
     },
 
     _initEditorForSeq: function(content) {
-      var actorPattern = /[^\s:\->][^:\->]*/;
-      var arrowPattern = /-x|->|-->|->>|--x|-->>/;
+      var actorPattern = /[^\s:：,，\->－＞》][^:：,，\->－＞》]*/;
+      var arrowPattern = /(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》]|[－-]{2}[xｘX]|[－-][xｘX])/;
 
       CodeMirror.defineSimpleMode("seqdiagram", {
         start: [
@@ -577,10 +589,10 @@ $(function() {
           {regex: /(\s*)(note|Note)(\s+)(right of |left of |over )/,
            token: [null, "keyword note", null, "keyword note-direction"],
            sol: true},
-          {regex: /(:)(.+)/, token: ["colon", "message"]},
+          {regex: /([:：])(.+)/, token: ["colon", "message"]},
           {regex: /\s*end\s*$/, token: "keyword dedent", dedent: true, sol: true},
-          {regex: /(-->>|-->|->>|->|--x|-x)(\s*)(\+|-)/, token: ["arrow", "before-activation", "activation"]},
-          {regex: /:/, token: "colon"},
+          {regex: /((?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》]|[－-]{2}[xｘX]|[－-][xｘX]))(\s*)(\+|-|＋|－)/, token: ["arrow", "before-activation", "activation"]},
+          {regex: /[:：]/, token: "colon"},
           {regex: arrowPattern, token: "arrow"},
           {regex: actorPattern, token: "actor"}
         ]
@@ -648,17 +660,17 @@ $(function() {
     },
 
     _initEditorForFlowchart: function(content) {
-      var arrowPattern = /->>|-->>/;
-      var arrowEndPattern = /-\s|--\s/;
-      var arrowMessagePattern = /[^\s:\->][^:\->]*/;
-      var arrowHeadPattern = /\s->>|\s-->>/;
+      var arrowPattern = /(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》])/;
+      var arrowEndPattern = /－\s|－－\s|-\s|--\s/;
+      var arrowMessagePattern = /[^\s:\->－＞》][^:\->－＞》]*/;
+      var arrowHeadPattern = /\s(?:[－-]{2}[>＞》]{2}|[－-]{2}[>＞》]|[－-][>＞》]{2}|[－-][>＞》])/;
       var arrowWithMessagePattern = new RegExp("(" + arrowEndPattern.source + ")" +
                                                "(" + arrowMessagePattern.source + ")" +
                                                "(" + arrowHeadPattern.source + ")");
-      var terminalPattern = /\(\([^\s\->].*?\)\)/;
+      var terminalPattern = /[(（][(（][^\s\->].*?[)）][)）]/;
       var decisionPattern = /[^\s\->].*?(\?|\？)/;
-      var processPattern = /[^\(\s\->][^\?\？]*?/;
-      var processPatternGreedy = /[^\(\s\->][^\?\？]*/;
+      var processPattern = /[^\(（\s\->－＞》][^\?\？]*/;
+      var processPatternGreedy = /[^\(（\s\->－＞》][^\?\？]*/;
       var processArrowPattern = new RegExp("(" + processPattern.source + ")" + "(" + arrowPattern.source + ")");
       var processArrowWithMessagePattern = new RegExp("(" + processPattern.source + ")" + arrowWithMessagePattern.source);
       
@@ -725,7 +737,7 @@ $(function() {
 
     renderChart: function() {
       if (this._type == "sequenceDiagram")
-        this._mermaidDraw("sequenceDiagram\n" + this._editor.getValue());
+        this._mermaidDraw("sequenceDiagram\n" + inputNormalizer.normalizeDiagramInput("sequenceDiagram", this._editor.getValue()));
       else if (this._type == "flowchart") {
         var compiled = this._translateFlowchart(this._editor);
         if (compiled && this._direction == "LR") {
