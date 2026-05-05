@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChartMage — Beautiful diagrams from text</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+/* ================================================================
+   Design tokens — Stripe DS
+   ================================================================ */
+:root {
+  --color-brand:        #533afd;
+  --color-brand-hover:  #4434d4;
+  --color-brand-strong: #1c1e54;
+  --color-brand-subtle: rgba(83,58,253,.05);
+  --color-brand-soft:   #b9b9f9;
+  --color-heading:      #061b31;
+  --color-text:         #425466;
+  --color-text-muted:   #64748d;
+  --color-surface:      #ffffff;
+  --color-bg:           #f6f9fc;
+  --color-border:       #e5edf5;
+  --color-border-strong:#cdd8e5;
+  --color-success:      #15be53;
+  --color-danger:       #ea2261;
+  --color-canvas-bg:    #fbfcfe;
+  --color-canvas-grid:  rgba(83,58,253,.08);
+  --color-editor-bg:    #ffffff;
+  --color-editor-gutter:#f6f9fc;
+  --color-editor-text:  #64748d;
+  --color-syn-kw:       #533afd;
+  --color-syn-str:      #108c3d;
+  --color-syn-arr:      #ea2261;
+  --color-syn-cmt:      #94a3b8;
+  --shadow-soft:     rgba(23,23,23,.06) 0 3px 6px;
+  --shadow-card:     rgba(23,23,23,.08) 0 15px 35px;
+  --shadow-elevated: rgba(50,50,93,.25) 0 30px 45px -30px, rgba(0,0,0,.1) 0 18px 36px -18px;
+  --focus-ring:      0 0 0 2px #fff, 0 0 0 4px var(--color-brand);
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'JetBrains Mono', monospace;
+  --gradient-brand: linear-gradient(135deg, #533afd 0%, #8b5cf6 45%, #ea2261 78%, #f96bee 100%);
+  --gradient-mark:  linear-gradient(135deg, #4434d4 0%, #533afd 35%, #8b5cf6 70%, #ea2261 100%);
+}
+
+/* ================================================================
+   Reset + base
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-surface);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01";
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* ================================================================
+   Logo component (identical in app.html)
+   ================================================================ */
+.cm-logo {
+  display: inline-flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit;
+}
+.cm-logo .mark {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--gradient-mark);
+  border-radius: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(83,58,253,.25), inset 0 0 0 1px rgba(255,255,255,.18);
+}
+.cm-logo.size-sm .mark { width: 24px; height: 24px; border-radius: 5px; }
+.cm-logo.size-md .mark { width: 32px; height: 32px; border-radius: 7px; }
+.cm-logo .mark svg { width: 100%; height: 100%; }
+.cm-logo .word {
+  font-size: 15px; font-weight: 400; letter-spacing: -.01em;
+  color: var(--color-heading);
+  font-feature-settings: "ss01";
+}
+.cm-logo .word b { font-weight: 500; }
+
+/* ================================================================
+   Site navigation
+   ================================================================ */
+.site-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,.90);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+}
+.site-nav-inner {
+  max-width: 1080px; margin: 0 auto;
+  padding: 0 28px;
+  height: 56px;
+  display: flex; align-items: center; gap: 24px;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 4px; margin-left: 8px;
+}
+.nav-links a {
+  font-size: 14px; font-weight: 400;
+  color: var(--color-text-muted);
+  padding: 6px 10px; border-radius: 5px;
+  transition: color 160ms, background 160ms;
+}
+.nav-links a:hover { color: var(--color-heading); background: var(--color-bg); }
+.nav-cta {
+  margin-left: auto;
+  display: inline-flex; align-items: center;
+  background: var(--color-brand); color: #fff;
+  font-size: 14px; font-weight: 400;
+  padding: 7px 16px; border-radius: 5px;
+  transition: background 160ms;
+  white-space: nowrap;
+}
+.nav-cta:hover { background: var(--color-brand-hover); }
+
+/* ================================================================
+   Hero section
+   ================================================================ */
+.hero {
+  padding: 80px 28px 60px;
+  max-width: 1080px; margin: 0 auto;
+  text-align: center;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px; text-transform: uppercase; letter-spacing: .16em;
+  color: var(--color-brand);
+  margin-bottom: 22px;
+}
+.eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 4px rgba(21,190,83,.18);
+  flex-shrink: 0;
+}
+.hero h1 {
+  font-size: clamp(38px, 5.5vw, 60px);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  color: var(--color-heading);
+  margin: 0 0 20px;
+  font-feature-settings: "ss01";
+}
+.hero h1 em {
+  font-style: normal;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero .lede {
+  font-size: 18px; font-weight: 300; line-height: 1.6;
+  color: var(--color-text);
+  max-width: 540px; margin: 0 auto 36px;
+  font-feature-settings: "ss01";
+}
+.hero-ctas {
+  display: inline-flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  justify-content: center;
+}
+.btn-primary {
+  display: inline-flex; align-items: center;
+  background: var(--color-brand); color: #fff;
+  font-size: 15px; font-weight: 400;
+  padding: 11px 24px; border-radius: 6px;
+  border: 1px solid var(--color-brand);
+  box-shadow: rgba(50,50,93,.25) 0 6px 18px -6px, rgba(0,0,0,.1) 0 4px 8px -4px;
+  transition: background 160ms, box-shadow 160ms;
+}
+.btn-primary:hover {
+  background: var(--color-brand-hover);
+  border-color: var(--color-brand-hover);
+  box-shadow: rgba(50,50,93,.35) 0 8px 22px -6px, rgba(0,0,0,.15) 0 6px 12px -4px;
+}
+.btn-ghost {
+  display: inline-flex; align-items: center;
+  background: transparent; color: var(--color-brand);
+  font-size: 15px; font-weight: 400;
+  padding: 10px 20px; border-radius: 6px;
+  border: 1px solid var(--color-brand-soft);
+  transition: background 160ms, border-color 160ms;
+}
+.btn-ghost:hover { background: var(--color-brand-subtle); }
+
+/* ================================================================
+   Try-it section
+   ================================================================ */
+.try-it-section {
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: 56px 28px 64px;
+}
+.try-it-header {
+  max-width: 960px; margin: 0 auto 28px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+}
+.try-it-header .section-label {
+  font-family: var(--font-mono);
+  font-size: 11px; text-transform: uppercase; letter-spacing: .16em;
+  color: var(--color-brand);
+}
+.try-it-header h2 {
+  font-size: 22px; font-weight: 300;
+  letter-spacing: -.02em; line-height: 1.2;
+  color: var(--color-heading);
+  margin: 4px 0 0;
+  font-feature-settings: "ss01";
+}
+.try-it-header .open-hint {
+  font-size: 13px; color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.try-it-header a.open-hint { color: var(--color-brand); }
+.try-it-header a.open-hint:hover { text-decoration: underline; }
+
+/* ================================================================
+   Editor component (identical structure in app.html)
+   ================================================================ */
+.editor-shell {
+  max-width: 960px; margin: 0 auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated);
+  overflow: hidden;
+}
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 4px 1fr;
+  height: 400px;
+}
+.editor-pane, .preview-pane {
+  display: flex; flex-direction: column;
+  min-height: 0; overflow: hidden;
+}
+.editor-pane { border-right: 0; }
+.preview-pane { background: var(--color-canvas-bg); }
+.pane-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 14px; height: 44px; flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+}
+.pane-title {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; color: var(--color-heading);
+  font-feature-settings: "ss01";
+}
+.pane-title svg { width: 13px; height: 13px; color: var(--color-brand); }
+.pane-meta {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-text-muted);
+}
+.pane-status-ok  { font-family: var(--font-mono); font-size: 11px; color: var(--color-success); }
+.pane-status-err { font-family: var(--font-mono); font-size: 11px; color: var(--color-danger); }
+.pane-spacer { flex: 1; }
+
+/* Code body: gutter + textarea */
+.code-body {
+  flex: 1; display: flex; overflow: hidden;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.85;
+}
+.code-gutter {
+  background: var(--color-editor-gutter);
+  border-right: 1px solid var(--color-border);
+  color: var(--color-editor-text);
+  text-align: right;
+  padding: 14px 10px 14px 14px;
+  user-select: none;
+  min-width: 40px;
+  font-size: 11px; line-height: 1.85;
+  overflow: hidden;
+}
+.code-gutter span { display: block; }
+.code-textarea-wrap {
+  flex: 1; position: relative; overflow: hidden;
+}
+.code-textarea {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  background: var(--color-editor-bg);
+  border: none; outline: none; resize: none;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.85;
+  color: var(--color-heading);
+  padding: 14px 16px;
+  white-space: pre; overflow: auto;
+  caret-color: var(--color-brand);
+}
+.code-textarea::selection { background: rgba(83,58,253,.15); }
+
+/* Canvas stage */
+.canvas-stage {
+  flex: 1; overflow: auto;
+  display: flex; align-items: center; justify-content: center;
+  background-color: var(--color-canvas-bg);
+  background-image: radial-gradient(var(--color-canvas-grid) 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+}
+.canvas-stage svg { max-width: 90%; max-height: 90%; background: transparent !important; }
+
+/* Pane footer */
+.pane-footer {
+  display: flex; align-items: center; gap: 10px;
+  height: 36px; padding: 0 14px; flex-shrink: 0;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--color-text-muted);
+  font-feature-settings: "tnum";
+}
+.pane-footer .sep { color: var(--color-border-strong); }
+
+/* Resizer */
+.editor-resizer {
+  background: var(--color-border);
+  position: relative; cursor: col-resize;
+}
+.editor-resizer::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 2px; height: 28px;
+  transform: translate(-50%,-50%);
+  background: var(--color-border-strong); border-radius: 2px;
+}
+
+/* icon btn */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 5px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--color-text-muted); cursor: pointer;
+  transition: background 160ms, color 160ms;
+}
+.icon-btn:hover { background: var(--color-brand-subtle); color: var(--color-brand); }
+.icon-btn svg { width: 13px; height: 13px; }
+
+/* Pulse animation */
+.pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--color-success);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(21,190,83,.5); }
+  50%      { box-shadow: 0 0 0 6px rgba(21,190,83,0); }
+}
+
+/* ================================================================
+   Features section
+   ================================================================ */
+.features-section {
+  padding: 64px 28px;
+  max-width: 1080px; margin: 0 auto;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-border);
+}
+.feature-item {
+  background: var(--color-surface);
+  padding: 28px 26px 30px;
+}
+.feature-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px; text-transform: uppercase; letter-spacing: .14em;
+  color: var(--color-brand);
+  margin-bottom: 10px;
+}
+.feature-item h3 {
+  font-size: 16px; font-weight: 400;
+  color: var(--color-heading); margin: 0 0 8px;
+  font-feature-settings: "ss01";
+  letter-spacing: -.015em;
+}
+.feature-item p {
+  font-size: 14px; font-weight: 300; line-height: 1.6;
+  color: var(--color-text-muted); margin: 0;
+}
+
+/* ================================================================
+   Footer
+   ================================================================ */
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 24px 28px;
+  text-align: center;
+  font-size: 12px; color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+.site-footer a { color: var(--color-brand); }
+.site-footer a:hover { text-decoration: underline; }
+.site-footer .sep { margin: 0 8px; color: var(--color-border-strong); }
+
+/* ================================================================
+   Editor fade-in animation
+   ================================================================ */
+.editor-shell {
+  animation: editorIn 0.5s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes editorIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 720px) {
+  .editor-grid { grid-template-columns: 1fr; height: auto; }
+  .editor-pane { height: 260px; }
+  .preview-pane { height: 260px; border-top: 1px solid var(--color-border); }
+  .editor-resizer { display: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .try-it-header { flex-direction: column; gap: 4px; }
+}
+@media (max-width: 500px) {
+  .hero h1 { letter-spacing: -.025em; }
+  .hero .lede { font-size: 16px; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="cm-mark" viewBox="0 0 32 32">
+      <g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round">
+        <line x1="10" y1="10" x2="22" y2="22"/>
+      </g>
+      <circle cx="10" cy="10" r="3.6" fill="#fff"/>
+      <circle cx="22" cy="22" r="3.6" fill="#fff" opacity=".92"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ===== Navigation ===== -->
+<nav class="site-nav" role="navigation" aria-label="Site navigation">
+  <div class="site-nav-inner">
+    <a class="cm-logo size-sm" href="index.html" aria-label="ChartMage home">
+      <span class="mark"><svg><use href="#cm-mark"/></svg></span>
+      <span class="word">Chart<b>Mage</b></span>
+    </a>
+    <div class="nav-links">
+      <a href="#try-it">Try it</a>
+      <a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+    <a class="nav-cta" href="app.html">Open editor →</a>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="eyebrow">
+    <span class="dot" aria-hidden="true"></span>
+    Local-first · Mermaid · browser-only
+  </div>
+  <h1>Beautiful diagrams from<br><em>a few lines of text.</em></h1>
+  <p class="lede">
+    Sequence and flowchart, rendered as you type.
+    No account. No upload. Your charts stay in this browser.
+  </p>
+  <div class="hero-ctas">
+    <a class="btn-primary" href="app.html">Open editor</a>
+    <a class="btn-ghost" href="#try-it">Try it live ↓</a>
+  </div>
+</section>
+
+<!-- ===== Try-it section ===== -->
+<section class="try-it-section" id="try-it" aria-label="Live editor demo">
+  <div class="try-it-header">
+    <div>
+      <div class="section-label">Live demo</div>
+      <h2>Type any Mermaid syntax. It renders instantly.</h2>
+    </div>
+    <a class="open-hint" href="app.html">Open full editor →</a>
+  </div>
+
+  <div class="editor-shell">
+    <div class="editor-grid" id="landing-editor-grid">
+
+      <!-- Input pane -->
+      <div class="editor-pane" role="region" aria-label="Diagram input">
+        <div class="pane-header">
+          <span class="pane-title">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="M3 3h10v10H3z"/><path d="M5 6h6M5 8h4M5 10h6"/>
+            </svg>
+            Diagram Input
+          </span>
+          <span class="pane-meta" id="landing-chart-label">sequence · demo</span>
+        </div>
+        <div class="code-body">
+          <div class="code-gutter" id="landing-gutter" aria-hidden="true"></div>
+          <div class="code-textarea-wrap">
+            <textarea
+              id="landing-textarea"
+              class="code-textarea"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              aria-label="Mermaid diagram code"
+            >sequenceDiagram
+  Alice->>Bob: Hi Bob
+  Bob-->>Alice: Hi Alice
+  Alice->>Bob: How are you?
+  Bob-->>Alice: I'm good 👋
+  Note over Alice,Bob: handshake complete</textarea>
+          </div>
+        </div>
+        <div class="pane-footer">
+          <span id="landing-status" class="pane-status-ok">● rendered</span>
+          <span class="sep">·</span>
+          <span id="landing-line-count">6 lines</span>
+          <span class="pane-spacer"></span>
+          <span>sequence · Mermaid</span>
+        </div>
+      </div>
+
+      <!-- Resizer -->
+      <div class="editor-resizer" aria-hidden="true"></div>
+
+      <!-- Preview pane -->
+      <div class="preview-pane" role="region" aria-label="Live preview">
+        <div class="pane-header">
+          <span class="pane-title">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <circle cx="6" cy="6" r="2.5"/><circle cx="11" cy="11" r="2.5"/>
+              <line x1="7.8" y1="7.8" x2="9.2" y2="9.2"/>
+            </svg>
+            Live Preview
+          </span>
+          <span class="pane-spacer"></span>
+          <span id="landing-render-status" class="pane-status-ok" aria-live="polite">● rendered</span>
+        </div>
+        <div class="canvas-stage" id="landing-canvas" aria-label="Rendered diagram"></div>
+        <div class="pane-footer">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span id="landing-render-time" style="margin-left:6px">— ms</span>
+          <span class="pane-spacer"></span>
+          <button class="icon-btn" id="landing-fit-btn" title="Fit diagram" aria-label="Fit diagram">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M3 6V3h3M13 6V3h-3M3 10v3h3M13 10v3h-3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features ===== -->
+<section class="features-section" aria-label="Features">
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-kicker">Storage</div>
+      <h3>Local-first, always</h3>
+      <p>Charts live in your browser's localStorage. Nothing leaves your machine. No account required, ever.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-kicker">Rendering</div>
+      <h3>Instant as you type</h3>
+      <p>Mermaid runs entirely in your browser. Every keystroke re-renders in under 100 ms — no round-trip, no lag.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-kicker">Export</div>
+      <h3>SVG, ready to ship</h3>
+      <p>Export any diagram as a clean SVG. Drop it into Figma, Notion, slides, or any design tool — it stays sharp at any size.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+  ChartMage
+  <span class="sep">·</span>
+  Forked &amp; maintained from the original by
+  <a href="https://github.com/heyjunlin/chart-mage" target="_blank" rel="noopener">heyjunlin/chart-mage</a>
+  <span class="sep">·</span>
+  <a href="app.html">Open editor</a>
+</footer>
+
+<script>
+// ============================================================
+// Mermaid config
+// ============================================================
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  securityLevel: 'loose',
+  themeVariables: {
+    background: 'transparent',
+    mainBkg: '#ffffff',
+    primaryColor: '#ffffff',
+    primaryBorderColor: '#533afd',
+    primaryTextColor: '#061b31',
+    secondaryColor: '#f6f9fc',
+    tertiaryColor: '#eef4fb',
+    lineColor: '#533afd',
+    textColor: '#061b31',
+    edgeLabelBackground: 'rgba(246,249,252,0.9)',
+    actorBackground: '#ffffff',
+    actorBorder: '#533afd',
+    actorTextColor: '#061b31',
+    actorLineColor: '#cdd8e5',
+    signalColor: '#533afd',
+    signalTextColor: '#425466',
+    labelBoxBkgColor: 'rgba(83,58,253,0.05)',
+    labelBoxBorderColor: '#b9b9f9',
+    labelTextColor: '#533afd',
+    loopTextColor: '#533afd',
+    noteBorderColor: '#e5edf5',
+    noteBkgColor: '#f6f9fc',
+    noteTextColor: '#425466',
+    activationBorderColor: '#533afd',
+    activationBkgColor: 'rgba(83,58,253,0.06)',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+    fontSize: '13px'
+  }
+});
+
+// ============================================================
+// Landing live editor
+// ============================================================
+const textarea   = document.getElementById('landing-textarea');
+const canvas     = document.getElementById('landing-canvas');
+const gutter     = document.getElementById('landing-gutter');
+const statusEl   = document.getElementById('landing-status');
+const renderSt   = document.getElementById('landing-render-status');
+const renderTime = document.getElementById('landing-render-time');
+const lineCount  = document.getElementById('landing-line-count');
+const chartLabel = document.getElementById('landing-chart-label');
+
+let renderTimer = null;
+let diagCounter = 0;
+
+function updateGutter() {
+  const n = textarea.value.split('\n').length;
+  gutter.innerHTML = Array.from({ length: n }, (_, i) => `<span>${i + 1}</span>`).join('');
+  lineCount.textContent = n + (n === 1 ? ' line' : ' lines');
+}
+
+function detectType(code) {
+  const t = code.trim().toLowerCase();
+  if (t.startsWith('sequencediagram')) return 'sequence';
+  if (t.startsWith('graph') || t.startsWith('flowchart')) return 'flow';
+  if (t.startsWith('classDiagram') || t.startsWith('classdiagram')) return 'class';
+  if (t.startsWith('gitgraph')) return 'git';
+  return 'diagram';
+}
+
+async function doRender() {
+  const code = textarea.value.trim();
+  if (!code) return;
+
+  const t0 = performance.now();
+  diagCounter++;
+  const id = 'landing-diag-' + diagCounter;
+
+  try {
+    const { svg } = await mermaid.render(id, code);
+    canvas.innerHTML = svg;
+    const el = canvas.querySelector('svg');
+    if (el) { el.style.maxWidth = '90%'; el.style.maxHeight = '90%'; }
+    const ms = Math.round(performance.now() - t0);
+    renderTime.textContent = ms + ' ms';
+    statusEl.textContent = '● rendered';
+    statusEl.className = 'pane-status-ok';
+    renderSt.textContent = '● rendered';
+    renderSt.className = 'pane-status-ok';
+    chartLabel.textContent = detectType(code) + ' · demo';
+  } catch (e) {
+    canvas.innerHTML = '';
+    statusEl.textContent = '● parse error';
+    statusEl.className = 'pane-status-err';
+    renderSt.textContent = '● parse error';
+    renderSt.className = 'pane-status-err';
+    renderTime.textContent = '— ms';
+  }
+}
+
+function scheduleRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(doRender, 380);
+}
+
+textarea.addEventListener('input', () => {
+  updateGutter();
+  scheduleRender();
+});
+
+textarea.addEventListener('scroll', () => {
+  gutter.scrollTop = textarea.scrollTop;
+});
+
+textarea.addEventListener('keydown', e => {
+  // Tab inserts two spaces
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = textarea.selectionStart;
+    const v = textarea.value;
+    textarea.value = v.slice(0, s) + '  ' + v.slice(textarea.selectionEnd);
+    textarea.selectionStart = textarea.selectionEnd = s + 2;
+    updateGutter();
+    scheduleRender();
+  }
+});
+
+// Initial render
+updateGutter();
+doRender();
+</script>
+</body>
+</html>
