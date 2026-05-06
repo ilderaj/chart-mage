@@ -45,6 +45,14 @@ function copyImages() {
 		.pipe(gulp.dest("dist/images", { encoding: false }));
 }
 
+function copyIntroRuntimeScripts() {
+	return gulp.src([
+		"app/js/lib/mermaidAPI.min.js",
+		"app/js/maestro-observer.js"
+	], { encoding: false })
+		.pipe(gulp.dest("dist/js", { encoding: false }));
+}
+
 function copyHeaders() {
 	return gulp.src("app/_headers")
 		.pipe(gulp.dest("dist"));
@@ -68,6 +76,7 @@ gulp.task("browserSync", startBrowserSync);
 gulp.task("watch", gulp.series(startBrowserSync, watchFiles));
 gulp.task("useref", buildUseref);
 gulp.task("images", copyImages);
+gulp.task("intro-runtime", copyIntroRuntimeScripts);
 gulp.task("headers", copyHeaders);
 gulp.task("version:html", versionBuiltHtml);
-gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages, copyHeaders), versionBuiltHtml));
+gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages, copyIntroRuntimeScripts, copyHeaders), versionBuiltHtml));

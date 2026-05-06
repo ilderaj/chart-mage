@@ -45,6 +45,22 @@
   - tests/deployment-cache-contract.test.js (updated)
   - planning/active/cloudflare-pages-deploy/progress.md (updated)
 
+  ## 2026-05-06 Final intro runtime follow-up
+
+  - **Status:** in_progress
+  - Actions taken:
+    - 已确认 follow-up PR #12 合并后，生产 CSS 恢复为 `200`，但 intro 页运行时脚本 `/js/lib/mermaidAPI.min.js` 与 `/js/maestro-observer.js` 仍为 `404`。
+    - 已定位根因：这两份脚本不在 main bundle 的 `useref` build block 里，Gulp 构建原先不会把它们复制到 `dist`。
+    - 已为构建链补充 `copyIntroRuntimeScripts`，将 `app/js/lib/mermaidAPI.min.js` 和 `app/js/maestro-observer.js` 复制到 `dist/js/`。
+    - 已新增并跑通对应 deployment regression，且 `npm test` 现为 19/19 通过。
+    - 下一步：提交这轮最终 follow-up，推送 `origin/dev`，再次通过 `dev -> main` 触发自动部署，确认生产 intro 页脚本也恢复为 `200`。
+  - Files created/modified:
+    - gulpfile.js (updated)
+    - tests/deployment-cache-contract.test.js (updated)
+    - dist/js/mermaidAPI.min.js (created)
+    - dist/js/maestro-observer.js (created)
+    - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ## 2026-04-30 Worker Git deployment convergence
 
 - **Status:** complete
