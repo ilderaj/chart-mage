@@ -49,7 +49,7 @@ function copyIntroRuntimeScripts() {
 	return gulp.src([
 		"app/js/lib/mermaidAPI.min.js",
 		"app/js/maestro-observer.js"
-	], { encoding: false })
+	], { base: "app/js", encoding: false })
 		.pipe(gulp.dest("dist/js", { encoding: false }));
 }
 
