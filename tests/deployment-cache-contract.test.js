@@ -37,20 +37,36 @@ test("build pipeline must copy deployment headers into dist", () => {
 test("entry html should version bundled asset URLs to break existing stale caches", () => {
   const introHtml = read("app/intro.html");
   const indexHtml = read("app/index.html");
+  const gulpfile = read("gulpfile.js");
 
   assert.match(
     introHtml,
-    /build:css\s+css\/intro\.min\.css\?v=/,
-    "intro bundle target should carry a deployment version query"
+    /build:css\s+css\/intro\.min\.css\s-->/,
+    "intro source html should keep a stable bundle filename for useref output"
   );
   assert.match(
     indexHtml,
-    /build:css\s+css\/style\.min\.css\?v=/,
-    "main css bundle target should carry a deployment version query"
+    /build:css\s+css\/style\.min\.css\s-->/,
+    "main source html should keep a stable css bundle filename for useref output"
   );
   assert.match(
     indexHtml,
-    /build:js\s+js\/bundle\.js\?v=/,
-    "main js bundle target should carry a deployment version query"
+    /build:js\s+js\/bundle\.js\s-->/,
+    "main source html should keep a stable js bundle filename for useref output"
+  );
+  assert.match(
+    gulpfile,
+    /replace\(\/css\\\/intro\\\.min\\\.css\(\?!\\\?v=\)\/g,\s*"css\/intro\.min\.css\?v=" \+ deployAssetVersion\)/,
+    "build should append a version query to intro bundle URLs after useref runs"
+  );
+  assert.match(
+    gulpfile,
+    /replace\(\/css\\\/style\\\.min\\\.css\(\?!\\\?v=\)\/g,\s*"css\/style\.min\.css\?v=" \+ deployAssetVersion\)/,
+    "build should append a version query to main css bundle URLs after useref runs"
+  );
+  assert.match(
+    gulpfile,
+    /replace\(\/js\\\/bundle\\\.js\(\?!\\\?v=\)\/g,\s*"js\/bundle\.js\?v=" \+ deployAssetVersion\)/,
+    "build should append a version query to main js bundle URLs after useref runs"
   );
 });

@@ -1,5 +1,6 @@
 var gulp = require("gulp");
 var fs = require("fs");
+var path = require("path");
 var browserSync = require("browser-sync").create();
 var useref = require("gulp-useref");
 var uglify = require("gulp-uglify");
@@ -7,6 +8,8 @@ var gulpIf = require("gulp-if");
 var postcss = require("gulp-postcss");
 var cssnano = require("cssnano");
 var autoPrefixer = require("gulp-autoprefixer").default;
+
+var deployAssetVersion = "20260506a";
 
 function cleanDist(done) {
 	fs.rmSync("dist", { recursive: true, force: true });
@@ -47,10 +50,24 @@ function copyHeaders() {
 		.pipe(gulp.dest("dist"));
 }
 
+function versionBuiltHtml(done) {
+	["dist/intro.html", "dist/index.html"].forEach(function(filePath) {
+		var absolutePath = path.resolve(filePath);
+		var html = fs.readFileSync(absolutePath, "utf8");
+		html = html
+			.replace(/css\/intro\.min\.css(?!\?v=)/g, "css/intro.min.css?v=" + deployAssetVersion)
+			.replace(/css\/style\.min\.css(?!\?v=)/g, "css/style.min.css?v=" + deployAssetVersion)
+			.replace(/js\/bundle\.js(?!\?v=)/g, "js/bundle.js?v=" + deployAssetVersion);
+		fs.writeFileSync(absolutePath, html);
+	});
+	done();
+}
+
 gulp.task("clean:dist", cleanDist);
 gulp.task("browserSync", startBrowserSync);
 gulp.task("watch", gulp.series(startBrowserSync, watchFiles));
 gulp.task("useref", buildUseref);
 gulp.task("images", copyImages);
 gulp.task("headers", copyHeaders);
-gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages, copyHeaders)));
+gulp.task("version:html", versionBuiltHtml);
+gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages, copyHeaders), versionBuiltHtml));
