@@ -55,6 +55,7 @@ Phase 2 - Task 2 design tokens (after Task 1 red confirmed)
 | 现有页面已部分对齐，计划假设略旧 | 盲目按“全量重写”执行 | 容易破坏现有 selector/runtime | 以新 contract tests 为准，只改未满足的结构与样式 |
 | shell 重构误伤 legacy id / modal 流程 | HTML shell 大改 | `app.js` 事件绑定、Maestro flow | 先写静态 contract tests，保留既有 id 与 modal id |
 | intro/main CSS 大改引入回归 | landing/main 样式重写 | 横向滚动、移动端、drawer/modal 显示 | 用无渐变球背景的 contract + 后续 HTTP/Maestro/视觉验证兜底 |
+| 本地清理误删 feature worktree / branch | 执行 `git worktree remove /Users/jared/Vibings/ChartMage/.worktrees/intro-main-ui-alignment && git branch -d intro-main-ui-alignment` | 仅影响当前仓库本地 feature 工作区与本地分支；不触及远端分支 | 已生成 bundle 检查点：`/Users/jared/.copilot/session-state/317ce829-54f6-444b-8f70-5e53050335f9/files/intro-main-ui-alignment-pre-cleanup.bundle`。回退可用 `git clone <bundle>` 或 `git fetch origin intro-main-ui-alignment:intro-main-ui-alignment && git worktree add .worktrees/intro-main-ui-alignment intro-main-ui-alignment` 重建。 |
 
 ## Key Questions
 1. 当前仓库中已存在的半成品 redesign 代码，哪些可以复用？→ 可复用局部 token、部分 nav/toolbar 结构，但仍需对齐 plan 指定 class/id contract。
