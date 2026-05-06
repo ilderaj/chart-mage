@@ -42,7 +42,7 @@
         localStorage.setItem("visited", "true");
       }
 
-      if (!isMaestroAutomation && (!localStorage.getItem("visited") || window.innerWidth < 768))
+      if (!isMaestroAutomation && !localStorage.getItem("visited"))
         window.location.replace("intro.html");
       if (/*@cc_on!@*/false || !!document.documentMode)
         window.location.replace("browser.html");
@@ -110,7 +110,7 @@
       </defs>
     </svg>
     
-    <nav class="app-nav hidden">
+    <nav class="app-nav hidden" role="navigation" aria-label="App navigation">
       <div class="app-nav-left">
         <a href="intro.html" class="brand-logo nav-brand-logo" aria-label="Chart Mage home">
           <span class="brand-mark" aria-hidden="true">
@@ -151,18 +151,10 @@
       </div>
     </nav>
     
-    <main role="main" class="hidden">
-      <div class="workspaceFileFrame" aria-label="Editable diagram workspace">
-        <div class="workspaceFileBar">
-          <div class="workspaceWindowControls" aria-hidden="true">
-            <span class="windowDot windowDotDanger"></span>
-            <span class="windowDot windowDotWarning"></span>
-            <span class="windowDot windowDotSuccess"></span>
-          </div>
-        </div>
-
-        <div class="workspaceSplit">
-          <section class="editor workspacePanel">
+    <main role="main" class="app-layout hidden">
+      <div class="workspaceFileFrame editor-shell" aria-label="Editable diagram workspace">
+        <div class="editor-grid workspaceSplit" id="editor-grid">
+          <section class="editor-pane editor workspacePanel" role="region" aria-label="Diagram code input">
             <div class="workspaceHeader pane-header">
               <div class="workspaceCopy">
                 <p class="workspaceEyebrow">Input</p>
@@ -178,8 +170,7 @@
                 <button type="button" class="quick-chip" data-sequence="Note right of John: Text in note" data-flow="subgraph Title&#10;  Process ->> Process 2&#10;end">note</button>
                 <button type="button" class="quick-chip" data-sequence="loop Retry&#10;  Alice ->> John: Try again&#10;end" data-flow="Decision? - Yes ->> Process 2">loop</button>
               </div>
-              <textarea id="code" name="code">
-              </textarea>
+              <textarea id="code" name="code"></textarea>
             </div>
             <div class="pane-footer pane-footer-input" aria-hidden="true">
               <span class="ok">&#9679; parsed ok</span>
@@ -190,7 +181,9 @@
             </div>
           </section>
 
-          <section class="diagram workspacePanel">
+          <div class="editor-resizer" id="editor-resizer" aria-hidden="true" role="separator" aria-orientation="vertical"></div>
+
+          <section class="preview-pane diagram workspacePanel" role="region" aria-label="Diagram preview">
             <div class="workspaceHeader pane-header">
               <div class="workspaceCopy">
                 <p class="workspaceEyebrow">Output</p>
@@ -218,8 +211,22 @@
       </div>
     </main>
 
-    <div class="workspaceBackdrop hidden" id="drawer-backdrop"></div>
-    <aside class="chartsDrawer hidden" id="charts-drawer" aria-label="My Charts">
+    <section class="mobile-gate" aria-label="Mobile gate">
+      <a href="intro.html" class="brand-logo nav-brand-logo mobile-gate-logo" aria-label="Chart Mage intro">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="brand-line"></span>
+          <span class="brand-node brand-node-left"></span>
+          <span class="brand-node brand-node-right"></span>
+        </span>
+        <span class="brand-word">Chart<strong>Mage</strong></span>
+      </a>
+      <h2>Desktop editor only</h2>
+      <p>The main editor now stays on this route, but smaller screens get a focused notice instead of an automatic redirect. Use the intro page or come back on a wider display.</p>
+      <a class="button-primary" href="intro.html">Back to intro</a>
+    </section>
+
+    <div class="workspaceBackdrop modal-overlay hidden" id="drawer-backdrop"></div>
+    <aside class="chartsDrawer drawer hidden" id="charts-drawer" aria-label="My Charts">
       <div class="drawerHeader">
         <div>
           <p class="drawerEyebrow">Library</p>
