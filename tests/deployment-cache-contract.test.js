@@ -39,8 +39,18 @@ test("build pipeline must preserve intro runtime scripts outside the main bundle
 
   assert.match(
     gulpfile,
+    /base:\s*"app\/js"/,
+    "build should preserve intro runtime subpaths relative to app/js"
+  );
+  assert.match(
+    gulpfile,
     /app\/js\/lib\/mermaidAPI\.min\.js/,
     "build should copy the intro Mermaid runtime into dist"
+  );
+  assert.match(
+    gulpfile,
+    /gulp\.dest\("dist\/js"/,
+    "build should preserve the intro maestro observer under dist/js"
   );
   assert.match(
     gulpfile,
