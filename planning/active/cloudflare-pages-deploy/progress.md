@@ -29,6 +29,22 @@
   - planning/active/cloudflare-pages-deploy/task_plan.md (updated)
   - planning/active/cloudflare-pages-deploy/progress.md (updated)
 
+## 2026-05-06 Follow-up rollout fix
+
+- **Status:** in_progress
+- Actions taken:
+  - 已确认 `dev -> main` PR #11 合并后，`origin/main` 更新成功，但生产站点引用的 `?v=` bundle URL 返回 `404`。
+  - 已定位根因：把 `?v=...` 直接写进 `useref` build target 会让 Gulp 产出带问号的物理文件名，Worker 静态资产按路径查找时无法命中。
+  - 已将 source HTML 的 build target 恢复为稳定文件名，并在 `gulpfile.js` 中新增构建后 HTML 重写步骤，只给 `dist/*.html` 注入版本 query。
+  - 已验证 `tests/deployment-cache-contract.test.js` 通过、`npm test` 18/18 通过、`npm run build` 成功，且 `dist` 只保留正常物理文件名 `intro.min.css` / `style.min.css` / `bundle.js`。
+  - 下一步：提交 follow-up fix，推送 `origin/dev`，重新创建并合并 `dev -> main` PR 以修复生产资源引用。
+- Files created/modified:
+  - app/intro.html (updated)
+  - app/index.html (updated)
+  - gulpfile.js (updated)
+  - tests/deployment-cache-contract.test.js (updated)
+  - planning/active/cloudflare-pages-deploy/progress.md (updated)
+
 ## 2026-04-30 Worker Git deployment convergence
 
 - **Status:** complete
