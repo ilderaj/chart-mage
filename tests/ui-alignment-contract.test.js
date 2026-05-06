@@ -83,3 +83,12 @@ test("CSS consumes shared tokens and avoids prototype-only one-off palettes", ()
   assertIncludes(mainCss, ".modal-overlay.open", "modal open state");
   assert.doesNotMatch(`${landingCss}\n${mainCss}`, /radial-gradient\([^)]*(top left|top right|circle at)/i, "background should not rely on decorative gradient orbs");
 });
+
+test("landing demo footers avoid fixed-height clipping", () => {
+  const landingCss = read("app/css/landing.css");
+  const paneFooterBlock = landingCss.match(/\.pane-footer\s*\{[^}]*display\s*:\s*flex;[^}]*\}/s)?.[0] || "";
+
+  assertIncludes(landingCss, ".pane-footer", "landing pane footer styles");
+  assert.match(paneFooterBlock, /min-height\s*:/, "pane footer should allow content-driven height");
+  assert.doesNotMatch(paneFooterBlock, /(^|\n)\s*height\s*:/, "pane footer should not use a fixed height that can clip text");
+});

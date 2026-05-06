@@ -81,3 +81,12 @@
 1. 若只需恢复本地分支与 worktree：`git fetch origin intro-main-ui-alignment:intro-main-ui-alignment`
 2. 重新创建 worktree：`git worktree add .worktrees/intro-main-ui-alignment intro-main-ui-alignment`
 3. 若远端分支将来被删除，可从 bundle 恢复：`git clone /Users/jared/.copilot/session-state/317ce829-54f6-444b-8f70-5e53050335f9/files/intro-main-ui-alignment-pre-cleanup.bundle <target-dir>`
+
+## 2026-05-06（增量修复）
+
+### intro live demo footer 裁切
+
+- 问题：`app/intro.html` 的 live demo 底部 footer 文案在浏览器像素截图里出现下沿裁切，尤其是左侧 `rendered` 和右侧 `Local Mermaid`。
+- 根因：`app/css/landing.css` 中 `.pane-footer` 使用固定高度布局，且 monospace 文本基线在当前渲染环境里偏低，导致底栏内容贴近下边缘。
+- 修复：将 `.pane-footer` 改为 `min-height` + padding 的内容驱动布局，并把 footer 内联项整体上移 1px，消除基线贴边。
+- 验证：新增并跑通 `tests/ui-alignment-contract.test.js` 中的 footer regression；同时通过本地浏览器对 `.pane-footer` 元素截图复核，底栏文案已完整显示。
