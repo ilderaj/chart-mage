@@ -16,6 +16,7 @@ DEFAULT_FLOWS=(
   ".maestro/flows/web-chart-pill-rename.yaml"
   ".maestro/flows/web-top-nav-actions.yaml"
   ".maestro/flows/web-favicon-entrypoints.yaml"
+  ".maestro/flows/web-intro-ui-alignment.yaml"
 )
 
 ensure_java() {

@@ -27,11 +27,14 @@
 	--color-danger: #ea2261;
 	--color-danger-hover: #d11b57;
 	--color-success: #15be53;
+	--color-warn: #f59e0b;
 	--color-overlay: rgba(13, 37, 61, 0.58);
+	--color-overlay-soft: rgba(6, 27, 49, 0.35);
 
 	--shadow-soft: 0 3px 6px rgba(23, 23, 23, 0.06);
 	--shadow-card: 0 15px 35px rgba(23, 23, 23, 0.08);
 	--shadow-elevated: 0 30px 45px -30px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.1);
+	--shadow-overlay: rgba(6, 27, 49, 0.35) 0 0 0 100vmax;
 	--shadow-deep: 0 14px 21px -14px rgba(3, 3, 39, 0.25), 0 8px 17px -8px rgba(0, 0, 0, 0.1);
 	--shadow-nav: 0 24px 45px -30px rgba(43, 65, 101, 0.24), 0 16px 28px -24px rgba(83, 58, 253, 0.3);
 
@@ -48,6 +51,8 @@
 	--space-7: 32px;
 	--space-8: 40px;
 	--space-9: 56px;
+	--nav-h: 52px;
+	--app-shell-gap: 0px;
 
 	--transition-base: 180ms ease;
 	--focus-ring: 0 0 0 2px rgba(83, 58, 253, 0.24);
@@ -61,10 +66,15 @@
 	--color-editor-bg: #ffffff;
 	--color-editor-gutter: #f6f9fc;
 	--color-editor-active: rgba(83, 58, 253, 0.05);
+	--color-editor-text: var(--color-text-muted);
 	--color-syntax-keyword: #533afd;
 	--color-syntax-string: #108c3d;
 	--color-syntax-arrow: #ea2261;
 	--color-syntax-comment: #94a3b8;
+	--color-syn-kw: var(--color-syntax-keyword);
+	--color-syn-str: var(--color-syntax-string);
+	--color-syn-arr: var(--color-syntax-arrow);
+	--color-syn-cmt: var(--color-syntax-comment);
 }
 
 html {
