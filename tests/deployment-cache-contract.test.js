@@ -34,6 +34,21 @@ test("build pipeline must copy deployment headers into dist", () => {
   );
 });
 
+test("build pipeline must preserve intro runtime scripts outside the main bundle", () => {
+  const gulpfile = read("gulpfile.js");
+
+  assert.match(
+    gulpfile,
+    /app\/js\/lib\/mermaidAPI\.min\.js/,
+    "build should copy the intro Mermaid runtime into dist"
+  );
+  assert.match(
+    gulpfile,
+    /app\/js\/maestro-observer\.js/,
+    "build should copy the intro maestro observer into dist"
+  );
+});
+
 test("entry html should version bundled asset URLs to break existing stale caches", () => {
   const introHtml = read("app/intro.html");
   const indexHtml = read("app/index.html");
