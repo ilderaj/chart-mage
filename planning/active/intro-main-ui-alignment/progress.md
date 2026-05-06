@@ -44,3 +44,40 @@
 | What's the goal? | 完成 intro/main UI alignment，同时保留运行时和测试合约 |
 | What have I learned? | 当前代码已部分 redesign，但仍不满足计划中的结构 contract |
 | What have I done? | 已建立 worktree、完成基线测试、初始化持久化计划与 todo |
+
+## 2026-05-06（续）
+
+### Maestro Flow 根因调试与修复
+
+**问题**：`assertVisible: "Beautiful diagrams from"` 超时失败。
+
+**根因诊断**（系统化调试流程）：
+1. `text-transform: uppercase` 导致 eyebrow/section-label 文本断言不可用（如 `Local-first`、`Live demo`）
+2. `<h1>` 有混合子节点（text + `<em>`），Maestro web Beta 无法匹配跨节点文本
+3. 长段落文本（`<p class="lede">`）断言超时——Maestro web Beta 对非交互元素的长 innerText 匹配存在限制
+4. Nav 按钮（My Charts、New chart）含 SVG 子节点，innerText 前缀空白导致匹配失败
+5. `assertVisible: "Try it live"` 隐式触发页面滚动，导致后续元素出视口
+
+**修复策略**：改用只在初始视口内的短原子文本节点（ChartMage、Open editor）+ id 选择器（show-charts-button、new-chart-button）
+
+### 最终验证结果
+- ✅ 14/14 静态合约测试通过
+- ✅ 5/5 dist assets HTTP 200
+- ✅ Maestro intro E2E flow 全通过（7 步）
+- ✅ 提交: `595c070`
+- ✅ 推送: `origin/intro-main-ui-alignment`
+
+## 2026-05-06（收尾）
+
+### dev 同步、PR 与本地清理准备
+
+- 本地 `dev` 已 fast-forward 到 `origin/dev`（`d782dae`）。
+- 已创建 PR：`https://github.com/ilderaj/chart-mage/pull/9`（`dev -> main`）。
+- 发现仓库中不存在 `./scripts/harness checkpoint . --quiet` 可执行入口，因此改用 git bundle 作为清理前检查点：
+  - `/Users/jared/.copilot/session-state/317ce829-54f6-444b-8f70-5e53050335f9/files/intro-main-ui-alignment-pre-cleanup.bundle`
+
+### 本地清理回退方案
+
+1. 若只需恢复本地分支与 worktree：`git fetch origin intro-main-ui-alignment:intro-main-ui-alignment`
+2. 重新创建 worktree：`git worktree add .worktrees/intro-main-ui-alignment intro-main-ui-alignment`
+3. 若远端分支将来被删除，可从 bundle 恢复：`git clone /Users/jared/.copilot/session-state/317ce829-54f6-444b-8f70-5e53050335f9/files/intro-main-ui-alignment-pre-cleanup.bundle <target-dir>`
