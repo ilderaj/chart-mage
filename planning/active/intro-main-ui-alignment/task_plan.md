@@ -1,79 +1,56 @@
-# Task Plan: intro-main-ui-alignment
+# intro 与主功能页 UI 对齐任务
 
-## Goal
-将生产 `app/intro.html` 与 `app/index.html` 对齐到 `prototypes/redesign-v3/` 的视觉方向，同时保留现有静态应用的存储、编辑、渲染、导出、路由与 Maestro/UAT 合约，并完成完整验证。
+## 目标
+- 基于设计师提供的 `prototypes/redesign-v3/index.html` 与 `prototypes/redesign-v3/app.html`，输出可 review 的严格实施计划。
+- 后续获批后，将生产 `app/intro.html` 和 `app/index.html` 对齐到 redesign-v3 方向，同时保留现有静态 app 的行为、存储、渲染、导出和 UAT 合约。
 
-## Current State
-Status: active
+## 当前状态
+Status: waiting_review
 Archive Eligible: no
 Close Reason:
 
-## Companion Plan
-- Path: `docs/superpowers/plans/2026-05-05-intro-main-ui-alignment.md`
-- Summary: 9 个任务，覆盖 contract tests、tokens、intro/main shell、CSS、JS bridge、Maestro flow 与严格验证矩阵。
-- Sync-back status: synced on start; execution tracking now lives here.
+Companion plan: `docs/superpowers/plans/2026-05-05-intro-main-ui-alignment.md`
+Companion summary: 渐进式移植 redesign-v3 UI。intro 采用新 landing/nav/hero/live-demo/features/footer；主功能页采用固定 top nav、全视口 split editor、drawer/modal/mobile gate。保留 legacy ids、CodeMirror、jQuery、local Mermaid API、`spells` 和 `lastOpenID` localStorage 合约。测试包括 Node 静态合约、Gulp build、HTTP smoke、Maestro intro/full smoke、桌面和移动浏览器视觉检查。
+Sync-back status: companion plan written and synced
 
-## Current Phase
-Phase 2 - Task 2 design tokens (after Task 1 red confirmed)
+## 范围
 
-## Phases
+### In Scope
+- `app/intro.html` 与 `app/css/landing.css` 的 redesign-v3 landing 对齐。
+- `app/index.html` 与 `app/css/main.css` 的 redesign-v3 main app shell 对齐。
+- `app/css/design-tokens.css` 补齐少量共享 token。
+- `app/js/app.js` 仅做必要 selector、mobile gate 和状态同步桥接。
+- 新增静态 UI 合约测试与 intro Maestro UAT flow。
+- 严格验证：`npm test`、`npm run build`、HTTP smoke、`npm run uat:smoke`、浏览器视觉和交互检查。
 
-### Phase 1: 上下文恢复与基线
-- [x] 审阅 companion plan 和现有生产文件
-- [x] 在 `.worktrees/intro-main-ui-alignment` 创建隔离工作区
-- [x] 运行基线 `npm install` 与 `npm test`
-- **Status:** complete
+### Out of Scope
+- 不重写 jQuery、CodeMirror、Mermaid legacy API 或 storage schema。
+- 不复制 prototype 的整套 runtime。
+- 不改动 `prototypes/redesign-v3/` 用户素材。
+- 不清理当前 `.DS_Store`、zip 或 prototype 变更。
+- 不改 Cloudflare Pages 部署配置。
+- 不提交 git commit，除非用户明确要求。
 
-### Phase 2: 合约测试与共享 token
-- [x] 新增 `tests/ui-alignment-contract.test.js`
-- [x] 先观察新测试按预期失败
-- [ ] 补齐 `app/css/design-tokens.css` 所需 token/alias
-- **Status:** in_progress
+## 阶段
+1. 读取相关 skills 与项目上下文（已完成）
+2. 梳理生产 intro/main 与 redesign-v3 差距（已完成）
+3. 输出 strict implementation plan（已完成，等待 review）
+4. 用户 review 后再执行代码改动（未开始）
 
-### Phase 3: Intro 页面与 live demo
-- [ ] 重建 `app/intro.html`
-- [ ] 重写 `app/css/landing.css`
-- [ ] 接入本地 Mermaid intro demo
-- **Status:** pending
+## 决策
+- 使用独立 task id：`intro-main-ui-alignment`。
+- `prototypes/redesign-v3/` 作为设计参考，只读，不纳入执行改动。
+- intro live demo 如实现，必须使用本地 `js/lib/mermaidAPI.min.js`，不能引入 CDN Mermaid。
+- 主功能页必须保留现有 legacy ids，让 `app/js/app.js` 和 Maestro flow 继续工作。
+- 计划中提出一个待审 mobile 行为变更：主功能页小屏显示 `.mobile-gate`，不再强制跳回 intro。若用户不接受，执行前移除该步骤。
 
-### Phase 4: 主功能页 shell、样式与桥接
-- [ ] 重构 `app/index.html` shell
-- [ ] 重塑 `app/css/main.css`
-- [ ] 最小化调整 `app/js/app.js`
-- **Status:** pending
-
-### Phase 5: UAT 与全量验证
-- [ ] 添加 intro Maestro flow
-- [ ] 更新 smoke flow 列表
-- [ ] 运行 tests/build/http smoke/maestro smoke/visual diagnostics
-- **Status:** pending
-
-## Risk Assessment
-
-| 风险 | 触发条件 | 影响范围 | 缓解 / 已落盘的回退方案 |
-|---|---|---|---|
-| 现有页面已部分对齐，计划假设略旧 | 盲目按“全量重写”执行 | 容易破坏现有 selector/runtime | 以新 contract tests 为准，只改未满足的结构与样式 |
-| shell 重构误伤 legacy id / modal 流程 | HTML shell 大改 | `app.js` 事件绑定、Maestro flow | 先写静态 contract tests，保留既有 id 与 modal id |
-| intro/main CSS 大改引入回归 | landing/main 样式重写 | 横向滚动、移动端、drawer/modal 显示 | 用无渐变球背景的 contract + 后续 HTTP/Maestro/视觉验证兜底 |
-| 本地清理误删 feature worktree / branch | 执行 `git worktree remove /Users/jared/Vibings/ChartMage/.worktrees/intro-main-ui-alignment && git branch -d intro-main-ui-alignment` | 仅影响当前仓库本地 feature 工作区与本地分支；不触及远端分支 | 已生成 bundle 检查点：`/Users/jared/.copilot/session-state/317ce829-54f6-444b-8f70-5e53050335f9/files/intro-main-ui-alignment-pre-cleanup.bundle`。回退可用 `git clone <bundle>` 或 `git fetch origin intro-main-ui-alignment:intro-main-ui-alignment && git worktree add .worktrees/intro-main-ui-alignment intro-main-ui-alignment` 重建。 |
-
-## Key Questions
-1. 当前仓库中已存在的半成品 redesign 代码，哪些可以复用？→ 可复用局部 token、部分 nav/toolbar 结构，但仍需对齐 plan 指定 class/id contract。
-2. 是否需要复制 prototype runtime？→ 不需要；只复用视觉结构与必要文案，继续保留现有 jQuery/CodeMirror/mermaidAPI/localStorage 合约。
-
-## Decisions Made
-| Decision | Rationale |
-|----------|-----------|
-| 在 `.worktrees/intro-main-ui-alignment` 中实施 | 避开原工作树中的无关改动，满足 executing-plans / using-git-worktrees 流程要求 |
-| 以静态 contract tests 作为改造护栏 | 先锁定 intro/main/token/js contract，防止 UI 重构破坏运行时接口 |
-| 以现有生产文件为基础做增量重构，而非复制 prototype | plan 明确禁止复制 prototype runtime，且仓库已有部分对齐代码可复用 |
+## 验证状态
+- 已运行 planning session catchup，无输出。
+- 已确认 `npm test` 当前配置为 `node --test tests/*.test.js`。
+- 已确认 `scripts/run-maestro-web-smoke.sh` 默认 flows 可扩展。
+- 尚未执行实现、build 或 UAT，本轮只交付计划。
 
 ## Errors Encountered
 | Error | Attempt | Resolution |
 |-------|---------|------------|
-| 新增 contract tests 后 `npm test` 失败 | 1 | 失败点与预期一致：intro 缺 `.site-nav`，main 缺 `.app-layout`，tokens 缺 `--color-warn`，继续进入实现阶段 |
-
-## Notes
-- 当前权威任务状态位于 `planning/active/intro-main-ui-alignment/`。
-- 工作目录：`/Users/jared/Vibings/ChartMage/.worktrees/intro-main-ui-alignment`
-- 下一步严格按 TDD：先写 `tests/ui-alignment-contract.test.js`，再运行失败测试。
+| 无 | 本轮只做计划 | 无 |

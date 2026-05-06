@@ -42,9 +42,15 @@ function copyImages() {
 		.pipe(gulp.dest("dist/images", { encoding: false }));
 }
 
+function copyHeaders() {
+	return gulp.src("app/_headers")
+		.pipe(gulp.dest("dist"));
+}
+
 gulp.task("clean:dist", cleanDist);
 gulp.task("browserSync", startBrowserSync);
 gulp.task("watch", gulp.series(startBrowserSync, watchFiles));
 gulp.task("useref", buildUseref);
 gulp.task("images", copyImages);
-gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages)));
+gulp.task("headers", copyHeaders);
+gulp.task("default", gulp.series(cleanDist, gulp.parallel(buildUseref, copyImages, copyHeaders)));

@@ -84,11 +84,15 @@ test("CSS consumes shared tokens and avoids prototype-only one-off palettes", ()
   assert.doesNotMatch(`${landingCss}\n${mainCss}`, /radial-gradient\([^)]*(top left|top right|circle at)/i, "background should not rely on decorative gradient orbs");
 });
 
-test("landing demo footers avoid fixed-height clipping", () => {
+test("landing demo footers keep compact height with top-aligned mono metadata", () => {
   const landingCss = read("app/css/landing.css");
   const paneFooterBlock = landingCss.match(/\.pane-footer\s*\{[^}]*display\s*:\s*flex;[^}]*\}/s)?.[0] || "";
+  const paneFooterSpanBlock = landingCss.match(/\.pane-footer\s*>\s*span\s*\{[^}]*\}/s)?.[0] || "";
 
   assertIncludes(landingCss, ".pane-footer", "landing pane footer styles");
-  assert.match(paneFooterBlock, /min-height\s*:/, "pane footer should allow content-driven height");
-  assert.doesNotMatch(paneFooterBlock, /(^|\n)\s*height\s*:/, "pane footer should not use a fixed height that can clip text");
+  assert.match(paneFooterBlock, /height\s*:\s*36px/, "pane footer should keep the compact prototype height");
+  assert.match(paneFooterBlock, /align-items\s*:\s*flex-start/, "pane footer metadata should anchor to the top of the footer bar");
+  assert.match(paneFooterBlock, /padding\s*:\s*7px 14px 0/, "pane footer should use top-biased padding to visually center the mono text");
+  assert.match(paneFooterBlock, /font-feature-settings\s*:\s*"tnum"/, "pane footer should use tabular figures");
+  assert.match(paneFooterSpanBlock, /top\s*:\s*0/, "pane footer spans should not require extra baseline offsets once the footer layout is corrected");
 });
